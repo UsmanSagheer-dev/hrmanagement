@@ -1,7 +1,8 @@
  import HrLogo from './hrlogo.png'
-
+import Profileimg from './profilephoto.jpg'
  const IMAGES={
-HrLogo
+HrLogo,
+ Profileimg
  }
 
  export default IMAGES

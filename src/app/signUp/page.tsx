@@ -49,7 +49,7 @@ function SignUp() {
         </div>
 
         <div className="flex items-center justify-center  w-full px-4">
-          <Button title="Register" className="h-[56px] w-[420px] " />
+          <Button title="Register"  />
         </div>
       </div>
     </div>

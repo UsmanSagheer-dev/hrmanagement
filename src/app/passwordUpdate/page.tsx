@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { useRouter } from "next/navigation"; // Next.js router
+import { useRouter } from "next/navigation"; 
 import Button from "../components/button/Button";
 
 const PasswordUpdated: React.FC = () => {
@@ -13,7 +13,7 @@ const PasswordUpdated: React.FC = () => {
         <p className="text-gray-400 text-[16px] font-light mt-2 mb-[40px]">
           Your password has been updated
         </p>
-        <Button title="Back to Login" className="w-[376px]" onClick={() => router.push("/login")} />
+        <Button title="Back to Login"  onClick={() => router.push("/login")} />
       </div>
     </div>
   );

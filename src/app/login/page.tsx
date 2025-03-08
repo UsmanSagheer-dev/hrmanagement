@@ -55,7 +55,7 @@ function Login() {
         </div>
 
         <div className="flex items-center justify-center  w-full px-4 mt-[30px]">
-          <Button title="Login" className="h-[56px] w-[420px] " />
+          <Button title="Login" />
         </div>
       </div>
     </div>

@@ -40,10 +40,8 @@ function ForgetPassword() {
           />
         
         </div>
-        
-
         <div className="flex items-center justify-center  w-full px-4 mt-[30px]">
-          <Button title="SEND OTP" className="h-[56px] w-[420px] " />
+          <Button title="SEND OTP"  />
         </div>
       </div>
     </div>
