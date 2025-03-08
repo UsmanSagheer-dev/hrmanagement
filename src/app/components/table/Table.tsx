@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import SearchBar from "../searchBar/SearchBar";
 import Button from "../button/Button";
 import { IoIosAddCircleOutline } from "react-icons/io";
@@ -31,12 +32,14 @@ interface EmployeeTableProps {
 }
 
 const Table: React.FC<EmployeeTableProps> = ({
+  
   employees,
 
   onSearch,
   initialRecordsPerPage = 10,
   totalRecords = 0,
 }) => {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(initialRecordsPerPage);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +52,9 @@ const Table: React.FC<EmployeeTableProps> = ({
       setCurrentPage(page);
     }
   };
-
+  const handleAddEmployee = () => {
+    router.push("/addNewEmployee");
+  };
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -77,6 +82,7 @@ const Table: React.FC<EmployeeTableProps> = ({
             <Button
               icon={IoIosAddCircleOutline}
               title="Add New Employee"
+              onClick={handleAddEmployee}
               className="w-[221px] h-[50px] bg-[#E25319] flex items-center rounded-[10px] justify-center gap-2 cursor-pointer"
             />
             <Button
