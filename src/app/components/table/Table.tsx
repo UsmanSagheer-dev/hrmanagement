@@ -224,5 +224,4 @@ const Table: React.FC<EmployeeTableProps> = ({
    
   );
 };
-
 export default Table;
