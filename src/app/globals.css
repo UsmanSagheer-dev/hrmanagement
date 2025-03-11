@@ -22,3 +22,8 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, and Opera */
 }
+
+select option {
+  background-color: #000000 !important; /* Black background for options */
+  color: #ffffff !important; /* White text for options */
+}

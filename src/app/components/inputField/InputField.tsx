@@ -37,20 +37,23 @@ const InputField: React.FC<InputFieldProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     onChange(e.target.value);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && onFileChange) {
       onFileChange(e.target.files);
-      // Update the value to show the file name (optional)
       onChange(e.target.files[0]?.name || "");
     }
   };
 
   const renderInput = () => {
-    const baseClasses = `w-full cursor-pointer text-[#A2A1A8CC] border p-2 rounded-[10px] outline-orange placeholder-[#A2A1A8CC] ${label ? "pt-5" : ""} ${className}`;
+    const baseClasses = `w-full cursor-pointer text-[#A2A1A8CC] border p-2 rounded-[10px] outline-orange placeholder-[#A2A1A8CC] ${
+      label ? "pt-5" : ""
+    } ${className}`;
 
     switch (type) {
       case "password":
@@ -88,7 +91,7 @@ const InputField: React.FC<InputFieldProps> = ({
               onBlur={() => setIsFocused(value !== "")}
               name={name}
               required={required}
-              className={`${baseClasses} appearance-none placeholder-[#A2A1A8CC]`} // Fixed placeholder color
+              className={`${baseClasses} appearance-none placeholder-[#A2A1A8CC]`}
             >
               <option value="" disabled>
                 {placeholder}
@@ -140,7 +143,9 @@ const InputField: React.FC<InputFieldProps> = ({
               required={required}
               className="w-4 h-4 accent-[#E25319] cursor-pointer"
             />
-            {placeholder && <span className="ml-2 text-white">{placeholder}</span>}
+            {placeholder && (
+              <span className="ml-2 text-white">{placeholder}</span>
+            )}
           </div>
         );
 

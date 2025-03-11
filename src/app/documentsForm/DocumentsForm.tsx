@@ -13,16 +13,16 @@ type DocumentsTabProps = {
 
 type FormData = {
   employeeId: string;
- 
 };
 
 const DocumentsTab: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   const [formData, setFormData] = useState<FormData>({
     employeeId: "",
-    
   });
 
-  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>(
+    {}
+  );
 
   const handleFileUpload = (file: File, type: string) => {
     setUploadedFiles((prev) => ({
@@ -35,14 +35,12 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   const handleCancel = () => {
     setFormData({
       employeeId: "",
-     
     });
     setUploadedFiles({});
     onTabChange("professional");
   };
 
   const handleNext = () => {
-    // Only navigate if all files are uploaded
     if (Object.keys(uploadedFiles).length === documents.length) {
       onTabChange("account");
     }
@@ -80,12 +78,12 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
         >
           <Icon className="text-lg" />
         </div>
+
         <span>{title}</span>
       </button>
     );
   };
 
-  // Check if all documents have been uploaded
   const isNextDisabled = Object.keys(uploadedFiles).length < documents.length;
 
   return (

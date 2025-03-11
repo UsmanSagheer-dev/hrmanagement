@@ -1,7 +1,6 @@
-import React from 'react';
-import Table, { Column } from '../components/table/Table'; // Adjust the import path as needed
+import React from "react";
+import Table, { Column } from "../components/table/Table";
 
-// Define the type for leave records
 interface LeaveRecord {
   date: string;
   duration: string;
@@ -11,24 +10,52 @@ interface LeaveRecord {
 }
 
 export const LeaveContent: React.FC = () => {
-  // Leave data from the image
   const leaveData: LeaveRecord[] = [
-    { date: "July 01, 2026", duration: "July 05 – July 08", days: "3 Days", reportingManager: "Mark Williams", status: "Pending" },
-    { date: "Apr 05, 2026", duration: "Apr 06 – Apr 10", days: "4 Days", reportingManager: "Mark Williams", status: "Approved" },
-    { date: "Mar 12, 2026", duration: "Mar 14 – Mar 16", days: "2 Days", reportingManager: "Mark Williams", status: "Approved" },
-    { date: "Feb 01, 2026", duration: "Feb 02 – Feb 10", days: "8 Days", reportingManager: "Mark Williams", status: "Approved" },
-    { date: "Jan 01, 2026", duration: "Jan 16 – Jan 19", days: "3 Days", reportingManager: "Mark Williams", status: "Reject" },
+    {
+      date: "July 01, 2026",
+      duration: "July 05 – July 08",
+      days: "3 Days",
+      reportingManager: "Mark Williams",
+      status: "Pending",
+    },
+    {
+      date: "Apr 05, 2026",
+      duration: "Apr 06 – Apr 10",
+      days: "4 Days",
+      reportingManager: "Mark Williams",
+      status: "Approved",
+    },
+    {
+      date: "Mar 12, 2026",
+      duration: "Mar 14 – Mar 16",
+      days: "2 Days",
+      reportingManager: "Mark Williams",
+      status: "Approved",
+    },
+    {
+      date: "Feb 01, 2026",
+      duration: "Feb 02 – Feb 10",
+      days: "8 Days",
+      reportingManager: "Mark Williams",
+      status: "Approved",
+    },
+    {
+      date: "Jan 01, 2026",
+      duration: "Jan 16 – Jan 19",
+      days: "3 Days",
+      reportingManager: "Mark Williams",
+      status: "Reject",
+    },
   ];
 
-  // Define the columns for the table
   const leaveColumns: Column<LeaveRecord>[] = [
     { key: "date", header: "Date" },
     { key: "duration", header: "Duration" },
     { key: "days", header: "Days" },
     { key: "reportingManager", header: "Reporting Manager" },
-    { 
-      key: "status", 
-      header: "Status", 
+    {
+      key: "status",
+      header: "Status",
       render: (item) => (
         <span
           className={

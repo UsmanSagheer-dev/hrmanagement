@@ -4,157 +4,129 @@ import Sidebar from "../components/sidebar/Sidebar";
 import Header from "../header/Header";
 import Table from "../components/table/Table";
 import Pagination from "../components/pagination/Pagination";
-import RowActions from "../components/rowActions/RowActions";
 import Image from "next/image";
 import EmployeeTableToolbar from "../components/employeeTableToolbar/EmployeeTableToolbar";
+import SearchBar from "../components/searchBar/SearchBar";
 
+// Update the Employee interface to match the screenshot data
 export interface Employee {
-  id: string;
   name: string;
-  department: string;
   designation: string;
   type: string;
-  status: string;
+  checkInTime: string;
+  status: "On Time" | "Late";
   image?: string;
 }
 
-function AllEmployee() {
+function ViewAttendace() {
+  // Update the employees data to match the screenshot
   const [employees, setEmployees] = useState<Employee[]>([
     {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "PM",
-      designation: "Project Manager",
+      name: "Vasilisa Coneva",
+      designation: "Team Lead - Design",
       type: "Office",
-      status: "Permanent",
+      checkInTime: "09:27 AM",
+      status: "On Time",
       image: "/avatars/vasilisa.jpg",
     },
     {
-      id: "000666000",
-      name: "Dina",
-      department: "HR",
-      designation: "HR Executive",
+      name: "Evghenii Conev",
+      designation: "Web Designer",
       type: "Office",
-      status: "Permanent",
+      checkInTime: "10:15 AM",
+      status: "Late",
+      image: "/avatars/evghenii.jpg",
+    },
+    {
+      name: "Jack Conev",
+      designation: "Medical Assistant",
+      type: "Remote",
+      checkInTime: "10:24 AM",
+      status: "Late",
+      image: "/avatars/jack.jpg",
+    },
+    {
+      name: "Vasilisa Coneva",
+      designation: "Marketing Coordinator",
+      type: "Office",
+      checkInTime: "09:10 AM",
+      status: "On Time",
+      image: "/avatars/vasilisa.jpg",
+    },
+    {
+      name: "Jack Conev",
+      designation: "Data Analyst",
+      type: "Office",
+      checkInTime: "09:15 AM",
+      status: "On Time",
+      image: "/avatars/jack.jpg",
+    },
+    {
+      name: "Evghenii Conev",
+      designation: "Phyton Developer",
+      type: "Remote",
+      checkInTime: "09:29 AM",
+      status: "On Time",
+      image: "/avatars/evghenii.jpg",
+    },
+    {
+      name: "Dina Coneva",
+      designation: "UI/UX Design",
+      type: "Remote",
+      checkInTime: "09:29 AM",
+      status: "On Time",
       image: "/avatars/dina.jpg",
     },
     {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "Development",
+      name: "Vasilisa Coneva",
+      designation: "React JS",
+      type: "Remote",
+      checkInTime: "09:29 AM",
+      status: "On Time",
+      image: "/avatars/vasilisa.jpg",
+    },
+    {
+      name: "Vasilisa C",
+      designation: "iOS Developer",
+      type: "Remote",
+      checkInTime: "10:50 AM",
+      status: "Late",
+      image: "/avatars/vasilisa_c.jpg",
+    },
+    {
+      name: "Evghenii C",
+      designation: "HR",
+      type: "Remote",
+      checkInTime: "09:29 AM",
+      status: "On Time",
+      image: "/avatars/evghenii_c.jpg",
+    },
+    {
+      name: "Jack C",
+      designation: "Sales Manager",
+      type: "Remote",
+      checkInTime: "09:29 AM",
+      status: "On Time",
+      image: "/avatars/jack_c.jpg",
+    },
+    {
+      name: "Dina Coneva",
       designation: "React JS Developer",
-      type: "Office",
-      status: "Permanent",
-      image: "/avatars/vasilisa.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Dina",
-      department: "Finance",
-      designation: "Finance Manager",
-      type: "Office",
-      status: "Permanent",
+      type: "Remote",
+      checkInTime: "11:30 AM",
+      status: "Late",
       image: "/avatars/dina.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Office",
-      status: "Permanent",
-      image: "/avatars/vasilisa.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Dina",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/dina.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/vasilisa.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Dina",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/dina.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/vasilisa.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Dina",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/dina.jpg",
-    },
-    {
-      id: "000666000",
-      name: "Vasilisa",
-      department: "Finance",
-      designation: "Finance Analyst",
-      type: "Remote",
-      status: "Permanent",
-      image: "/avatars/vasilisa.jpg",
     },
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
 
-  const handleAddEmployee = () => {
-    console.log("Add employee clicked");
-  };
-
-  const handleEdit = (employee: Employee) => {
-    console.log("Edit:", employee);
-  };
-
-  const handleDelete = (employee: Employee) => {
-    console.log("Delete:", employee);
-  };
-
-  const handleView = (employee: Employee) => {
-    console.log("View:", employee);
-  };
-
-  const handleSearch = (query: string) => {
-    console.log("Search:", query);
-  };
-
-  const handleFilter = () => {
-    console.log("Filter clicked");
-  };
-
   const actualTotalRecords = employees.length;
   const startIndex = (currentPage - 1) * recordsPerPage;
-  const paginatedData = employees.slice(
-    startIndex,
-    startIndex + recordsPerPage
-  );
+  const paginatedData = employees.slice(startIndex, startIndex + recordsPerPage);
 
+  // Update the columns to match the screenshot
   const columns = [
     {
       key: "name",
@@ -180,28 +152,22 @@ function AllEmployee() {
         </div>
       ),
     },
-    { key: "id", header: "Employee ID" },
-    { key: "department", header: "Department" },
     { key: "designation", header: "Designation" },
     { key: "type", header: "Type" },
+    { key: "checkInTime", header: "Check In Time" },
     {
       key: "status",
       header: "Status",
       render: (employee: Employee) => (
-        <span className="text-orange-500 bg-[#E253191A] p-1 rounded-[4px] text-[16px] font-light">
+        <span
+          className={`p-1 rounded-[4px] text-[16px] font-light ${
+            employee.status === "On Time"
+              ? "text-green-500 bg-green-500/10"
+              : "text-red-500 bg-red-500/10"
+          }`}
+        >
           {employee.status}
         </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Action",
-      render: (employee: Employee) => (
-        <RowActions
-          onView={() => handleView(employee)}
-          onEdit={() => handleEdit(employee)}
-          onDelete={() => handleDelete(employee)}
-        />
       ),
     },
   ];
@@ -212,16 +178,17 @@ function AllEmployee() {
         <div>
           <Sidebar />
         </div>
-        <div className="w-full">
+        <div className="w-full flex flex-col items-center gap-[30px]">
           <div className="w-full">
             <Header
-              title="All Employees"
-              description="All Employee Information"
+              title="Attendance"
+              description="All Employee Attendance"
+              textColor="#A2A1A8"
             />
           </div>
           <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
-            <div className="mb-4 flex-shrink-0">
-              <EmployeeTableToolbar />
+            <div className="mb-7 flex-shrink-0">
+            <SearchBar/>
             </div>
 
             <div className="flex-grow overflow-auto hide-vertical-scrollbar">
@@ -247,4 +214,4 @@ function AllEmployee() {
   );
 }
 
-export default AllEmployee;
+export default ViewAttendace;

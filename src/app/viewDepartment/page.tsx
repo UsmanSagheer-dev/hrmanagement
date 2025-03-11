@@ -11,19 +11,17 @@ import EmployeeTableToolbar from "../components/employeeTableToolbar/EmployeeTab
 export interface Employee {
   id: string;
   name: string;
-  department: string;
   designation: string;
   type: string;
   status: string;
   image?: string;
 }
 
-function AllEmployee() {
+function ViewDepartment() {
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "PM",
       designation: "Project Manager",
       type: "Office",
       status: "Permanent",
@@ -32,7 +30,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Dina",
-      department: "HR",
       designation: "HR Executive",
       type: "Office",
       status: "Permanent",
@@ -41,7 +38,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "Development",
       designation: "React JS Developer",
       type: "Office",
       status: "Permanent",
@@ -50,7 +46,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Dina",
-      department: "Finance",
       designation: "Finance Manager",
       type: "Office",
       status: "Permanent",
@@ -59,7 +54,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Office",
       status: "Permanent",
@@ -68,7 +62,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Dina",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -77,7 +70,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -86,7 +78,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Dina",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -95,7 +86,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -104,7 +94,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Dina",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -113,7 +102,6 @@ function AllEmployee() {
     {
       id: "000666000",
       name: "Vasilisa",
-      department: "Finance",
       designation: "Finance Analyst",
       type: "Remote",
       status: "Permanent",
@@ -124,10 +112,7 @@ function AllEmployee() {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
 
-  const handleAddEmployee = () => {
-    console.log("Add employee clicked");
-  };
-
+ 
   const handleEdit = (employee: Employee) => {
     console.log("Edit:", employee);
   };
@@ -140,13 +125,6 @@ function AllEmployee() {
     console.log("View:", employee);
   };
 
-  const handleSearch = (query: string) => {
-    console.log("Search:", query);
-  };
-
-  const handleFilter = () => {
-    console.log("Filter clicked");
-  };
 
   const actualTotalRecords = employees.length;
   const startIndex = (currentPage - 1) * recordsPerPage;
@@ -156,6 +134,7 @@ function AllEmployee() {
   );
 
   const columns = [
+    { key: "id", header: "Employee ID" },
     {
       key: "name",
       header: "Employee Name",
@@ -180,9 +159,8 @@ function AllEmployee() {
         </div>
       ),
     },
-    { key: "id", header: "Employee ID" },
-    { key: "department", header: "Department" },
     { key: "designation", header: "Designation" },
+
     { key: "type", header: "Type" },
     {
       key: "status",
@@ -215,8 +193,8 @@ function AllEmployee() {
         <div className="w-full">
           <div className="w-full">
             <Header
-              title="All Employees"
-              description="All Employee Information"
+              title="Design Department"
+              description="All Departments > Design Department"
             />
           </div>
           <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
@@ -247,4 +225,4 @@ function AllEmployee() {
   );
 }
 
-export default AllEmployee;
+export default ViewDepartment;

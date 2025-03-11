@@ -50,7 +50,7 @@ function Login() {
             <p className=" text-white text-[16px] font-light">Remember me</p>
           </div>
           <Link href="/forgetPassword" className="text-orange-500">
-          Forgot Password?
+            Forgot Password?
           </Link>
         </div>
 

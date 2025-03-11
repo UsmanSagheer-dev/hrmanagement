@@ -74,8 +74,7 @@ const ProfessionalInformationForm: React.FC<
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Add form validation here if needed
-    onTabChange("documents"); // Move to the next tab (Documents)
+    onTabChange("documents");
   };
 
   const handleCancel = () => {

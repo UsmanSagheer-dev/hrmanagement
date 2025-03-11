@@ -12,7 +12,6 @@ interface TableProps<T> {
 const Table = <T,>({ data, columns }: TableProps<T>) => {
   return (
     <div className="w-full">
-      {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm text-left min-w-[640px]">
           <thead className="text-white border-b border-gray-800 bg-gray-900 sticky top-0 z-10">
@@ -47,7 +46,6 @@ const Table = <T,>({ data, columns }: TableProps<T>) => {
         </table>
       </div>
 
-      {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {data.map((item, index) => (
           <div

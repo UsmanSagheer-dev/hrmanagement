@@ -31,12 +31,10 @@ const EmployeeTableToolbar: React.FC<EmployeeTableToolbarProps> = ({
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-6 w-full gap-4">
-      {/* Search Bar */}
       <div className="w-full md:w-1/2 lg:w-1/3">
         <SearchBar value={searchQuery} onChange={handleSearch} />
       </div>
 
-      {/* Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto justify-center">
         <Button
           icon={IoIosAddCircleOutline}

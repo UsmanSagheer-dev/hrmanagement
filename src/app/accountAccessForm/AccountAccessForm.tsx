@@ -18,7 +18,9 @@ type FormData = {
   githubId: string;
 };
 
-const AccountAccessForm: React.FC<AccountAccessFormProps> = ({ onTabChange }) => {
+const AccountAccessForm: React.FC<AccountAccessFormProps> = ({
+  onTabChange,
+}) => {
   const [formData, setFormData] = useState<FormData>({
     emailAddress: "",
     slackId: "",
