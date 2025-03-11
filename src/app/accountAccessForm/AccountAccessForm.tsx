@@ -101,7 +101,7 @@ const AccountAccessForm: React.FC<AccountAccessFormProps> = ({ onTabChange }) =>
   ];
 
   return (
-    <div className="h-[67vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
+    <div className="h-[40vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
         <div className="flex border-b border-gray-700 flex-wrap">
           <NavigationTab

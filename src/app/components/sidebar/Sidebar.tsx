@@ -48,13 +48,13 @@ const Sidebar: React.FC = () => {
           src={IMAGES.HrLogo.src}
           alt=""
           className="w-[32px] md:w-[83px] h-[32px] cursor-pointer"
-          onClick={() => router.push("/dashboard")} // Navigate to dashboard on logo click
+          onClick={() => router.push("/dashboard")} 
         />
       </div>
       
       <div className="flex-grow">
         <ul className="space-y-2 md:space-y-4">
-          {initialMenuItems.map((item) => (
+          {initialMenuItems?.map((item) => (
             <li
               key={item.id}
               onClick={() => handleItemClick(item.id, item.path)}

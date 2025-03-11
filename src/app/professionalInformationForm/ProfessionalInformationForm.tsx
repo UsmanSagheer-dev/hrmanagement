@@ -5,7 +5,7 @@ import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import InputField from "../components/inputField/InputField";
-import Button from "../components/button/Button"; 
+import Button from "../components/button/Button";
 
 type ProfessionalInformationFormProps = {
   onTabChange: (tabName: string) => void;

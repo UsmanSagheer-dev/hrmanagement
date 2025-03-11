@@ -180,7 +180,6 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
     );
   };
 
-  // Input field configurations
   const inputFields = [
     {
       section: 'name',
