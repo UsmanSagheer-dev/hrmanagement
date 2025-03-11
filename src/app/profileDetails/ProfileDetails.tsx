@@ -4,7 +4,7 @@ import { FaCamera, FaEdit } from "react-icons/fa";
 import Button from "../components/button/Button";
 import IMAGES from "../assets/images";
 import { ProfileContent } from "../profileContent/ProfileContent";
-import { AttendanceContent } from "../attendanceContent/AttendanceContent";
+import  AttendanceContent  from "../attendanceContent/AttendanceContent";
 import { ProjectsContent } from "../projectsContent/ProjectsContent";
 import { LeaveContent } from "../leaveContent/LeaveContent";
 import { IoIosPerson } from "react-icons/io";

@@ -264,7 +264,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
   return (
     <div className="h-[84vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
-        <div className="flex border-b border-gray-700">
+        <div className="flex flex-wrap border-b border-gray-700">
           <NavigationTab Icon={IoIosPerson} title="Personal Information" tabName="personal" isActive={true} />
           <NavigationTab Icon={HiOutlineBriefcase} title="Professional Information" tabName="professional" isActive={false} />
           <NavigationTab Icon={IoDocumentTextOutline} title="Documents" tabName="documents" isActive={false} />

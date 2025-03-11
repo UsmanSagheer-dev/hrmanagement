@@ -1,26 +1,52 @@
 import React from 'react';
-import { UserData } from '../types/types';
+import Table, { Column } from '../components/table/Table'; // Adjust the import path as needed
 
-interface AttendanceContentProps {
-  userData: UserData;
+interface AttendanceRecord {
+  date: string;
+  checkIn: string;
+  checkOut: string;
+  breakTime: string;
+  workingHours: string;
+  status: string;
 }
 
-export const AttendanceContent: React.FC<AttendanceContentProps> = ({ userData }) => (
-  <div className="mt-4">
-    <h3 className="text-white text-lg mb-4">Attendance Overview</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-      <div className="mb-4">
-        <p className="text-gray-500 text-sm mb-1">Present Days</p>
-        <p className="text-white">{userData.attendance?.presentDays}</p>
-      </div>
-      <div className="mb-4">
-        <p className="text-gray-500 text-sm mb-1">Absent Days</p>
-        <p className="text-white">{userData.attendance?.absentDays}</p>
-      </div>
-      <div className="mb-4">
-        <p className="text-gray-500 text-sm mb-1">Last Check-In</p>
-        <p className="text-white">{userData.attendance?.lastCheckIn}</p>
-      </div>
+const AttendanceContent: React.FC = () => {
+  const attendanceData: AttendanceRecord[] = [
+    { date: "July 01, 2026", checkIn: "09:28 AM", checkOut: "07:00 PM", breakTime: "00:30 Min", workingHours: "09:02 Hrs", status: "On Time" },
+    { date: "July 02, 2026", checkIn: "09:20 AM", checkOut: "07:00 PM", breakTime: "00:20 Min", workingHours: "09:20 Hrs", status: "On Time" },
+    { date: "July 03, 2026", checkIn: "09:25 AM", checkOut: "07:00 PM", breakTime: "00:30 Min", workingHours: "09:05 Hrs", status: "On Time" },
+    { date: "July 04, 2026", checkIn: "09:45 AM", checkOut: "07:00 PM", breakTime: "00:40 Min", workingHours: "08:35 Hrs", status: "Late" },
+    { date: "July 05, 2026", checkIn: "10:00 AM", checkOut: "07:00 PM", breakTime: "00:30 Min", workingHours: "08:30 Hrs", status: "Late" },
+    { date: "July 06, 2026", checkIn: "09:28 AM", checkOut: "07:00 PM", breakTime: "00:30 Min", workingHours: "09:02 Hrs", status: "On Time" },
+    { date: "July 07, 2026", checkIn: "09:30 AM", checkOut: "07:00 PM", breakTime: "00:15 Min", workingHours: "09:15 Hrs", status: "On Time" },
+    { date: "July 08, 2026", checkIn: "09:52 AM", checkOut: "07:00 PM", breakTime: "00:45 Min", workingHours: "08:23 Hrs", status: "Late" },
+    { date: "July 09, 2026", checkIn: "09:10 AM", checkOut: "07:00 PM", breakTime: "00:30 Min", workingHours: "09:02 Hrs", status: "On Time" },
+    { date: "July 10, 2026", checkIn: "09:48 AM", checkOut: "07:00 PM", breakTime: "00:42 Min", workingHours: "08:30 Hrs", status: "Late" },
+  ];
+
+  const attendanceColumns: Column<AttendanceRecord>[] = [
+    { key: "date", header: "Date" },
+    { key: "checkIn", header: "Check In" },
+    { key: "checkOut", header: "Check Out" },
+    { key: "breakTime", header: "Break" },
+    { key: "workingHours", header: "Working Hours" },
+    { 
+      key: "status", 
+      header: "Status", 
+      render: (item) => (
+        <span className={item.status === "On Time" ? "text-green-500" : "text-red-500"}>
+          {item.status}
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div className="mt-4">
+      <h3 className="text-white text-lg mb-4">Attendance Table</h3>
+      <Table data={attendanceData} columns={attendanceColumns} />
     </div>
-  </div>
-);
+  );
+};
+
+export default AttendanceContent;

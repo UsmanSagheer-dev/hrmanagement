@@ -30,11 +30,9 @@ const Header: React.FC<HeaderProps> = ({ title, description }) => {
         <p className="text-sm md:text-base">{description}</p>
       </div>
       <div className="flex items-center space-x-4">
-        {/* SearchBar - hidden on tablet and below */}
         <div className="hidden md:block">
           <SearchBar />
         </div>
-        {/* Notification Button - hidden on tablet and below */}
         <div className="hidden md:block">
           <Button 
             icon={IoMdNotificationsOutline} 
