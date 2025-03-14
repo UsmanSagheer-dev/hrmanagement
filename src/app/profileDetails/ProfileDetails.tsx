@@ -3,15 +3,18 @@ import React, { useState } from "react";
 import { FaCamera, FaEdit } from "react-icons/fa";
 import Button from "../components/button/Button";
 import IMAGES from "../assets/images";
-import { ProfileContent } from "../profileContent/ProfileContent";
-import  AttendanceContent  from "../attendanceContent/AttendanceContent";
-import { ProjectsContent } from "../projectsContent/ProjectsContent";
-import { LeaveContent } from "../leaveContent/LeaveContent";
+import { ProfileContent } from "../(content)/profileContent/ProfileContent";
+// import AttendanceContent from "../attendanceContent/AttendanceContent";
+import { ProjectsContent } from "../(content)/projectsContent/ProjectsContent";
+// import { LeaveContent } from "../leaveContent/LeaveContent";
 import { IoIosPerson } from "react-icons/io";
 import { LuCalendarCheck, LuCalendarRange } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { HiOutlineMail } from "react-icons/hi";
+import AttendanceContent from "../(content)/attendanceContent/AttendanceContent";
+import LeaveContent from "../(content)/leaveContent/LeaveContent";
+import { useRouter } from "next/navigation";
 
 type ProfileDetailsProps = {
   onTabChange: (tabName: string) => void;
@@ -52,6 +55,7 @@ type UserData = {
 };
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
+const router = useRouter();
   const [userData] = useState<UserData>({
     firstName: "Dina",
     lastName: "Coneva",
@@ -85,7 +89,9 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
     githubID: "dina_coneva",
     slackID: "dina_coneva",
   });
-
+const handleEditProfile = () => {
+  router.push("/employee/add");
+};
   const [activeSection, setActiveSection] = useState("profile");
   const [activeProfileTab, setActiveProfileTab] = useState("personal");
 
@@ -154,72 +160,73 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
           <div className="ml-auto">
             <Button
               title="Edit Profile"
+              onClick={handleEditProfile}
               icon={FaEdit}
               className="bg-[#E25319] text-white px-4 py-2 rounded-lg hover:bg-[#d14917] transition-colors flex items-center"
             />
           </div>
         </div>
         <div className="flex flex-wrap scroll-auto overflow-auto mt-[30px] mb-[30px] md:flex-nowrap">
-  <div className="w-full md:w-[242px] mb-4 md:mb-0">
-    <div className="border border-[#A2A1A833] rounded-md">
-      <nav className="space-y-2 ">
-        <button
-          onClick={() => setActiveSection("profile")}
-          className={`flex items-center p-2 w-full text-left rounded-md ${
-            activeSection === "profile"
-              ? "bg-orange-500 text-white"
-              : "text-white hover:bg-gray-700"
-          }`}
-        >
-          <span className="mr-2">
-            <IoIosPerson />
-          </span>
-          Profile
-        </button>
-        <button
-          onClick={() => setActiveSection("attendance")}
-          className={`flex items-center p-2 w-full text-left rounded-md ${
-            activeSection === "attendance"
-              ? "bg-orange-500 text-white"
-              : "text-white hover:bg-gray-700"
-          }`}
-        >
-          <span className="mr-2">
-            <LuCalendarCheck size={24} />
-          </span>
-          Attendance
-        </button>
-        <button
-          onClick={() => setActiveSection("projects")}
-          className={`flex items-center p-2 w-full text-left rounded-md ${
-            activeSection === "projects"
-              ? "bg-orange-500 text-white"
-              : "text-white hover:bg-gray-700"
-          }`}
-        >
-          <span className="mr-2">
-            <GrNotes />
-          </span>
-          Projects
-        </button>
-        <button
-          onClick={() => setActiveSection("leave")}
-          className={`flex items-center p-2 w-full text-left rounded-md ${
-            activeSection === "leave"
-              ? "bg-orange-500 text-white"
-              : "text-white hover:bg-gray-700"
-          }`}
-        >
-          <span className="mr-2">
-            <LuCalendarRange size={24} />
-          </span>
-          Leave
-        </button>
-      </nav>
-    </div>
-  </div>
-  <div className="flex-1 md:ml-6 w-full">{renderContent()}</div>
-</div>
+          <div className="w-full md:w-[242px] mb-4 md:mb-0">
+            <div className="border border-[#A2A1A833] rounded-md">
+              <nav className="space-y-2 ">
+                <button
+                  onClick={() => setActiveSection("profile")}
+                  className={`flex items-center p-2 w-full text-left rounded-md ${
+                    activeSection === "profile"
+                      ? "bg-orange-500 text-white"
+                      : "text-white hover:bg-gray-700"
+                  }`}
+                >
+                  <span className="mr-2">
+                    <IoIosPerson />
+                  </span>
+                  Profile
+                </button>
+                <button
+                  onClick={() => setActiveSection("attendance")}
+                  className={`flex items-center p-2 w-full text-left rounded-md ${
+                    activeSection === "attendance"
+                      ? "bg-orange-500 text-white"
+                      : "text-white hover:bg-gray-700"
+                  }`}
+                >
+                  <span className="mr-2">
+                    <LuCalendarCheck size={24} />
+                  </span>
+                  Attendance
+                </button>
+                <button
+                  onClick={() => setActiveSection("projects")}
+                  className={`flex items-center p-2 w-full text-left rounded-md ${
+                    activeSection === "projects"
+                      ? "bg-orange-500 text-white"
+                      : "text-white hover:bg-gray-700"
+                  }`}
+                >
+                  <span className="mr-2">
+                    <GrNotes />
+                  </span>
+                  Projects
+                </button>
+                <button
+                  onClick={() => setActiveSection("leave")}
+                  className={`flex items-center p-2 w-full text-left rounded-md ${
+                    activeSection === "leave"
+                      ? "bg-orange-500 text-white"
+                      : "text-white hover:bg-gray-700"
+                  }`}
+                >
+                  <span className="mr-2">
+                    <LuCalendarRange size={24} />
+                  </span>
+                  Leave
+                </button>
+              </nav>
+            </div>
+          </div>
+          <div className="flex-1 md:ml-6 w-full">{renderContent()}</div>
+        </div>
       </div>
     </div>
   );

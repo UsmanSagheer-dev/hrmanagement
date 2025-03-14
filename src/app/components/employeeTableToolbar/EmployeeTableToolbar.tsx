@@ -18,7 +18,7 @@ const EmployeeTableToolbar: React.FC<EmployeeTableToolbarProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleAddEmployee = () => {
-    router.push("/addNewEmployee");
+    router.push("/employee/add");
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

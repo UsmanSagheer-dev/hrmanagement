@@ -32,7 +32,7 @@ const DepartmentList: React.FC<DepartmentListProps> = ({
         </div>
        
         <Button
-        title='    View All'
+        title='View All'
           onClick={onViewAll}
           className="text-orange-500 hover:text-orange-400 text-sm font-medium"
         />
