@@ -31,13 +31,13 @@ const Sidebar: React.FC = () => {
       id: 2,
       name: "All Employees",
       icon: <FaUsers size={24} />,
-      path: "/allEmployee",
+      path: "/employee/details",
     },
     {
       id: 3,
       name: "Attendance",
       icon: <LuCalendarCheck size={24} />,
-      path: "/viewAttendace",
+      path: "/viewattendace",
     },
     {
       id: 4,
@@ -50,6 +50,18 @@ const Sidebar: React.FC = () => {
       name: "Settings",
       icon: <IoSettingsOutline size={24} />,
       path: "/settings",
+    },
+      {
+      id: 6,
+      name: "View Details",
+      icon: <IoSettingsOutline size={24} />,
+      path: "/viewemployeedetail",
+    },
+          {
+      id: 7,
+      name: "Department",
+      icon: <IoSettingsOutline size={24} />,
+      path: "/department/alldepartment",
     },
   ];
 
