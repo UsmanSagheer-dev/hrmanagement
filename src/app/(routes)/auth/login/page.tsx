@@ -4,11 +4,14 @@ import IMAGES from "../../../assets/images/index";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
 import Link from "next/link";
+import { FaGithub } from "react-icons/fa";
+import { login } from "../../../../../actions/auth";
 
 function Login() {
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
   return (
     <div className="h-screen bg-[#131313] flex items-center justify-center">
       <div className="w-[455px] max-w-full flex flex-col justify-center">
@@ -56,6 +59,10 @@ function Login() {
 
         <div className="flex items-center justify-center  w-full px-4 mt-[30px]">
           <Button title="Login" />
+        </div>
+
+         <div className="flex items-center justify-center  w-full px-4 mt-[30px]">
+          <Button title="Login with github" icon={FaGithub} onClick={()=>login('github')}/>
         </div>
       </div>
     </div>
