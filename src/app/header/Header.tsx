@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "../components/button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import IMAGES from "../assets/images";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
+import { signOut } from "next-auth/react"; 
 
 interface User {
   name: string;
@@ -18,9 +19,21 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
   };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/auth/login" });
+  };
+
   const user: User = {
     name: "usman",
     role: "HR Manager",
@@ -71,19 +84,48 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
             className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
           />
         </div>
-        <div className="flex items-center h-[40px] md:h-[50px] space-x-2 border border-[#A2A1A833] rounded-[8px] px-[5px]">
-          <img
-            src={IMAGES.Profileimg.src}
-            alt={`${user.name}'s avatar`}
-            className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded"
-          />
-          <div>
-            <p className="text-[14px] md:text-[16px] font-semibold">
-              {user.name}
-            </p>
-            <p className="text-xs font-light text-gray-400">{user.role}</p>
+        <div className="relative">
+          <div
+            className="flex items-center h-[40px] md:h-[50px] space-x-2 border border-[#A2A1A833] rounded-[8px] px-[5px] cursor-pointer"
+            onClick={toggleDropdown}
+          >
+            <img
+              src={IMAGES.Profileimg.src}
+              alt={`${user.name}'s avatar`}
+              className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded"
+            />
+            <div>
+              <p className="text-[14px] md:text-[16px] font-semibold">
+                {user.name}
+              </p>
+              <p className="text-xs font-light text-gray-400">{user.role}</p>
+            </div>
+            <MdKeyboardArrowDown size={20} />
           </div>
-          <MdKeyboardArrowDown size={20} />
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-[8px] shadow-lg z-20">
+              <ul className="py-2">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={handleLogout} // Call logout handler
+                >
+                  Logout
+                </li>
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => console.log("Sign clicked")}
+                >
+                  Sign
+                </li>
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => console.log("Update clicked")}
+                >
+                  Update
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </header>

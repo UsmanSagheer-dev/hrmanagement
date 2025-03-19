@@ -4,11 +4,11 @@ import db from "../../../../lib/prismadb";
 
 export async function POST(req: Request) {
   try {
-    // Log the raw body to see what’s being received
+
     const rawBody = await req.text();
     console.log("Raw request body:", rawBody);
 
-    const body = JSON.parse(rawBody); // Manually parse to catch errors
+    const body = JSON.parse(rawBody); 
     const { email, password } = body;
 
     if (!email || !password) {

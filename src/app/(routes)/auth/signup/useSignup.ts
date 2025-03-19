@@ -37,7 +37,6 @@ export const useSignUp = () => {
   try {
     setIsLoading(true);
 
-    // Log the data being sent
     console.log("Sending to API:", { email, password });
     const body = JSON.stringify({ email, password });
     console.log("Serialized body:", body);
@@ -66,7 +65,7 @@ export const useSignUp = () => {
 };
 
   const navigateToLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   return {
