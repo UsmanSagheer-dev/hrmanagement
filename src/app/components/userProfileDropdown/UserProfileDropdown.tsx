@@ -1,8 +1,9 @@
+// UserProfileDropdown.tsx
 import React from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
-
 import { signOut } from "next-auth/react";
 import IMAGES from "@/app/assets/images";
+import Link from "next/link";
 
 interface User {
   name: string;
@@ -52,12 +53,11 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
             >
               Logout
             </li>
-            <li
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => console.log("Sign clicked")}
-            >
-              Sign
-            </li>
+            <Link href="/profile">
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                Profile
+              </li>
+            </Link>
             <li
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => console.log("Update clicked")}

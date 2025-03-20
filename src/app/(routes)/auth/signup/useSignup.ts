@@ -54,8 +54,15 @@ export const useSignUp = () => {
         throw new Error(data.error || "Registration failed");
       }
 
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
+      // Check the role from the response and redirect accordingly
+      if (data.role === "Admin") {
+        toast.success("Admin account created successfully!");
+        router.push("/dashboard");
+      } else {
+        toast.success("Employee account created successfully!");
+        router.push("/employee/add"); // Change this to your desired route for employees
+      }
+
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {

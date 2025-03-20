@@ -35,8 +35,12 @@ function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // On successful login, redirect to dashboard or home page
-      router.push("/dashboard");
+      // Redirect based on user role
+      if (data.role === "Admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/employee/add"); 
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
