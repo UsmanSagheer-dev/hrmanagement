@@ -4,14 +4,10 @@ import db from "../../../../lib/prismadb";
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json();
+    const { email, password, name } = body;
 
-    const rawBody = await req.text();
-    console.log("Raw request body:", rawBody);
-
-    const body = JSON.parse(rawBody); 
-    const { email, password } = body;
-
-    if (!email || !password) {
+    if (!name ||!email || !password) {
       return NextResponse.json({ error: "Missing data" }, { status: 400 });
     }
 
@@ -25,10 +21,17 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Create user with "Employee" role by default
+    // First user in system could be made admin automatically (optional)
+    const userCount = await db.user.count();
+    const isFirstUser = userCount === 0;
+
     const newUser = await db.user.create({
       data: {
         email,
+        name: name,
         hashedPassword,
+        role: isFirstUser ? "Admin" : "Employee" // First user becomes Admin, others Employee
       },
     });
 

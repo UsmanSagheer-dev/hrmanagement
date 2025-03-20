@@ -2,18 +2,7 @@ import { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import prismadb from "./prismadb";
 import bcrypt from "bcryptjs";
-
-interface User {
-  id: string;
-  name: string | null;
-  email: string | null;
-  hashedPassword: string | null; 
-  role?: string | null; 
-  emailVerified?: Date | null;
-  image?: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import {User} from '../src/app/types/types'
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -24,7 +13,6 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing credentials");
         }
@@ -38,7 +26,6 @@ export const authOptions: AuthOptions = {
         if (!user || !user.id || !user.hashedPassword) {
           throw new Error("Invalid credentials");
         }
-
 
         const correctPassword = await bcrypt.compare(
           credentials.password, 
@@ -61,4 +48,21 @@ export const authOptions: AuthOptions = {
     signIn: "/login",
   },
   debug: process.env.NODE_ENV !== "production",
+  // Added callbacks
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role; // ڈیٹابیس سے رول لے کر JWT میں شامل کریں
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.role = token.role as string;
+        session.user.id = token.id as string;
+      }
+      return session;
+    }
+  }
 };

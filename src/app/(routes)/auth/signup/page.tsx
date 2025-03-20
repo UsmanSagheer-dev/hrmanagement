@@ -35,8 +35,8 @@ const SignUp: React.FC = () => {
           <InputField
             label="User Name"
             type="text"
-            value={formData.user}
-            onChange={handleChange("user")}
+            value={formData.name}
+            onChange={handleChange("name")}
           />
           <InputField
             label="Email Address"
@@ -55,7 +55,7 @@ const SignUp: React.FC = () => {
             <Button 
               title={isLoading ? "Creating Account..." : "Register"} 
               disabled={isLoading}
-              onClick={handleSubmit}
+             onClick={handleSubmit}
             />
           </div>
           
