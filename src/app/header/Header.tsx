@@ -1,7 +1,7 @@
+"use client";
 import React, { useState } from "react";
 import Button from "../components/button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import IMAGES from "../assets/images";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
 import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown"; 
@@ -29,8 +29,8 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const user: User = {
-    name: "usman",
+  const fallbackUser: User = {
+    name: "Usman",
     role: "HR Manager",
     avatar: "https://via.placeholder.com/40",
   };
@@ -80,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
           />
         </div>
         <UserProfileDropdown
-          user={user}
+          user={fallbackUser} 
           isDropdownOpen={isDropdownOpen}
           toggleDropdown={toggleDropdown}
         />
