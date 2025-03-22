@@ -7,69 +7,8 @@ import { IoDocumentTextOutline } from 'react-icons/io5';
 import { MdLockOpen } from 'react-icons/md';
 import InputField from '../../components/inputField/InputField';
 import Button from '../../components/button/Button';
-
-type PersonalInformationFormProps = {
-  onTabChange: (tabName: string) => void;
-};
-
-type FormData = {
-  firstName: string;
-  lastName: string;
-  mobileNumber: string;
-  email: string;
-  dateOfBirth: string;
-  maritalStatus: string;
-  gender: string;
-  nationality: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  profileImage?: File | null;
-};
-
-const maritalStatusOptions = [
-  { value: 'single', label: 'Single' },
-  { value: 'married', label: 'Married' },
-  { value: 'divorced', label: 'Divorced' },
-  { value: 'widowed', label: 'Widowed' },
-];
-
-const genderOptions = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'other', label: 'Other' },
-  { value: 'prefer-not-to-say', label: 'Prefer not to say' },
-];
-
-const nationalityOptions = [
-  { value: 'india', label: 'India' },
-  { value: 'usa', label: 'USA' },
-  { value: 'uk', label: 'UK' },
-  { value: 'canada', label: 'Canada' },
-  { value: 'australia', label: 'Australia' },
-];
-
-const cityOptions = [
-  { value: 'mumbai', label: 'Mumbai' },
-  { value: 'delhi', label: 'Delhi' },
-  { value: 'bangalore', label: 'Bangalore' },
-  { value: 'hyderabad', label: 'Hyderabad' },
-];
-
-const stateOptions = [
-  { value: 'maharashtra', label: 'Maharashtra' },
-  { value: 'karnataka', label: 'Karnataka' },
-  { value: 'telangana', label: 'Telangana' },
-  { value: 'delhi', label: 'Delhi' },
-];
-
-const zipCodeOptions = [
-  { value: '400001', label: '400001' },
-  { value: '110001', label: '110001' },
-  { value: '560001', label: '560001' },
-  { value: '500001', label: '500001' },
-];
+import { PersonalInformationFormProps, FormData } from "../../types/formTypes";
+import { maritalStatusOptions, genderOptions, nationalityOptions, cityOptions, stateOptions, zipCodeOptions } from "../../constants/formConstants";
 
 const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTabChange }) => {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);

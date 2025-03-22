@@ -1,28 +1,29 @@
+// app/EmployeeFormPage.tsx
 "use client";
 import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import Header from "@/app/header/Header";
 import PersonalInformationForm from "@/app/(form)/personalInformationForm/PersonalInformationForm";
 import ProfessionalInformationForm from "@/app/(form)/professionalInformationForm/ProfessionalInformationForm";
-import React, { useState } from "react";
-import Document from "next/document";
-import DocumentsTab from "@/app/(form)/documentsForm/DocumentsForm";
+import React from "react";
 import DocumentsForm from "@/app/(form)/documentsForm/DocumentsForm";
-function Page() {
-  const [activeTab, setActiveTab] = useState("personal");
+import { useEmployeeForm } from "../../../hooks/useEmployeeForm";
+
+function EmployeeFormPage() {
+  const { activeTab, handleTabChange } = useEmployeeForm();
 
   const renderContent = () => {
     switch (activeTab) {
       case "personal":
-        return <PersonalInformationForm onTabChange={setActiveTab} />;
+        return <PersonalInformationForm onTabChange={handleTabChange} />;
       case "professional":
-        return <ProfessionalInformationForm onTabChange={setActiveTab} />;
+        return <ProfessionalInformationForm onTabChange={handleTabChange} />;
       case "documents":
-        return <DocumentsForm onTabChange={setActiveTab} />;
+        return <DocumentsForm onTabChange={handleTabChange} />;
       case "account":
-        return <AccountAccessForm onTabChange={setActiveTab} />;
+        return <AccountAccessForm onTabChange={handleTabChange} />;
       default:
-        return <PersonalInformationForm onTabChange={setActiveTab} />;
+        return <PersonalInformationForm onTabChange={handleTabChange} />;
     }
   };
 
@@ -46,4 +47,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default EmployeeFormPage;

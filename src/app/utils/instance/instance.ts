@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-  baseURL: "http://localhost:3000/api/register",
+  baseURL: "http://localhost:3000/",
   timeout: 20000,
   headers: {
     "Content-Type": "application/json",

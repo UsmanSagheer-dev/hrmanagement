@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import { useDispatch, useSelector } from "react-redux";
-
+import employeeFormReducer from './slices/employeeFormSlice'
 
 const store = configureStore({
   reducer: {
-
+ employeeForm: employeeFormReducer,
 
   },
 });

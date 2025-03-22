@@ -7,53 +7,20 @@ import { MdLockOpen } from "react-icons/md";
 import InputField from "../../components/inputField/InputField";
 import Button from "../../components/button/Button";
 
-type ProfessionalInformationFormProps = {
-  onTabChange: (tabName: string) => void;
-};
+import { PersonalForm, ProfessionalInformationFormProps } from "../../types/formTypes";
+import {
+  employeeTypeOptions,
+  departmentOptions,
+  workingDaysOptions,
+  officeLocationOptions,
+} from "../../constants/formConstants";
 
-type FormData = {
-  employeeId: string;
-  userName: string;
-  employeeType: string;
-  emailAddress: string;
-  department: string;
-  designation: string;
-  workingDays: string;
-  joiningDate: string;
-  officeLocation: string;
-};
 
-const employeeTypeOptions = [
-  { value: "full-time", label: "Full-Time" },
-  { value: "part-time", label: "Part-Time" },
-  { value: "contract", label: "Contract" },
-  { value: "intern", label: "Intern" },
-];
-
-const departmentOptions = [
-  { value: "hr", label: "HR" },
-  { value: "it", label: "IT" },
-  { value: "marketing", label: "Marketing" },
-  { value: "finance", label: "Finance" },
-];
-
-const workingDaysOptions = [
-  { value: "mon-fri", label: "Monday to Friday" },
-  { value: "mon-sat", label: "Monday to Saturday" },
-  { value: "flexible", label: "Flexible" },
-];
-
-const officeLocationOptions = [
-  { value: "mumbai", label: "Mumbai" },
-  { value: "delhi", label: "Delhi" },
-  { value: "bangalore", label: "Bangalore" },
-  { value: "hyderabad", label: "Hyderabad" },
-];
 
 const ProfessionalInformationForm: React.FC<
   ProfessionalInformationFormProps
 > = ({ onTabChange }) => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<PersonalForm>({
     employeeId: "",
     userName: "",
     employeeType: "",
@@ -65,7 +32,7 @@ const ProfessionalInformationForm: React.FC<
     officeLocation: "",
   });
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof PersonalForm, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,

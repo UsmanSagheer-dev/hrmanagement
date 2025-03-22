@@ -1,8 +1,27 @@
-import { AuthOptions } from "next-auth";
+import { AuthOptions, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import prismadb from "./prismadb";
 import bcrypt from "bcryptjs";
-import {User} from '../src/app/types/types'
+import { NextApiRequest, NextApiResponse } from "next";
+
+// Extend the NextAuth User type to include role
+declare module "next-auth" {
+  interface User {
+    id: string;
+    email: string | null;
+    name: string | null;
+    role: string | null;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      email: string | null;
+      name: string | null;
+      role: string | null;
+    };
+  }
+}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -12,57 +31,71 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
+          throw new Error("Email and password are required");
         }
 
-        const user = await prismadb.user.findFirst({
-          where: {
-            email: credentials.email,
-          },
-        }) as User;
+        const user = await prismadb.user.findUnique({
+          where: { email: credentials.email },
+        });
 
-        if (!user || !user.id || !user.hashedPassword) {
+        if (!user || !user.hashedPassword) {
           throw new Error("Invalid credentials");
         }
 
-        const correctPassword = await bcrypt.compare(
-          credentials.password, 
-          user.hashedPassword 
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
         );
 
-        if (!correctPassword) {
-          throw new Error("Invalid credentials");
-        }
+        if (!isValid) throw new Error("Invalid password");
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
+    },
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
-  debug: process.env.NODE_ENV !== "production",
-  // Added callbacks
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role; // ڈیٹابیس سے رول لے کر JWT میں شامل کریں
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role as string;
+      if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
-    }
-  }
+    },
+  },
+  debug: true, // Debugging enabled
+  csrf: false, // CSRF protection off (only for testing)
 };

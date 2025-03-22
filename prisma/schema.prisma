@@ -76,3 +76,45 @@ model Authenticator {
   user                 User    @relation(fields: [userId], references: [id])  // Update to `id`
   @@unique([userId, credentialID])
 }
+
+model Employee {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName          String
+  lastName           String
+  mobileNumber       String?
+  email              String    @unique
+  dateOfBirth        DateTime?
+  maritalStatus      String?
+  gender             String?
+  nationality        String?
+  address            String?
+  city               String?
+  state              String?
+  zipCode            String?
+  profileImage       String?
+  
+  // Professional Info
+  employeeId         String    @unique
+  userName           String?
+  employeeType       String?
+  workEmail          String?   @unique
+  department         String?
+  designation        String?
+  workingDays        String?
+  joiningDate        DateTime?
+  officeLocation     String?
+  
+  // Documents
+  appointmentLetter  String?
+  salarySlips        String?
+  relievingLetter    String?
+  experienceLetter   String?
+  
+  // Account Access
+  slackId            String?
+  skypeId            String?
+  githubId           String?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}

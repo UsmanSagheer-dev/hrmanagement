@@ -35,7 +35,6 @@ function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Redirect based on user role
       if (data.role === "Admin") {
         router.push("/dashboard");
       } else {
@@ -107,13 +106,22 @@ function Login() {
             />
           </div>
 
-          <div className="flex items-center justify-center w-full px-4 mt-[30px]">
+          <div className="flex items-center justify-center w-full px-4 mt-[15px]">
             <Button
               title="Login with GitHub"
               icon={FaGithub}
               onClick={() => login("github")}
               disabled={loading}
             />
+          </div>
+
+          <div className="flex items-center justify-center w-full px-4 mt-[20px]">
+            <p className="text-white text-[16px] font-light">
+              Don&apos;t have an account?{" "}
+              <Link href="/auth/signup" className="text-orange-500 hover:underline">
+                Sign Up
+              </Link>
+            </p>
           </div>
         </form>
       </div>

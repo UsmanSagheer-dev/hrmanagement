@@ -118,12 +118,16 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
 
         <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-6">
           {documents.map((doc) => (
-            <FileUpload
-              key={doc.id}
-              id={doc.id}
-              title={doc.title}
-              onFileUpload={handleFileUpload}
-            />
+            <div key={doc.id}>
+              <FileUpload
+                id={doc.id}
+                title={doc.title}
+                onFileUpload={handleFileUpload}
+              />
+              {uploadedFiles[doc.id] && (
+                <p className="text-sm text-gray-400 mt-2">{uploadedFiles[doc.id].name}</p>
+              )}
+            </div>
           ))}
         </div>
 
