@@ -1,15 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import IMAGES from "../../../assets/images";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
+import { useSignUp } from "./useSignup"; 
 
-function SignUp() {
-  const widthClass = "w-[430px]";
-  const heightClass = "w-56";
-  const [user, setUser] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const SignUp: React.FC = () => {
+  const {
+    formData,
+    isLoading,
+    handleChange,
+    handleSubmit,
+    navigateToLogin,
+  } = useSignUp();
+
   return (
     <div className="h-screen bg-[#131313] flex items-center justify-center">
       <div className="w-[455px] max-w-full flex flex-col justify-center">
@@ -20,40 +24,57 @@ function SignUp() {
             className="w-full max-w-[409px] h-auto"
           />
         </div>
-        <div className="flex flex-col  ml-[15px]">
-          <h1 className="text-white text-[30px] font-semibold ">Welcome</h1>
-          <p className=" text-white text[16px] font-light ">
-            Please register here{" "}
+        <div className="flex flex-col ml-[15px]">
+          <h1 className="text-white text-[30px] font-semibold">Welcome</h1>
+          <p className="text-white text-[16px] font-light">
+            Please register here
           </p>
         </div>
 
-        <div className="flex flex-col space-y-4 p-4 rounded-md">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4 p-4 rounded-md">
           <InputField
             label="User Name"
             type="text"
-            value={user}
-            onChange={setUser}
+            value={formData.name}
+            onChange={handleChange("name")}
           />
           <InputField
             label="Email Address"
             type="email"
-            value={email}
-            onChange={setEmail}
+            value={formData.email}
+            onChange={handleChange("email")}
           />
           <InputField
             label="Password"
             type="password"
-            value={password}
-            onChange={setPassword}
+            value={formData.password}
+            onChange={handleChange("password")}
           />
-        </div>
-
-        <div className="flex items-center justify-center  w-full px-4">
-          <Button title="Register"  />
-        </div>
+          
+          <div className="flex items-center justify-center w-full px-4 mt-4">
+            <Button 
+              title={isLoading ? "Creating Account..." : "Register"} 
+              disabled={isLoading}
+             onClick={handleSubmit}
+            />
+          </div>
+          
+          <div className="text-center mt-4">
+            <p className="text-white text-sm">
+              Already have an account?{" "}
+              <button 
+                type="button"
+                onClick={navigateToLogin} 
+                className="text-blue-400 hover:underline"
+              >
+                Login
+              </button>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
+};
 
 export default SignUp;

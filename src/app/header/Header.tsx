@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "../components/button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import IMAGES from "../assets/images";
-import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
+import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown"; 
 
 interface User {
   name: string;
@@ -18,9 +19,16 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
   };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   const user: User = {
     name: "usman",
     role: "HR Manager",
@@ -71,20 +79,11 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
             className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
           />
         </div>
-        <div className="flex items-center h-[40px] md:h-[50px] space-x-2 border border-[#A2A1A833] rounded-[8px] px-[5px]">
-          <img
-            src={IMAGES.Profileimg.src}
-            alt={`${user.name}'s avatar`}
-            className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded"
-          />
-          <div>
-            <p className="text-[14px] md:text-[16px] font-semibold">
-              {user.name}
-            </p>
-            <p className="text-xs font-light text-gray-400">{user.role}</p>
-          </div>
-          <MdKeyboardArrowDown size={20} />
-        </div>
+        <UserProfileDropdown
+          user={user}
+          isDropdownOpen={isDropdownOpen}
+          toggleDropdown={toggleDropdown}
+        />
       </div>
     </header>
   );

@@ -5,6 +5,8 @@ interface CustomButtonProps {
   icon?: IconType;
   className?: string;
   onClick?: () => void;
+  disabled?: boolean;
+  type?: string;
 }
 
 const Button: React.FC<CustomButtonProps> = ({

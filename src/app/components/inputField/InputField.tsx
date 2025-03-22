@@ -1,3 +1,4 @@
+'use client'
 import { useState, useRef } from "react";
 import { BiHide, BiShow } from "react-icons/bi";
 import { MdKeyboardArrowDown } from "react-icons/md";
@@ -16,6 +17,7 @@ interface InputFieldProps {
   accept?: string;
   multiple?: boolean;
   onFileChange?: (files: FileList) => void;
+  disabled?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
