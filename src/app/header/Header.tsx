@@ -4,13 +4,8 @@ import Button from "../components/button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
-import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown"; 
-
-interface User {
-  name: string;
-  role: string;
-  avatar: string;
-}
+import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
+import { useAdmin } from "@/app/hooks/useAdmin";
 
 interface HeaderProps {
   title: string;
@@ -20,6 +15,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { adminData } = useAdmin();
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
@@ -27,12 +23,6 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const fallbackUser: User = {
-    name: "Usman",
-    role: "HR Manager",
-    avatar: "https://via.placeholder.com/40",
   };
 
   const renderDescriptionWithIcon = () => {
@@ -43,10 +33,7 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
         <div className="flex items-center space-x-2">
           {parts.map((part, index) => (
             <React.Fragment key={index}>
-              <span
-                className="text-sm md:text-base"
-                style={{ color: textColor }}
-              >
+              <span className="text-sm md:text-base" style={{ color: textColor }}>
                 {part.trim()}
               </span>
               {index < parts.length - 1 && <MdKeyboardArrowRight size={20} />}
@@ -79,11 +66,7 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
             className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
           />
         </div>
-        <UserProfileDropdown
-          user={fallbackUser} 
-          isDropdownOpen={isDropdownOpen}
-          toggleDropdown={toggleDropdown}
-        />
+        <UserProfileDropdown />
       </div>
     </header>
   );

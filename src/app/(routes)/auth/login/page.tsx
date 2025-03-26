@@ -1,51 +1,23 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import IMAGES from "../../../assets/images/index";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
 import Link from "next/link";
-import { FaGithub } from "react-icons/fa";
-import { login } from "../../../../../actions/auth";
-import { useRouter } from "next/navigation";
+import { FcGoogle } from "react-icons/fc"; // Changed from FaGithub to FcGoogle
+import { useLogin } from "@/app/hooks/useLogin";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      if (data.role === "Admin") {
-        router.push("/dashboard");
-      } else {
-        router.push("/employee/add"); 
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    error,
+    loading,
+    handleSubmit,
+    handleGoogleLogin,
+  } = useLogin();
 
   return (
     <div className="h-screen bg-[#131313] flex items-center justify-center">
@@ -93,7 +65,7 @@ function Login() {
               />
               <p className="text-white text-[16px] font-light">Remember me</p>
             </div>
-            <Link href="/forgetPassword" className="text-orange-500">
+            <Link href="/auth/forgetPassword" className="text-orange-500">
               Forgot Password?
             </Link>
           </div>
@@ -108,16 +80,16 @@ function Login() {
 
           <div className="flex items-center justify-center w-full px-4 mt-[15px]">
             <Button
-              title="Login with GitHub"
-              icon={FaGithub}
-              onClick={() => login("github")}
+              title={loading ? "Processing..." : "Login with Google"} // Changed text
+              icon={FcGoogle} // Changed icon
+              onClick={handleGoogleLogin}
               disabled={loading}
             />
           </div>
 
           <div className="flex items-center justify-center w-full px-4 mt-[20px]">
             <p className="text-white text-[16px] font-light">
-              Don&apos;t have an account?{" "}
+              Don't have an account?{" "}
               <Link href="/auth/signup" className="text-orange-500 hover:underline">
                 Sign Up
               </Link>

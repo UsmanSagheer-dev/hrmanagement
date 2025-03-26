@@ -1,48 +1,90 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import IMAGES from "@/app/assets/images";
 import InputField from "@/app/components/inputField/InputField";
+import { useAdmin } from "@/app/hooks/useAdmin";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const ProfilePage: React.FC = () => {
+  const { adminData, isLoading, error, updateAdmin } = useAdmin();
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "John Doe",
-    role: "Developer",
-    image: IMAGES.Profileimg.src,
+    name: "",
+    role: "",
+    avatar: "",
   });
-  const [previewImage, setPreviewImage] = useState(formData.image);
+  const [previewImage, setPreviewImage] = useState("");
+
+  useEffect(() => {
+    if (adminData) {
+      setFormData({
+        name: adminData.name,
+        role: adminData.role,
+        avatar: adminData.avatar || "",
+      });
+      setPreviewImage(adminData.avatar || IMAGES.Profileimg.src);
+    }
+  }, [adminData]);
 
   const handleInputChange = (field: string) => (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleFileChange = (files: FileList) => {
     const file = files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
-      setFormData((prev) => ({
-        ...prev,
-        image: imageUrl,
-      }));
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("File size should be less than 2MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setPreviewImage(base64String);
+        setFormData((prev) => ({ ...prev, avatar: base64String }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-    if (isEditing) {
-      setFormData({
-        name: "John Doe",
-        role: "Developer",
-        image: IMAGES.Profileimg.src,
+  const handleSave = async () => {
+    try {
+      await updateAdmin({
+        name: formData.name,
+        role: formData.role,
+        avatar: formData.avatar,
       });
-      setPreviewImage(IMAGES.Profileimg.src);
+      setIsEditing(false);
+      toast.success("Profile updated successfully");
+      router.push("/dashboard"); // Redirect to dashboard
+    } catch (err) {
+      toast.error("Failed to update profile");
     }
   };
+
+  const handleCancel = () => {
+    if (adminData) {
+      setFormData({
+        name: adminData.name,
+        role: adminData.role,
+        avatar: adminData.avatar || "",
+      });
+      setPreviewImage(adminData.avatar || IMAGES.Profileimg.src);
+    }
+    setIsEditing(false);
+  };
+
+  if (isLoading) {
+    return <div className="text-white min-h-screen flex items-center justify-center">Loading profile...</div>;
+  }
+
+  if (error) {
+    return <div className="text-white min-h-screen flex items-center justify-center">Error: {error}</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#131313]">
@@ -68,24 +110,22 @@ const ProfilePage: React.FC = () => {
                 <motion.img
                   src={previewImage}
                   alt="Profile avatar"
-                  className="w-[120px] h-[120px] rounded-full shadow-lg"
+                  className="w-[120px] h-[120px] rounded-full shadow-lg object-cover"
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
                 />
-                <div className="absolute bottom-2 bg-white/80 px-2 py-1 rounded-md text-sm text-gray-700 shadow-md">
+                <label className="absolute bottom-2 bg-white/80 px-2 py-1 rounded-md text-sm text-gray-700 shadow-md cursor-pointer">
                   Change Image
-                </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files && handleFileChange(e.target.files)}
+                  />
+                </label>
               </div>
 
-              <InputField
-                type="file"
-                value=""
-                onChange={() => {}}
-                onFileChange={handleFileChange}
-                accept="image/*"
-                className="mb-4 text-white border-gray-300"
-              />
               <InputField
                 label="Name"
                 type="text"
@@ -103,19 +143,15 @@ const ProfilePage: React.FC = () => {
 
               <div className="flex space-x-2 justify-center">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   type="button"
-                  onClick={handleEditToggle}
+                  onClick={handleSave}
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
                 >
                   Save
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   type="button"
-                  onClick={handleEditToggle}
+                  onClick={handleCancel}
                   className="bg-gray-400 px-4 py-2 rounded-lg shadow-md hover:bg-gray-500 transition-all"
                 >
                   Cancel
@@ -125,9 +161,9 @@ const ProfilePage: React.FC = () => {
           ) : (
             <>
               <motion.img
-                src={formData.image}
+                src={previewImage}
                 alt="Profile avatar"
-                className="w-[120px] h-[120px] rounded-full mb-4 shadow-lg"
+                className="w-[120px] h-[120px] rounded-full mb-4 shadow-lg object-cover"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
@@ -136,14 +172,12 @@ const ProfilePage: React.FC = () => {
                 {formData.name}
               </h2>
               <p className="text-gray-400 mb-4">{formData.role}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleEditToggle}
+              <button
+                onClick={() => setIsEditing(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
               >
                 Edit Profile
-              </motion.button>
+              </button>
             </>
           )}
         </motion.div>
