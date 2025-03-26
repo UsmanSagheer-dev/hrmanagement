@@ -56,10 +56,11 @@ const ProfilePage: React.FC = () => {
       await updateAdmin({
         name: formData.name,
         role: formData.role,
-        avatar: formData.avatar
+        avatar: formData.avatar,
       });
       setIsEditing(false);
       toast.success("Profile updated successfully");
+      router.push("/dashboard"); // Redirect to dashboard
     } catch (err) {
       toast.error("Failed to update profile");
     }
