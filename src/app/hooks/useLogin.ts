@@ -24,11 +24,17 @@ export function useLogin() {
 
       if (result?.error) {
         setError("Invalid email or password");
+        setLoading(false);
         return;
       }
 
       if (result?.ok) {
-        router.push("/dashboard");
+        const userRole = await fetchUserRole();
+        if (userRole === "Admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/employee/add");
+        }
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
@@ -37,15 +43,41 @@ export function useLogin() {
     }
   };
 
-  const handleGoogleLogin = async () => {  // Changed from handleGithubLogin to handleGoogleLogin
+  const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
 
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });  // Changed "github" to "google"
+      await signIn("google", {
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
+
+      const userRole = await fetchUserRole();
+      if (userRole === "Admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/employee/add");
+      }
     } catch (err) {
-      setError("Failed to initiate Google login.");  // Updated error message
+      setError("Failed to initiate Google login.");
       setLoading(false);
+    }
+  };
+
+  const fetchUserRole = async (): Promise<string> => {
+    try {
+      const response = await fetch("/api/user/role", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      return data.role;
+    } catch (err) {
+      console.error("Error fetching user role:", err);
+      return "user";
     }
   };
 
@@ -57,6 +89,6 @@ export function useLogin() {
     error,
     loading,
     handleSubmit,
-    handleGoogleLogin,  // Updated function name in return object
+    handleGoogleLogin,
   };
 }

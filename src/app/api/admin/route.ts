@@ -69,7 +69,6 @@ export const useAdmin = () => {
     }
   };
 
-  // Sync with session data when available
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       setAdminData({
@@ -77,9 +76,9 @@ export const useAdmin = () => {
         name: session.user.name || "",
         email: session.user.email || "",
         role: session.user.role || "user",
-        avatar: session.user.image || undefined, // Use Google image from session
-        createdAt: new Date().toISOString(), // Placeholder, replace with actual data if available
-        updatedAt: new Date().toISOString(), // Placeholder
+        avatar: session.user.image || undefined, 
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(), 
       });
       setIsLoading(false);
     } else if (status === "unauthenticated") {
