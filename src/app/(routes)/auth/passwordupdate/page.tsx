@@ -15,7 +15,7 @@ const PasswordUpdated: React.FC = () => {
         <p className="text-gray-400 text-[16px] font-light mt-2 mb-[40px]">
           Your password has been updated
         </p>
-        <Button title="Back to Login" onClick={() => router.push("/login")} />
+        <Button title="Back to Login" onClick={() => router.push("/auth/login")} />
       </div>
     </div>
   );

@@ -7,16 +7,16 @@ interface AdminData {
   name: string;
   email: string;
   role: string;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export const useAdmin = () => {
   const [adminData, setAdminData] = useState<AdminData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch admin data
   const fetchAdminData = async () => {
     try {
       setIsLoading(true);
@@ -31,56 +31,37 @@ export const useAdmin = () => {
       setAdminData(data);
     } catch (err: any) {
       setError(err.message);
-      toast.error(err.message);
+      console.error("Admin fetch error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Update admin data
-  const updateAdmin = async (updates: { name?: string; email?: string; password?: string }) => {
+  const updateAdmin = async (updates: {
+    name?: string;
+    role?: string;
+    avatar?: string;
+  }) => {
     try {
-      setIsLoading(true);
+      if (!adminData?.id) throw new Error("No user ID available");
+      
       const response = await fetch("/api/register", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
+        body: JSON.stringify({
+          userId: adminData.id,
+          ...updates
+        }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to update admin");
+      if (!response.ok) throw new Error(data.error || "Update failed");
 
-      setAdminData(data);
-      toast.success("Admin updated successfully");
+      setAdminData(prev => prev ? { ...prev, ...data } : null);
       return data;
     } catch (err: any) {
       setError(err.message);
-      toast.error(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Delete admin
-  const deleteAdmin = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/register", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to delete admin");
-
-      setAdminData(null);
-      toast.success("Admin deleted successfully");
-      return data;
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message);
-    } finally {
-      setIsLoading(false);
+      throw err;
     }
   };
 
@@ -94,6 +75,5 @@ export const useAdmin = () => {
     error,
     fetchAdminData,
     updateAdmin,
-    deleteAdmin,
   };
 };

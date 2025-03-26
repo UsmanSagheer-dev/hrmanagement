@@ -22,7 +22,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
     
-    // Validate role
+  
     if (!["Admin", "HR", "Employee"].includes(newRole)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
