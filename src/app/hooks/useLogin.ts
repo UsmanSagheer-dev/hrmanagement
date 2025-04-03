@@ -10,76 +10,30 @@ export function useLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
 
-      if (result?.error) {
-        setError("Invalid email or password");
-        setLoading(false);
-        return;
-      }
+    setLoading(false);
 
-      if (result?.ok) {
-        const userRole = await fetchUserRole();
-        if (userRole === "Admin") {
-          router.push("/dashboard");
-        } else {
-          router.push("/employee/add");
-        }
-      }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-    } finally {
-      setLoading(false);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      router.push("/dashboard");
     }
   };
 
   const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      await signIn("google", {
-        redirect: false,
-        callbackUrl: "/dashboard",
-      });
-
-      const userRole = await fetchUserRole();
-      if (userRole === "Admin") {
-        router.push("/dashboard");
-      } else {
-        router.push("/employee/add");
-      }
-    } catch (err) {
-      setError("Failed to initiate Google login.");
-      setLoading(false);
-    }
+    await signIn("google");
   };
 
-  const fetchUserRole = async (): Promise<string> => {
-    try {
-      const response = await fetch("/api/role", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      return data.role;
-    } catch (err) {
-      console.error("Error fetching user role:", err);
-      return "user";
-    }
-  };
 
   return {
     email,
