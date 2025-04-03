@@ -56,11 +56,18 @@ const ProfilePage: React.FC = () => {
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
+      
+      // Only send the name and avatar, not the role
+      // This will prevent the "Not authorized to change role" error
       const updatedData = await updateUser({
         name: formData.name,
-        role: formData.role,
         avatar: formData.avatar,
+        // Only include role if it changed AND user is an Admin
+        ...(userData?.role === "Admin" && formData.role !== userData.role 
+            ? { role: formData.role } 
+            : {})
       });
+      
       setFormData({
         name: updatedData.name,
         role: updatedData.role,
