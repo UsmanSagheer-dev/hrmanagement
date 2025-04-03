@@ -135,13 +135,13 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
           <Button
             title="Cancel"
             onClick={handleCancel}
-            className="w-[91px] h-[50px] bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="w-[91px] h-[50px] cursor-pointer bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
           />
           <Button
             title="Next"
             onClick={handleNext}
             disabled={isNextDisabled}
-            className={`w-[91px] h-[50px] rounded-lg transition-colors ${
+            className={`w-[91px] h-[50px] rounded-lg transition-colors cursor-pointer ${
               isNextDisabled
                 ? "bg-gray-500 text-gray-300 cursor-not-allowed"
                 : "bg-[#E25319] text-white hover:bg-[#d14917]"

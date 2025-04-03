@@ -3,12 +3,12 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import IMAGES from "@/app/assets/images";
 import InputField from "@/app/components/inputField/InputField";
-import { useAdmin } from "@/app/hooks/useAdmin";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useUserProfile } from "@/app/hooks/useUserProfile";
 
 const ProfilePage: React.FC = () => {
-  const { adminData, isLoading, error, updateAdmin } = useAdmin();
+  const { userData, isLoading, error, updateUser } = useUserProfile();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,71 +19,81 @@ const ProfilePage: React.FC = () => {
   const [previewImage, setPreviewImage] = useState("");
 
   useEffect(() => {
-    if (adminData) {
+    if (userData) {
       setFormData({
-        name: adminData.name,
-        role: adminData.role,
-        avatar: adminData.avatar || "",
+        name: userData.name || "",
+        role: userData.role || "",
+        avatar: userData.avatar || "",
       });
-      setPreviewImage(adminData.avatar || IMAGES.Profileimg.src);
+      setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
     }
-  }, [adminData]);
+  }, [userData]);
 
   const handleInputChange = (field: string) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (files: FileList) => {
-    const file = files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("File size should be less than 2MB");
-        return;
-      }
+  const handleFileChange = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setPreviewImage(base64String);
-        setFormData((prev) => ({ ...prev, avatar: base64String }));
-      };
-      reader.readAsDataURL(file);
+    const file = files[0];
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size should be less than 2MB");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setPreviewImage(base64String);
+      setFormData((prev) => ({ ...prev, avatar: base64String }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
     try {
-      await updateAdmin({
+      const updatedData = await updateUser({
         name: formData.name,
         role: formData.role,
         avatar: formData.avatar,
       });
+      console.log("Updated data after save:", updatedData); // Debug log
+      setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src); // Ensure preview updates
       setIsEditing(false);
       toast.success("Profile updated successfully");
-      router.push("/dashboard"); // Redirect to dashboard
-    } catch (err) {
-      toast.error("Failed to update profile");
+      router.push("/dashboard");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update profile");
     }
   };
 
   const handleCancel = () => {
-    if (adminData) {
+    if (userData) {
       setFormData({
-        name: adminData.name,
-        role: adminData.role,
-        avatar: adminData.avatar || "",
+        name: userData.name || "",
+        role: userData.role || "",
+        avatar: userData.avatar || "",
       });
-      setPreviewImage(adminData.avatar || IMAGES.Profileimg.src);
+      setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
     }
     setIsEditing(false);
   };
 
   if (isLoading) {
-    return <div className="text-white min-h-screen flex items-center justify-center">Loading profile...</div>;
+    return (
+      <div className="text-white min-h-screen flex items-center justify-center">
+        Loading profile...
+      </div>
+    );
   }
 
-  if (error) {
-    return <div className="text-white min-h-screen flex items-center justify-center">Error: {error}</div>;
+  if (error || !userData) {
+    return (
+      <div className="text-white min-h-screen flex items-center justify-center">
+        Error: {error || "No user data available"}
+      </div>
+    );
   }
 
   return (
@@ -121,7 +131,7 @@ const ProfilePage: React.FC = () => {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => e.target.files && handleFileChange(e.target.files)}
+                    onChange={(e) => handleFileChange(e.target.files)}
                   />
                 </label>
               </div>
@@ -139,6 +149,7 @@ const ProfilePage: React.FC = () => {
                 value={formData.role}
                 onChange={handleInputChange("role")}
                 className="mb-4 text-white"
+                disabled={userData.role !== "Admin"}
               />
 
               <div className="flex space-x-2 justify-center">
@@ -146,6 +157,8 @@ const ProfilePage: React.FC = () => {
                   type="button"
                   onClick={handleSave}
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Save
                 </motion.button>
@@ -153,6 +166,8 @@ const ProfilePage: React.FC = () => {
                   type="button"
                   onClick={handleCancel}
                   className="bg-gray-400 px-4 py-2 rounded-lg shadow-md hover:bg-gray-500 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Cancel
                 </motion.button>
@@ -172,12 +187,14 @@ const ProfilePage: React.FC = () => {
                 {formData.name}
               </h2>
               <p className="text-gray-400 mb-4">{formData.role}</p>
-              <button
+              <motion.button
                 onClick={() => setIsEditing(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Edit Profile
-              </button>
+              </motion.button>
             </>
           )}
         </motion.div>

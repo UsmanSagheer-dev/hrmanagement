@@ -65,9 +65,9 @@ const AccountAccessForm: React.FC<AccountAccessFormProps> = ({ onTabChange }) =>
             </div>
             <div className="flex justify-end gap-4">
               <Button title="Cancel" onClick={handleCancel}
-                className="w-[91px] h-[50px] bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors" />
+                className="w-[91px] h-[50px] bg-transparent border cursor-pointer border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors" />
               <Button title={isLoading ? "Saving..." : "Add"} disabled={isLoading}
-                className={`w-[91px] h-[50px] ${isLoading ? "bg-gray-600" : "bg-[#E25319]"} text-white rounded-lg hover:bg-[#d14917] transition-colors`} />
+                className={`w-[91px] h-[50px] ${isLoading ? "bg-gray-600" : "bg-[#E25319]"} text-white rounded-lg hover:bg-[#d14917] transition-colors cursor-pointer`} />
             </div>
           </div>
         </form>

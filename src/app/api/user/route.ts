@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 
-export async function GET() {
+export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -15,7 +15,13 @@ export async function GET() {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
+    const url = new URL(req.url);
+    const skip = parseInt(url.searchParams.get("skip") || "0", 10);
+    const take = parseInt(url.searchParams.get("take") || "10", 10);
+
     const users = await db.user.findMany({
+      skip,
+      take,
       select: {
         id: true,
         name: true,
@@ -24,7 +30,17 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(users, { status: 200 });
+    const totalUsers = await db.user.count();
+
+    return NextResponse.json(
+      {
+        users,
+        total: totalUsers,
+        skip,
+        take,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("USERS_FETCH_ERROR:", error);
     return NextResponse.json(
