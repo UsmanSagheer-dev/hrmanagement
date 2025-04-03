@@ -21,9 +21,22 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserData = useCallback(async () => {
-    if (!session?.user?.id) return;
+    if (status !== "authenticated") return;
 
-    const cachedData = cache.get(session.user.id);
+    // If we don't have a user ID in the session, log it and return
+    if (!session?.user?.id) {
+      console.error("No user ID found in session:", session);
+      setError("No user ID found in session");
+      setIsLoading(false);
+      return;
+    }
+
+    const userId = session.user.id;
+    
+    // Log to help debugging
+    console.log("Fetching user data for ID:", userId);
+
+    const cachedData = cache.get(userId);
     if (cachedData && !initialUserData) {
       setUserData(cachedData);
       setIsLoading(false);
@@ -35,28 +48,41 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       setIsLoading(true);
       const response = await fetch("/api/profile", {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        // Add cache control to ensure we get fresh data
+        cache: "no-store"
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to fetch user data");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
 
+      const data = await response.json();
+      console.log("Fetched user data:", data);
+      
       setUserData(data);
-      cache.set(session.user.id, data);
+      cache.set(userId, data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching user data");
       console.error("User fetch error:", err);
+      setError(err.message || "An error occurred while fetching user data");
     } finally {
       setIsLoading(false);
     }
-  }, [session, initialUserData]);
+  }, [session, status, initialUserData]);
 
   const updateUser = useCallback(
     async (updates: { name?: string; role?: string; avatar?: string }) => {
-      if (!userData?.id) throw new Error("No user ID available");
+      if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+      }
 
       try {
+        console.log("Updating user with data:", updates);
+        
         const response = await fetch("/api/profile", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -64,22 +90,30 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Update failed");
+        if (!response.ok) {
+          console.error("Update error response:", data);
+          throw new Error(data.error || "Update failed");
+        }
 
-        console.log("Updated user data from hook:", data); 
+        console.log("Updated user data:", data);
+        
+        // Update local state and cache
         setUserData((prev) => {
-          const updated = prev ? { ...prev, ...data } : null;
-          if (updated && session?.user?.id) cache.set(session.user.id, updated);
+          const updated = prev ? { ...prev, ...data } : data;
+          const userId = session.user?.id;
+          if (userId) cache.set(userId, updated);
           return updated;
         });
+        
         setError(null);
         return data;
       } catch (err: any) {
+        console.error("Profile update error:", err);
         setError(err.message || "Failed to update profile");
         throw err;
       }
     },
-    [userData, session]
+    [session]
   );
 
   useEffect(() => {
@@ -88,25 +122,14 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       if (session?.user?.id) cache.set(session.user.id, initialUserData);
       setIsLoading(false);
       setError(null);
-    } else if (status === "authenticated" && session?.user) {
-      const sessionData: UserData = {
-        id: session.user.id || "",
-        name: session.user.name || "",
-        email: session.user.email || "",
-        role: session.user.role || "user",
-        avatar: session.user.image || undefined,
-        createdAt: session.user.createdAt || new Date().toISOString(),
-        updatedAt: session.user.updatedAt || new Date().toISOString(),
-      };
-      setUserData(sessionData);
-      cache.set(session.user.id, sessionData);
+    } else if (status === "authenticated") {
       fetchUserData();
     } else if (status === "unauthenticated") {
       setUserData(null);
       setIsLoading(false);
       setError("Not authenticated");
     }
-  }, [session, status, fetchUserData, initialUserData]);
+  }, [status, fetchUserData, initialUserData, session]);
 
   return { userData, isLoading, error, fetchUserData, updateUser };
 };

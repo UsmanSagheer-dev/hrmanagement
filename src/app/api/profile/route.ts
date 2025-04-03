@@ -3,37 +3,69 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 
-export async function GET(req: Request) {
+export const GET = async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Not authenticated" }, 
+        { status: 401 }
+      );
     }
 
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    // Debug logging
+    console.log("GET /api/profile - Session:", {
+      id: session.user.id,
+      email: session.user.email
     });
+    
+    // First try finding by ID
+    let user = null;
+    if (session.user.id) {
+      user = await db.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    }
+    
+    // If no user found by ID, try by email (for Google auth)
+    if (!user && session.user.email) {
+      user = await db.user.findUnique({
+        where: { email: session.user.email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    }
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      console.error("User not found for:", { 
+        id: session.user.id, 
+        email: session.user.email 
+      });
+      
+      return NextResponse.json(
+        { error: "User not found" }, 
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json(user, {
-      status: 200,
-      headers: {
-        "Cache-Control": "s-maxage=3600, stale-while-revalidate",
-      },
-    });
+    return NextResponse.json(user);
   } catch (error) {
     console.error("PROFILE_FETCH_ERROR:", error);
     return NextResponse.json(
@@ -41,19 +73,24 @@ export async function GET(req: Request) {
       { status: 500 }
     );
   }
-}
+};
 
-export async function PUT(req: Request) {
+export const PUT = async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    // Debug logging
+    console.log("PUT /api/profile - Session:", {
+      id: session.user.id,
+      email: session.user.email
+    });
+
     const { name, role, avatar } = await req.json();
 
-    // Restrict role changes to admins
     if (role && session.user.role !== "Admin") {
       return NextResponse.json(
         { error: "Not authorized to change role" },
@@ -61,12 +98,35 @@ export async function PUT(req: Request) {
       );
     }
 
+    // First find the user to ensure they exist
+    let user = null;
+    if (session.user.id) {
+      user = await db.user.findUnique({
+        where: { id: session.user.id },
+      });
+    }
+    
+    // If not found by ID, try email (for Google auth)
+    if (!user && session.user.email) {
+      user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
+    }
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Now update the user with the found ID
     const updatedUser = await db.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: {
         name: name || undefined,
         role: role || undefined,
-        avatar: avatar || undefined, // Ensure avatar is saved
+        avatar: avatar || undefined,
         updatedAt: new Date(),
       },
       select: {
@@ -80,7 +140,6 @@ export async function PUT(req: Request) {
       },
     });
 
-    console.log("Updated user from API:", updatedUser); // Debug log
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
     console.error("PROFILE_UPDATE_ERROR:", error);
@@ -89,4 +148,7 @@ export async function PUT(req: Request) {
       { status: 500 }
     );
   }
-}
+};
+
+// Disable caching for this API route
+export const revalidate = 0;

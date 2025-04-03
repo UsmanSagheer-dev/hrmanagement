@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 
 const ProfilePage: React.FC = () => {
-  const { userData, isLoading, error, updateUser } = useUserProfile();
+  const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,14 +17,16 @@ const ProfilePage: React.FC = () => {
     avatar: "",
   });
   const [previewImage, setPreviewImage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (userData) {
-      setFormData({
+      const updatedData = {
         name: userData.name || "",
         role: userData.role || "",
         avatar: userData.avatar || "",
-      });
+      };
+      setFormData(updatedData);
       setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
     }
   }, [userData]);
@@ -53,18 +55,25 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
+      setIsSubmitting(true);
       const updatedData = await updateUser({
         name: formData.name,
         role: formData.role,
         avatar: formData.avatar,
       });
-      console.log("Updated data after save:", updatedData); // Debug log
-      setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src); // Ensure preview updates
+      setFormData({
+        name: updatedData.name,
+        role: updatedData.role,
+        avatar: updatedData.avatar,
+      });
+      setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
       setIsEditing(false);
       toast.success("Profile updated successfully");
       router.push("/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Failed to update profile");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,6 +101,12 @@ const ProfilePage: React.FC = () => {
     return (
       <div className="text-white min-h-screen flex items-center justify-center">
         Error: {error || "No user data available"}
+        <button
+          onClick={() => fetchUserData()}
+          className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -107,7 +122,6 @@ const ProfilePage: React.FC = () => {
         <h1 className="text-2xl font-bold mb-6 text-center text-white">
           User Profile
         </h1>
-
         <motion.div
           className="flex flex-col items-center"
           initial={{ opacity: 0, y: 20 }}
@@ -115,15 +129,17 @@ const ProfilePage: React.FC = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           {isEditing ? (
-            <form className="w-full">
+            <form className="w-full" onSubmit={(e) => e.preventDefault()}>
               <div className="mb-4 flex justify-center relative">
                 <motion.img
+                  key={previewImage}
                   src={previewImage}
                   alt="Profile avatar"
                   className="w-[120px] h-[120px] rounded-full shadow-lg object-cover"
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
+                  onError={(e) => (e.currentTarget.src = IMAGES.Profileimg.src)}
                 />
                 <label className="absolute bottom-2 bg-white/80 px-2 py-1 rounded-md text-sm text-gray-700 shadow-md cursor-pointer">
                   Change Image
@@ -135,7 +151,6 @@ const ProfilePage: React.FC = () => {
                   />
                 </label>
               </div>
-
               <InputField
                 label="Name"
                 type="text"
@@ -151,20 +166,23 @@ const ProfilePage: React.FC = () => {
                 className="mb-4 text-white"
                 disabled={userData.role !== "Admin"}
               />
-
               <div className="flex space-x-2 justify-center">
                 <motion.button
                   type="button"
                   onClick={handleSave}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+                  disabled={isSubmitting}
+                  className={`bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Save
+                  {isSubmitting ? "Saving..." : "Save"}
                 </motion.button>
                 <motion.button
                   type="button"
                   onClick={handleCancel}
+                  disabled={isSubmitting}
                   className="bg-gray-400 px-4 py-2 rounded-lg shadow-md hover:bg-gray-500 transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -176,12 +194,14 @@ const ProfilePage: React.FC = () => {
           ) : (
             <>
               <motion.img
+                key={previewImage}
                 src={previewImage}
                 alt="Profile avatar"
                 className="w-[120px] h-[120px] rounded-full mb-4 shadow-lg object-cover"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
+                onError={(e) => (e.currentTarget.src = IMAGES.Profileimg.src)}
               />
               <h2 className="text-xl font-semibold mb-2 text-white">
                 {formData.name}

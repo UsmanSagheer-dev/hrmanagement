@@ -67,7 +67,7 @@ export function useLogin() {
 
   const fetchUserRole = async (): Promise<string> => {
     try {
-      const response = await fetch("/api/user/role", {
+      const response = await fetch("/api/role", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

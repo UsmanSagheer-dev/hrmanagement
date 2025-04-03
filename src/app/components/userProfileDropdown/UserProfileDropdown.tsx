@@ -39,33 +39,26 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <img
-          src={`${userData.avatar || IMAGES.Profileimg.src}?t=${new Date().getTime()}`}
+          key={userData.avatar || "default"} // Force re-render when avatar changes
+          src={userData.avatar || IMAGES.Profileimg.src} // Simplified src without extra cache-busting
           alt={`${userData.name}'s avatar`}
           className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded object-cover"
+          onError={(e) => {
+            console.error("Image load error:", e);
+            e.currentTarget.src = IMAGES.Profileimg.src; // Fallback to default on error
+          }}
         />
         <div>
-          <p className="text-[14px] md:text-[16px] font-semibold text-white">
-            {userData.name}
-          </p>
+          <p className="text-[14px] md:text-[16px] font-semibold text-white">{userData.name}</p>
           <p className="text-xs font-light text-gray-400">{userData.role}</p>
         </div>
         <MdKeyboardArrowDown size={20} className="text-white" />
       </div>
-
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-[8px] shadow-lg z-20">
           <ul className="py-2">
-            <li
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </li>
-            <Link href="/profile">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                Profile
-              </li>
-            </Link>
+            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
+            <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li></Link>
           </ul>
         </div>
       )}
