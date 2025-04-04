@@ -6,7 +6,9 @@ import InputField from "@/app/components/inputField/InputField";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
-import { uploadImageToCloudinary } from "@/app/utils/cloudinary";
+import Image from "next/image";
+
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
 
 const ProfilePage: React.FC = () => {
   const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
@@ -22,11 +24,12 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (userData) {
-      setFormData({
+      const updatedData = {
         name: userData.name || "",
         role: userData.role || "",
         avatar: userData.avatar || "",
-      });
+      };
+      setFormData(updatedData);
       setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
     }
   }, [userData]);
@@ -35,48 +38,75 @@ const ProfilePage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = async (files: FileList | null) => {
+  const handleFileChange = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    if (file.size > 2 * 1024 * 1024) {
+    
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
       toast.error("File size should be less than 2MB");
       return;
     }
-
-    try {
-      toast.loading("Uploading image...");
-      const imageUrl = await uploadImageToCloudinary(file);
-      setPreviewImage(imageUrl);
-      setFormData((prev) => ({ ...prev, avatar: imageUrl }));
-      toast.dismiss();
-      toast.success("Image uploaded successfully");
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Failed to upload image");
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      // For preview and upload preparation
+      setPreviewImage(base64String);
+      setFormData((prev) => ({ ...prev, avatar: base64String }));
+    };
+    reader.onerror = () => {
+      toast.error("Error reading file");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
       
-      const updatedData = await updateUser({
-        name: formData.name,
-        avatar: formData.avatar,
-        ...(userData?.role === "Admin" && formData.role !== userData.role 
-            ? { role: formData.role } 
-            : {})
-      });
+      // Only send the fields that changed
+      const updates: Record<string, any> = {};
       
-      setFormData({
-        name: updatedData.name,
-        role: updatedData.role,
-        avatar: updatedData.avatar,
-      });
-      setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
+      if (formData.name !== userData?.name) {
+        updates.name = formData.name;
+      }
+      
+      if (previewImage !== userData?.avatar && formData.avatar) {
+        updates.avatar = formData.avatar;
+      }
+      
+      // Only include role if it changed AND user is an Admin
+      if (userData?.role === "Admin" && formData.role !== userData.role) {
+        updates.role = formData.role;
+      }
+      
+      // Only make API call if there are actual updates
+      if (Object.keys(updates).length > 0) {
+        const updatedData = await updateUser(updates);
+        
+        setFormData({
+          name: updatedData.name,
+          role: updatedData.role,
+          avatar: updatedData.avatar,
+        });
+        
+        // Update preview with Cloudinary URL returned from server
+        setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
+        toast.success("Profile updated successfully");
+      } else {
+        toast.info("No changes detected");
+      }
+      
       setIsEditing(false);
-      toast.success("Profile updated successfully");
       router.push("/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Failed to update profile");
@@ -139,21 +169,27 @@ const ProfilePage: React.FC = () => {
           {isEditing ? (
             <form className="w-full" onSubmit={(e) => e.preventDefault()}>
               <div className="mb-4 flex justify-center relative">
-                <motion.img
-                  key={previewImage}
-                  src={previewImage}
-                  alt="Profile avatar"
-                  className="w-[120px] h-[120px] rounded-full shadow-lg object-cover"
+                <motion.div
+                  className="relative w-[120px] h-[120px] rounded-full shadow-lg overflow-hidden"
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
-                  onError={(e) => (e.currentTarget.src = IMAGES.Profileimg.src)}
-                />
+                >
+                  <img
+                    src={previewImage}
+                    alt="Profile avatar"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error("Image load error");
+                      e.currentTarget.src = IMAGES.Profileimg.src;
+                    }}
+                  />
+                </motion.div>
                 <label className="absolute bottom-2 bg-white/80 px-2 py-1 rounded-md text-sm text-gray-700 shadow-md cursor-pointer">
                   Change Image
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
                     className="hidden"
                     onChange={(e) => handleFileChange(e.target.files)}
                   />
@@ -201,16 +237,22 @@ const ProfilePage: React.FC = () => {
             </form>
           ) : (
             <>
-              <motion.img
-                key={previewImage}
-                src={previewImage}
-                alt="Profile avatar"
-                className="w-[120px] h-[120px] rounded-full mb-4 shadow-lg object-cover"
+              <motion.div
+                className="relative w-[120px] h-[120px] rounded-full mb-4 shadow-lg overflow-hidden"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
-                onError={(e) => (e.currentTarget.src = IMAGES.Profileimg.src)}
-              />
+              >
+                <img
+                  src={previewImage}
+                  alt="Profile avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error("Image load error");
+                    e.currentTarget.src = IMAGES.Profileimg.src;
+                  }}
+                />
+              </motion.div>
               <h2 className="text-xl font-semibold mb-2 text-white">
                 {formData.name}
               </h2>
