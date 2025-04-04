@@ -1,32 +1,24 @@
+// app/api/user/me/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
-import db from "../../../../lib/prismadb";
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    if (session.user.role !== "Admin") {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-    }
-
-    const users = await db.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+    return NextResponse.json({
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      role: session.user.role,
     });
-
-    return NextResponse.json(users, { status: 200 });
   } catch (error) {
-    console.error("USERS_FETCH_ERROR:", error);
+    console.error("USER_ME_ERROR:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

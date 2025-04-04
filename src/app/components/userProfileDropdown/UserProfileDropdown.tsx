@@ -4,20 +4,32 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { signOut } from "next-auth/react";
 import IMAGES from "@/app/assets/images";
 import Link from "next/link";
-import { useAdmin } from "@/app/hooks/useAdmin";
+import { useUserProfile } from "@/app/hooks/useUserProfile";
 
-const UserProfileDropdown: React.FC = () => {
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Props {
+  initialUserData?: UserData | null;
+}
+
+const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { adminData, isLoading } = useAdmin();
+  const { userData, isLoading } = useUserProfile(initialUserData);
 
   const handleLogout = () => {
     signOut({ callbackUrl: "/auth/login" });
   };
 
-  if (isLoading || !adminData) {
-    return (
-      <div className="h-[50px] w-[200px] animate-pulse bg-gray-700 rounded-lg" />
-    );
+  if (isLoading || !userData) {
+    return <div className="h-[50px] w-[200px] animate-pulse bg-gray-700 rounded-lg" />;
   }
 
   return (
@@ -27,33 +39,26 @@ const UserProfileDropdown: React.FC = () => {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <img
-          src={adminData.avatar || IMAGES.Profileimg.src}
-          alt={`${adminData.name}'s avatar`}
+          key={userData.avatar || "default"} // Force re-render when avatar changes
+          src={userData.avatar || IMAGES.Profileimg.src} // Simplified src without extra cache-busting
+          alt={`${userData.name}'s avatar`}
           className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded object-cover"
+          onError={(e) => {
+            console.error("Image load error:", e);
+            e.currentTarget.src = IMAGES.Profileimg.src; // Fallback to default on error
+          }}
         />
         <div>
-          <p className="text-[14px] md:text-[16px] font-semibold text-white">
-            {adminData.name}
-          </p>
-          <p className="text-xs font-light text-gray-400">{adminData.role}</p>
+          <p className="text-[14px] md:text-[16px] font-semibold text-white">{userData.name}</p>
+          <p className="text-xs font-light text-gray-400">{userData.role}</p>
         </div>
         <MdKeyboardArrowDown size={20} className="text-white" />
       </div>
-
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-[8px] shadow-lg z-20">
           <ul className="py-2">
-            <li
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </li>
-            <Link href="/profile">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                Profile
-              </li>
-            </Link>
+            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
+            <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li></Link>
           </ul>
         </div>
       )}

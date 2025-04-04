@@ -7,17 +7,19 @@ import db from "./prismadb";
 declare module "next-auth" {
   interface User {
     id: string;
-    email: string | null;
+    email: string;
     name: string | null;
-    role: string | null;
+    role: string;
+    avatar?: string | null;
   }
 
   interface Session {
     user: {
       id: string;
-      email: string | null;
+      email: string;
       name: string | null;
-      role: string | null;
+      role: string;
+      avatar?: string | null;
     };
   }
 }
@@ -34,15 +36,33 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required");
         }
-        const user = await db.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user || !user.hashedPassword) {
-          throw new Error("Invalid credentials");
+
+        try {
+          const user = await db.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user || !user.hashedPassword) {
+            throw new Error("Invalid credentials");
+          }
+
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            user.hashedPassword
+          );
+          if (!isValid) throw new Error("Invalid password");
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role || "user",
+            avatar: user.avatar,
+          };
+        } catch (error) {
+          console.error("Authorize error:", error);
+          throw new Error("Authentication failed");
         }
-        const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
-        if (!isValid) throw new Error("Invalid password");
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
       },
     }),
     Google({
@@ -50,69 +70,122 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
       authorization: {
         params: {
-          scope: "openid email profile", // Explicitly request profile scope
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+          scope: "openid email profile",
         },
+      },
+      profile(profile) {
+        return {
+          id: profile.sub, // Google ID as temporary ID
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          role: "user",
+        };
       },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/auth/login",
   },
   callbacks: {
-async signIn({ user, account }) {
-  if (account?.provider === "google") {
-    try {
-      const existingUser = await db.user.findUnique({
-        where: { email: user.email! },
-      });
-      
-      if (!existingUser) {
-        // Create new user with Google details
-        const newUser = await db.user.create({
-          data: {
-            email: user.email!,
-            name: user.name!,
-            role: "user",
-            image: user.image || null, // Save Google profile image
-          },
-        });
-      } else {
-        // Update user's image if not already set
-        if (!existingUser.image && user.image) {
-          await db.user.update({
-            where: { email: user.email! },
-            data: { image: user.image },
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        try {
+          const existingUser = await db.user.findUnique({
+            where: { email: user.email },
           });
+
+          if (!existingUser) {
+            const newUser = await db.user.create({
+              data: {
+                email: user.email,
+                name: user.name,
+                role: "user",
+                avatar: user.image,
+              },
+            });
+            user.id = newUser.id; // Assign database ID
+            console.log("New Google user created with ID:", newUser.id);
+          } else {
+            user.id = existingUser.id; // Use existing database ID
+            if (user.image && user.image !== existingUser.avatar) {
+              await db.user.update({
+                where: { id: existingUser.id },
+                data: { avatar: user.image },
+              });
+              console.log("Updated avatar for user:", existingUser.id);
+            }
+          }
+          return true;
+        } catch (error) {
+          console.error("Google signIn error:", error);
+          return false;
         }
       }
-    } catch (error) {
-      console.error("Error creating/updating user in MongoDB:", error);
-      return false;
-    }
-  }
-  return true;
-},
+      return true; // Credentials sign-in
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
         token.role = user.role;
-       token.image = user.image;
+        token.avatar = user.avatar || user.image;
+        console.log("JWT token updated:", token);
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.image = token.image as string; // Add image to session
+      try {
+        if (token?.id) {
+          const dbUser = await db.user.findUnique({
+            where: { id: token.id as string },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              avatar: true,
+            },
+          });
+
+          if (dbUser) {
+            session.user = {
+              id: dbUser.id,
+              email: dbUser.email,
+              name: dbUser.name,
+              role: dbUser.role || "user",
+              avatar: dbUser.avatar,
+            };
+            console.log("Session updated with user:", session.user);
+          } else {
+            console.error("No user found in DB for token ID:", token.id);
+            // Fallback to token data if DB fails
+            session.user = {
+              id: token.id as string,
+              email: token.email as string,
+              name: token.name || null,
+              role: (token.role as string) || "user",
+              avatar: token.avatar || null,
+            };
+          }
+        } else {
+          console.error("No token.id available:", token);
+        }
+        return session;
+      } catch (error) {
+        console.error("Session callback error:", error);
+        throw new Error("Failed to update session");
       }
-      return session;
     },
   },
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
 };

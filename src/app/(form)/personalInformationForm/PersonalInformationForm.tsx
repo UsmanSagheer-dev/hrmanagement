@@ -236,11 +236,11 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
             <Button
               title="Cancel"
               onClick={handleCancel}
-              className="w-[91px] h-[50px] bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              className="w-[91px] h-[50px] cursor-pointer bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors "
             />
             <Button
               title="Next"
-              className="w-[91px] h-[50px] bg-[#E25319] text-white rounded-lg hover:bg-[#d14917] transition-colors"
+              className="w-[91px] h-[50px] cursor-pointer bg-[#E25319] text-white rounded-lg hover:bg-[#d14917] transition-colors"
             />
           </div>
         </form>

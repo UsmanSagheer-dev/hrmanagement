@@ -5,7 +5,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
 import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
-import { useAdmin } from "@/app/hooks/useAdmin";
+import { useUserProfile } from "@/app/hooks/useUserProfile"; 
 
 interface HeaderProps {
   title: string;
@@ -15,7 +15,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { adminData } = useAdmin();
+  const { userData } = useUserProfile(); // Updated to userData
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
@@ -33,7 +33,10 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
         <div className="flex items-center space-x-2">
           {parts.map((part, index) => (
             <React.Fragment key={index}>
-              <span className="text-sm md:text-base" style={{ color: textColor }}>
+              <span
+                className="text-sm md:text-base"
+                style={{ color: textColor }}
+              >
                 {part.trim()}
               </span>
               {index < parts.length - 1 && <MdKeyboardArrowRight size={20} />}

@@ -113,11 +113,10 @@ export const useEmployeeForm = () => {
   };
 
   const validatePhone = (phone: string): boolean => {
-    const re = /^\+?[1-9]\d{1,14}$/; // E.164 format
+    const re = /^\+?[1-9]\d{1,14}$/; 
     return re.test(phone);
   };
 
-  // Update handlers with validation
   const updatePersonal = async (data: any) => {
     if (!validateEmail(data.email)) {
       throw new Error('Invalid email format');
