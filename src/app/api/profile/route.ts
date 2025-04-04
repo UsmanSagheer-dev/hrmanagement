@@ -1,7 +1,9 @@
+
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
+import cloudinary, { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinary";
 
 export const GET = async (req: Request) => {
   try {
@@ -120,15 +122,46 @@ export const PUT = async (req: Request) => {
       );
     }
 
+    // Prepare update data
+    const updateData: any = {
+      updatedAt: new Date()
+    };
+    
+    if (name) {
+      updateData.name = name;
+    }
+    
+    if (role && session.user.role === "Admin") {
+      updateData.role = role;
+    }
+
+    // Handle avatar upload if provided and changed
+    if (avatar && avatar !== user.avatar) {
+      try {
+        console.log("Uploading new avatar to Cloudinary");
+        
+        // Upload new avatar to Cloudinary
+        const avatarUrl = await uploadToCloudinary(avatar);
+        updateData.avatar = avatarUrl;
+        
+        // Delete the old avatar from Cloudinary if it exists
+        if (user.avatar && user.avatar.includes('cloudinary.com')) {
+          console.log("Deleting old avatar from Cloudinary");
+          await deleteFromCloudinary(user.avatar);
+        }
+      } catch (err) {
+        console.error("Avatar upload error:", err);
+        return NextResponse.json(
+          { error: "Failed to upload avatar" },
+          { status: 500 }
+        );
+      }
+    }
+
     // Now update the user with the found ID
     const updatedUser = await db.user.update({
       where: { id: user.id },
-      data: {
-        name: name || undefined,
-        role: role || undefined,
-        avatar: avatar || undefined,
-        updatedAt: new Date(),
-      },
+      data: updateData,
       select: {
         id: true,
         name: true,

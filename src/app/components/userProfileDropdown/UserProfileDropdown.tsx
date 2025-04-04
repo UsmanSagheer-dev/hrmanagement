@@ -32,22 +32,39 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
     return <div className="h-[50px] w-[200px] animate-pulse bg-gray-700 rounded-lg" />;
   }
 
+  // Add a cache-busting parameter for Cloudinary URLs
+  const getAvatarUrl = (url?: string) => {
+    if (!url) return IMAGES.Profileimg.src;
+    
+    // For Cloudinary URLs, add a cache-busting parameter to avoid stale images
+    if (url.includes('cloudinary.com')) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}t=${new Date().getTime()}`;
+    }
+    
+    return url;
+  };
+
+  const avatarUrl = getAvatarUrl(userData.avatar);
+
   return (
     <div className="relative">
       <div
         className="flex items-center h-[40px] md:h-[50px] space-x-2 border border-[#A2A1A833] rounded-[8px] px-[5px] cursor-pointer"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
-        <img
-          key={userData.avatar || "default"} // Force re-render when avatar changes
-          src={userData.avatar || IMAGES.Profileimg.src} // Simplified src without extra cache-busting
-          alt={`${userData.name}'s avatar`}
-          className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded object-cover"
-          onError={(e) => {
-            console.error("Image load error:", e);
-            e.currentTarget.src = IMAGES.Profileimg.src; // Fallback to default on error
-          }}
-        />
+        <div className="relative w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded overflow-hidden">
+          <img
+            key={avatarUrl} // Force re-render when avatar changes
+            src={avatarUrl}
+            alt={`${userData.name}'s avatar`}
+            className="w-full h-full rounded object-cover"
+            onError={(e) => {
+              console.error("Image load error");
+              e.currentTarget.src = IMAGES.Profileimg.src;
+            }}
+          />
+        </div>
         <div>
           <p className="text-[14px] md:text-[16px] font-semibold text-white">{userData.name}</p>
           <p className="text-xs font-light text-gray-400">{userData.role}</p>
