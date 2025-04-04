@@ -6,6 +6,7 @@ import InputField from "@/app/components/inputField/InputField";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { uploadImageToCloudinary } from "@/app/utils/cloudinary";
 
 const ProfilePage: React.FC = () => {
   const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
@@ -21,12 +22,11 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (userData) {
-      const updatedData = {
+      setFormData({
         name: userData.name || "",
         role: userData.role || "",
         avatar: userData.avatar || "",
-      };
-      setFormData(updatedData);
+      });
       setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
     }
   }, [userData]);
@@ -35,7 +35,7 @@ const ProfilePage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (files: FileList | null) => {
+  const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
@@ -44,25 +44,26 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setPreviewImage(base64String);
-      setFormData((prev) => ({ ...prev, avatar: base64String }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      toast.loading("Uploading image...");
+      const imageUrl = await uploadImageToCloudinary(file);
+      setPreviewImage(imageUrl);
+      setFormData((prev) => ({ ...prev, avatar: imageUrl }));
+      toast.dismiss();
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to upload image");
+    }
   };
 
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
       
-      // Only send the name and avatar, not the role
-      // This will prevent the "Not authorized to change role" error
       const updatedData = await updateUser({
         name: formData.name,
         avatar: formData.avatar,
-        // Only include role if it changed AND user is an Admin
         ...(userData?.role === "Admin" && formData.role !== userData.role 
             ? { role: formData.role } 
             : {})
