@@ -9,7 +9,6 @@ import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm"
 import { EmployeeFormProvider, useEmployeeFormContext } from "@/app/contexts/EmployeeFormContext";
 
 
-// Inner component that uses the context
 function EmployeeFormContent() {
   const { activeTab, handleTabChange } = useEmployeeFormContext();
 
@@ -48,7 +47,6 @@ function EmployeeFormContent() {
   );
 }
 
-// Parent component with provider
 function EmployeeFormPage() {
   return (
     <EmployeeFormProvider>

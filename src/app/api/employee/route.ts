@@ -17,21 +17,56 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     
     const formattedData = {
-      ...data,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      mobileNumber: data.mobileNumber,
+      email: data.email,
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      maritalStatus: data.maritalStatus,
+      gender: data.gender,
+      nationality: data.nationality,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      zipCode: data.zipCode,
+      profileImage: data.profileImage,
+      
+      employeeId: data.employeeId,
+      userName: data.userName,
+      employeeType: data.employeeType,
+      workEmail: data.workEmail,
+      department: data.department,
+      designation: data.designation,
+      workingDays: data.workingDays,
       joiningDate: data.joiningDate ? new Date(data.joiningDate) : null,
+      officeLocation: data.officeLocation,
+      
+      appointmentLetter: data.appointmentLetter,
+      salarySlips: data.salarySlips,
+      relievingLetter: data.relievingLetter,
+      experienceLetter: data.experienceLetter,
+      
+      slackId: data.slackId,
+      skypeId: data.skypeId,
+      githubId: data.githubId,
     };
-    
-    // Check for existing employee with same employeeId
+
     const existingEmployee = await db.employee.findFirst({
       where: {
-        employeeId: formattedData.employeeId,
+        OR: [
+          { employeeId: formattedData.employeeId },
+          { email: formattedData.email },
+          { workEmail: formattedData.workEmail }
+        ]
       },
     });
 
     if (existingEmployee) {
       return NextResponse.json(
-        { error: "Employee with this ID already exists", field: "employeeId" },
+        { 
+          error: "Employee with this ID or email already exists",
+          field: existingEmployee.employeeId === formattedData.employeeId ? "employeeId" : "email"
+        },
         { status: 409 }
       );
     }
@@ -53,6 +88,7 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
