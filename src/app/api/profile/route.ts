@@ -1,28 +1,25 @@
-
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
-import cloudinary, { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinary";
+import cloudinary, {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "../../utils/cloudinary";
 
 export const GET = async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Not authenticated" }, 
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Debug logging
     console.log("GET /api/profile - Session:", {
       id: session.user.id,
-      email: session.user.email
+      email: session.user.email,
     });
-    
-    // First try finding by ID
+
     let user = null;
     if (session.user.id) {
       user = await db.user.findUnique({
@@ -38,8 +35,7 @@ export const GET = async (req: Request) => {
         },
       });
     }
-    
-    // If no user found by ID, try by email (for Google auth)
+
     if (!user && session.user.email) {
       user = await db.user.findUnique({
         where: { email: session.user.email },
@@ -56,15 +52,12 @@ export const GET = async (req: Request) => {
     }
 
     if (!user) {
-      console.error("User not found for:", { 
-        id: session.user.id, 
-        email: session.user.email 
+      console.error("User not found for:", {
+        id: session.user.id,
+        email: session.user.email,
       });
-      
-      return NextResponse.json(
-        { error: "User not found" }, 
-        { status: 404 }
-      );
+
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(user);
@@ -85,10 +78,9 @@ export const PUT = async (req: Request) => {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Debug logging
     console.log("PUT /api/profile - Session:", {
       id: session.user.id,
-      email: session.user.email
+      email: session.user.email,
     });
 
     const { name, role, avatar } = await req.json();
@@ -100,52 +92,43 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    // First find the user to ensure they exist
     let user = null;
     if (session.user.id) {
       user = await db.user.findUnique({
         where: { id: session.user.id },
       });
     }
-    
-    // If not found by ID, try email (for Google auth)
+
     if (!user && session.user.email) {
       user = await db.user.findUnique({
         where: { email: session.user.email },
       });
     }
-    
+
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Prepare update data
     const updateData: any = {
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
-    
+
     if (name) {
       updateData.name = name;
     }
-    
+
     if (role && session.user.role === "Admin") {
       updateData.role = role;
     }
 
-    // Handle avatar upload if provided and changed
     if (avatar && avatar !== user.avatar) {
       try {
         console.log("Uploading new avatar to Cloudinary");
-        
-        // Upload new avatar to Cloudinary
+
         const avatarUrl = await uploadToCloudinary(avatar);
         updateData.avatar = avatarUrl;
-        
-        // Delete the old avatar from Cloudinary if it exists
-        if (user.avatar && user.avatar.includes('cloudinary.com')) {
+
+        if (user.avatar && user.avatar.includes("cloudinary.com")) {
           console.log("Deleting old avatar from Cloudinary");
           await deleteFromCloudinary(user.avatar);
         }
@@ -158,7 +141,6 @@ export const PUT = async (req: Request) => {
       }
     }
 
-    // Now update the user with the found ID
     const updatedUser = await db.user.update({
       where: { id: user.id },
       data: updateData,
@@ -183,5 +165,4 @@ export const PUT = async (req: Request) => {
   }
 };
 
-// Disable caching for this API route
 export const revalidate = 0;

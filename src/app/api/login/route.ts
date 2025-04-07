@@ -11,7 +11,10 @@ export async function POST(req: Request) {
     const { email, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing email or password" },
+        { status: 400 }
+      );
     }
 
     const user = await db.user.findFirst({
@@ -19,16 +22,21 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.hashedPassword) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
-    
+
     if (!isPasswordValid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
     }
 
-    // Exclude hashedPassword but include role in the response
     const { hashedPassword, ...userWithoutPassword } = user;
 
     return NextResponse.json(userWithoutPassword, { status: 200 });

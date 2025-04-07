@@ -15,13 +15,11 @@ export interface Employee {
 }
 
 function Settings() {
-  // State for toggle switches
   const [twoFactor, setTwoFactor] = useState(true);
   const [mobilePush, setMobilePush] = useState(true);
   const [desktopNotif, setDesktopNotif] = useState(true);
   const [emailNotif, setEmailNotif] = useState(true);
 
-  // State for dropdowns
   const [theme, setTheme] = useState("Light");
   const [language, setLanguage] = useState("English");
 

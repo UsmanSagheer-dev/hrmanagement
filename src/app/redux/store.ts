@@ -1,12 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import { useDispatch, useSelector } from "react-redux";
-import employeeFormReducer from './slices/employeeFormSlice'
+import employeeFormReducer from "./slices/employeeFormSlice";
 
 const store = configureStore({
   reducer: {
- employeeForm: employeeFormReducer,
-
+    employeeForm: employeeFormReducer,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;

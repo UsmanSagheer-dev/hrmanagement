@@ -6,12 +6,12 @@ import InputField from "@/app/components/inputField/InputField";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
-import Image from "next/image";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; 
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 const ProfilePage: React.FC = () => {
-  const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
+  const { userData, isLoading, error, updateUser, fetchUserData } =
+    useUserProfile();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,13 +42,13 @@ const ProfilePage: React.FC = () => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    
+
     if (file.size > MAX_FILE_SIZE) {
       toast.error("File size should be less than 2MB");
       return;
     }
-    
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!validTypes.includes(file.type)) {
       toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
       return;
@@ -69,36 +69,36 @@ const ProfilePage: React.FC = () => {
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
-      
+
       const updates: Record<string, any> = {};
-      
+
       if (formData.name !== userData?.name) {
         updates.name = formData.name;
       }
-      
+
       if (previewImage !== userData?.avatar && formData.avatar) {
         updates.avatar = formData.avatar;
       }
-      
+
       if (userData?.role === "Admin" && formData.role !== userData.role) {
         updates.role = formData.role;
       }
-      
+
       if (Object.keys(updates).length > 0) {
         const updatedData = await updateUser(updates);
-        
+
         setFormData({
           name: updatedData.name,
           role: updatedData.role,
           avatar: updatedData.avatar,
         });
-        
+
         setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
         toast.success("Profile updated successfully");
       } else {
         toast.info("No changes detected");
       }
-      
+
       setIsEditing(false);
       router.push("/dashboard");
     } catch (err: any) {

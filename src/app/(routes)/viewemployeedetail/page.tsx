@@ -2,10 +2,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Header from '../../header/Header';
-import PersonalInformationForm from '../../(form)/personalInformationForm/PersonalInformationForm';
-import ProfessionalInformationForm from '../../(form)/professionalInformationForm/ProfessionalInformationForm'; 
-import DocumentsForm from '../../(form)/documentsForm/DocumentsForm'; 
-import AccountAccessForm from '../../(form)/accountAccessForm/AccountAccessForm'; 
 import ProfileDetails from '../../profileDetails/ProfileDetails';
 
 function 

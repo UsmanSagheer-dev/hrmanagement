@@ -5,10 +5,8 @@ import Header from "../../header/Header";
 import Table from "../../components/table/Table";
 import Pagination from "../../components/pagination/Pagination";
 import Image from "next/image";
-import EmployeeTableToolbar from "../../components/employeeTableToolbar/EmployeeTableToolbar";
 import SearchBar from "../../components/searchBar/SearchBar";
 
-// Update the Employee interface to match the screenshot data
 export interface Employee {
   name: string;
   designation: string;
@@ -19,7 +17,6 @@ export interface Employee {
 }
 
 function ViewAttendace() {
-  // Update the employees data to match the screenshot
   const [employees, setEmployees] = useState<Employee[]>([
     {
       name: "Vasilisa Coneva",
@@ -124,9 +121,11 @@ function ViewAttendace() {
 
   const actualTotalRecords = employees.length;
   const startIndex = (currentPage - 1) * recordsPerPage;
-  const paginatedData = employees.slice(startIndex, startIndex + recordsPerPage);
+  const paginatedData = employees.slice(
+    startIndex,
+    startIndex + recordsPerPage
+  );
 
-  // Update the columns to match the screenshot
   const columns = [
     {
       key: "name",
@@ -188,7 +187,7 @@ function ViewAttendace() {
           </div>
           <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
             <div className="mb-7 flex-shrink-0">
-            <SearchBar/>
+              <SearchBar />
             </div>
 
             <div className="flex-grow overflow-auto hide-vertical-scrollbar">

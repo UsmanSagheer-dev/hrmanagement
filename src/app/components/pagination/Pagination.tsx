@@ -41,13 +41,20 @@ const Pagination: React.FC<PaginationProps> = ({
       <div className="flex space-x-1">
         <Button
           icon={IoChevronBackOutline}
-          className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
         />
         {[...Array(Math.min(totalPages, 5))].map((_, i) => {
           const pageNum =
             currentPage > 3 && totalPages > 5
-              ? currentPage - 3 + i + (currentPage > totalPages - 2 ? totalPages - currentPage - 2 : 0)
+              ? currentPage -
+                3 +
+                i +
+                (currentPage > totalPages - 2
+                  ? totalPages - currentPage - 2
+                  : 0)
               : i + 1;
           if (pageNum <= totalPages) {
             return (
@@ -55,7 +62,9 @@ const Pagination: React.FC<PaginationProps> = ({
                 key={i}
                 title={pageNum.toString()}
                 className={`px-3 py-1 rounded text-white ${
-                  currentPage === pageNum ? 'bg-transparent border border-amber-600' : 'hover:bg-gray-800'
+                  currentPage === pageNum
+                    ? "bg-transparent border border-amber-600"
+                    : "hover:bg-gray-800"
                 }`}
                 onClick={() => onPageChange(pageNum)}
               />
@@ -65,8 +74,12 @@ const Pagination: React.FC<PaginationProps> = ({
         })}
         <Button
           icon={IoChevronForwardOutline}
-          className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+          className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${
+            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={() =>
+            currentPage < totalPages && onPageChange(currentPage + 1)
+          }
         />
       </div>
     </div>

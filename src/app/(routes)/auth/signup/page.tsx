@@ -3,16 +3,11 @@ import React from "react";
 import IMAGES from "../../../assets/images";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
-import { useSignUp } from "./useSignup"; 
+import { useSignUp } from "./useSignup";
 
 const SignUp: React.FC = () => {
-  const {
-    formData,
-    isLoading,
-    handleChange,
-    handleSubmit,
-    navigateToLogin,
-  } = useSignUp();
+  const { formData, isLoading, handleChange, handleSubmit, navigateToLogin } =
+    useSignUp();
 
   return (
     <div className="h-screen bg-[#131313] flex items-center justify-center">
@@ -31,7 +26,10 @@ const SignUp: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4 p-4 rounded-md">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col space-y-4 p-4 rounded-md"
+        >
           <InputField
             label="User Name"
             type="text"
@@ -50,21 +48,21 @@ const SignUp: React.FC = () => {
             value={formData.password}
             onChange={handleChange("password")}
           />
-          
+
           <div className="flex items-center justify-center w-full px-4 mt-4">
-            <Button 
-              title={isLoading ? "Creating Account..." : "Register"} 
+            <Button
+              title={isLoading ? "Creating Account..." : "Register"}
               disabled={isLoading}
-             onClick={handleSubmit}
+              onClick={handleSubmit}
             />
           </div>
-          
+
           <div className="text-center mt-4">
             <p className="text-white text-sm">
               Already have an account?{" "}
-              <button 
+              <button
                 type="button"
-                onClick={navigateToLogin} 
+                onClick={navigateToLogin}
                 className="text-blue-400 hover:underline"
               >
                 Login

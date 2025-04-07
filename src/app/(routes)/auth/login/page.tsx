@@ -4,7 +4,7 @@ import IMAGES from "../../../assets/images/index";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc"; // Changed from FaGithub to FcGoogle
+import { FcGoogle } from "react-icons/fc";
 import { useLogin } from "@/app/hooks/useLogin";
 
 function Login() {
@@ -31,12 +31,13 @@ function Login() {
         </div>
         <div className="flex flex-col ml-[15px]">
           <h1 className="text-white text-[30px] font-semibold">Welcome</h1>
-          <p className="text-white text-[16px] font-light">
-            Please login here
-          </p>
+          <p className="text-white text-[16px] font-light">Please login here</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4 p-4 rounded-md">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col space-y-4 p-4 rounded-md"
+        >
           <InputField
             label="Email Address"
             type="email"
@@ -80,8 +81,8 @@ function Login() {
 
           <div className="flex items-center justify-center w-full px-4 mt-[15px]">
             <Button
-              title={loading ? "Processing..." : "Login with Google"} // Changed text
-              icon={FcGoogle} // Changed icon
+              title={loading ? "Processing..." : "Login with Google"}
+              icon={FcGoogle}
               onClick={handleGoogleLogin}
               disabled={loading}
             />
@@ -90,7 +91,10 @@ function Login() {
           <div className="flex items-center justify-center w-full px-4 mt-[20px]">
             <p className="text-white text-[16px] font-light">
               Don't have an account?{" "}
-              <Link href="/auth/signup" className="text-orange-500 hover:underline">
+              <Link
+                href="/auth/signup"
+                className="text-orange-500 hover:underline"
+              >
                 Sign Up
               </Link>
             </p>

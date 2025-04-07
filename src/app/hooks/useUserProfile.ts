@@ -16,7 +16,9 @@ const cache = new Map<string, UserData>();
 
 export const useUserProfile = (initialUserData?: UserData | null) => {
   const { data: session, status } = useSession();
-  const [userData, setUserData] = useState<UserData | null>(initialUserData || null);
+  const [userData, setUserData] = useState<UserData | null>(
+    initialUserData || null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(!initialUserData);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
     }
 
     const userId = session.user.id;
-    
+
     console.log("Fetching user data for ID:", userId);
 
     const cachedData = cache.get(userId);
@@ -46,10 +48,10 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       setIsLoading(true);
       const response = await fetch("/api/profile", {
         method: "GET",
-        headers: { 
-          "Content-Type": "application/json"
+        headers: {
+          "Content-Type": "application/json",
         },
-        cache: "no-store"
+        cache: "no-store",
       });
 
       if (!response.ok) {
@@ -59,7 +61,7 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
 
       const data = await response.json();
       console.log("Fetched user data:", data);
-      
+
       setUserData(data);
       cache.set(userId, data);
       setError(null);
@@ -79,7 +81,7 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
 
       try {
         console.log("Updating user with data:", updates);
-        
+
         const response = await fetch("/api/profile", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -93,14 +95,14 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
         }
 
         console.log("Updated user data:", data);
-        
+
         setUserData((prev) => {
           const updated = prev ? { ...prev, ...data } : data;
           const userId = session.user?.id;
           if (userId) cache.set(userId, updated);
           return updated;
         });
-        
+
         setError(null);
         return data;
       } catch (err: any) {

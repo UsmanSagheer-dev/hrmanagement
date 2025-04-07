@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 
-
 type PersonalInfoContentProps = {
   userData: {
     firstName: string;
@@ -20,7 +19,6 @@ type PersonalInfoContentProps = {
   onTabChange: (tabName: string) => void;
 };
 
-
 const InfoSection = ({ label, value }: { label: string; value: string }) => {
   return (
     <div className="mb-4">
@@ -32,11 +30,9 @@ const InfoSection = ({ label, value }: { label: string; value: string }) => {
 
 const PersonalInfoContent: React.FC<PersonalInfoContentProps> = ({
   userData,
-
 }) => {
   return (
     <div>
-     
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         <InfoSection label="First Name" value={userData.firstName} />
         <InfoSection label="Last Name" value={userData.lastName} />

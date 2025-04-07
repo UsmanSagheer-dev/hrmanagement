@@ -51,13 +51,13 @@ const Sidebar: React.FC = () => {
       icon: <IoSettingsOutline size={24} />,
       path: "/settings",
     },
-      {
+    {
       id: 6,
       name: "View Details",
       icon: <IoSettingsOutline size={24} />,
       path: "/viewemployeedetail",
     },
-          {
+    {
       id: 7,
       name: "Department",
       icon: <IoSettingsOutline size={24} />,

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState, useRef } from "react";
 import { BiHide, BiShow } from "react-icons/bi";
 import { MdKeyboardArrowDown } from "react-icons/md";

@@ -108,11 +108,10 @@ function ViewDepartment() {
       image: "/avatars/vasilisa.jpg",
     },
   ]);
-const router = useRouter();
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
 
- 
   const handleEdit = (employee: Employee) => {
     console.log("Edit:", employee);
   };
@@ -122,9 +121,8 @@ const router = useRouter();
   };
 
   const handleView = (employee: Employee) => {
-router.push(`/employee/${employee.id}`);
+    router.push(`/employee/${employee.id}`);
   };
-
 
   const actualTotalRecords = employees.length;
   const startIndex = (currentPage - 1) * recordsPerPage;

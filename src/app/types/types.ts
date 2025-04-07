@@ -21,7 +21,7 @@ export type UserData = {
     employeeID?: string;
   userName?: string;
   employeeType?: string;
-  emailAdress?: string; // Note: typo in 'Adress'
+  emailAdress?: string; 
   department?: string;
   designation?: string;
   workingDays?: string;

@@ -15,7 +15,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { userData } = useUserProfile(); // Updated to userData
+  const { userData } = useUserProfile(); 
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";

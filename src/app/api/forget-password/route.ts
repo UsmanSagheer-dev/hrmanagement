@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "../../../../lib/prismadb";
-import bcrypt from "bcryptjs";
-import { randomBytes } from "crypto";
 
 const sendEmail = async (email: string, otp: string) => {
   console.log(`Sending OTP ${otp} to ${email}`);
-
 };
 
 export async function POST(req: Request) {
@@ -23,17 +20,14 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      // Don't reveal if user exists or not for security
       return NextResponse.json(
         { message: "If email exists, OTP will be sent" },
         { status: 200 }
       );
     }
 
-
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
-
 
     await db.user.update({
       where: { id: user.id },
@@ -43,7 +37,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // Send OTP via email
     await sendEmail(email, otp);
 
     return NextResponse.json(

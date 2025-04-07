@@ -29,19 +29,19 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
   };
 
   if (isLoading || !userData) {
-    return <div className="h-[50px] w-[200px] animate-pulse bg-gray-700 rounded-lg" />;
+    return (
+      <div className="h-[50px] w-[200px] animate-pulse bg-gray-700 rounded-lg" />
+    );
   }
 
-  // Add a cache-busting parameter for Cloudinary URLs
   const getAvatarUrl = (url?: string) => {
     if (!url) return IMAGES.Profileimg.src;
-    
-    // For Cloudinary URLs, add a cache-busting parameter to avoid stale images
-    if (url.includes('cloudinary.com')) {
-      const separator = url.includes('?') ? '&' : '?';
+
+    if (url.includes("cloudinary.com")) {
+      const separator = url.includes("?") ? "&" : "?";
       return `${url}${separator}t=${new Date().getTime()}`;
     }
-    
+
     return url;
   };
 
@@ -55,7 +55,7 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
       >
         <div className="relative w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded overflow-hidden">
           <img
-            key={avatarUrl} // Force re-render when avatar changes
+            key={avatarUrl}
             src={avatarUrl}
             alt={`${userData.name}'s avatar`}
             className="w-full h-full rounded object-cover"
@@ -66,7 +66,9 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
           />
         </div>
         <div>
-          <p className="text-[14px] md:text-[16px] font-semibold text-white">{userData.name}</p>
+          <p className="text-[14px] md:text-[16px] font-semibold text-white">
+            {userData.name}
+          </p>
           <p className="text-xs font-light text-gray-400">{userData.role}</p>
         </div>
         <MdKeyboardArrowDown size={20} className="text-white" />
@@ -74,8 +76,17 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-[8px] shadow-lg z-20">
           <ul className="py-2">
-            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
-            <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li></Link>
+            <li
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </li>
+            <Link href="/profile">
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                Profile
+              </li>
+            </Link>
           </ul>
         </div>
       )}

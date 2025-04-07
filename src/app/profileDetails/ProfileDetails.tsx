@@ -4,9 +4,7 @@ import { FaCamera, FaEdit } from "react-icons/fa";
 import Button from "../components/button/Button";
 import IMAGES from "../assets/images";
 import { ProfileContent } from "../(content)/profileContent/ProfileContent";
-// import AttendanceContent from "../attendanceContent/AttendanceContent";
 import { ProjectsContent } from "../(content)/projectsContent/ProjectsContent";
-// import { LeaveContent } from "../leaveContent/LeaveContent";
 import { IoIosPerson } from "react-icons/io";
 import { LuCalendarCheck, LuCalendarRange } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
@@ -55,7 +53,7 @@ type UserData = {
 };
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
-const router = useRouter();
+  const router = useRouter();
   const [userData] = useState<UserData>({
     firstName: "Dina",
     lastName: "Coneva",
@@ -89,9 +87,9 @@ const router = useRouter();
     githubID: "dina_coneva",
     slackID: "dina_coneva",
   });
-const handleEditProfile = () => {
-  router.push("/employee/add");
-};
+  const handleEditProfile = () => {
+    router.push("/employee/add");
+  };
   const [activeSection, setActiveSection] = useState("profile");
   const [activeProfileTab, setActiveProfileTab] = useState("personal");
 

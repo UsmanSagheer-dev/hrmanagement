@@ -27,7 +27,6 @@ function ForgetPassword() {
       const data = await response.json();
       if (response.ok) {
         setMessage("OTP sent to your email if it exists in our system");
-        // Redirect to reset password page after a delay
         setTimeout(() => {
           router.push(`/reset-password?email=${encodeURIComponent(email)}`);
         }, 2000);
@@ -52,14 +51,19 @@ function ForgetPassword() {
         </Link>
 
         <div className="flex flex-col ml-[15px] mb-[30px]">
-          <h1 className="text-white text-[30px] font-semibold">Forget Password</h1>
+          <h1 className="text-white text-[30px] font-semibold">
+            Forget Password
+          </h1>
           <p className="text-white text-[16px] font-light">
             Enter your registered email address. We'll send you a code to reset
             your password.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4 p-4 rounded-md">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col space-y-4 p-4 rounded-md"
+        >
           <InputField
             label="Email Address"
             type="email"
@@ -75,4 +79,3 @@ function ForgetPassword() {
 }
 
 export default ForgetPassword;
-

@@ -1,7 +1,5 @@
-// store/slices/employeeFormSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Define types for each form section
 type PersonalInfo = {
   firstName: string;
   lastName: string;
@@ -15,7 +13,7 @@ type PersonalInfo = {
   city: string;
   state: string;
   zipCode: string;
-  profileImage?: string | null; // Will store image as base64 string
+  profileImage?: string | null;
 };
 
 type ProfessionalInfo = {
@@ -44,7 +42,6 @@ type AccountInfo = {
   githubId: string;
 };
 
-// Combined employee form state
 type EmployeeFormState = {
   personal: PersonalInfo;
   professional: ProfessionalInfo;
@@ -56,116 +53,115 @@ type EmployeeFormState = {
   isLoading: boolean;
 };
 
-// Initial state
 const initialState: EmployeeFormState = {
   personal: {
-    firstName: '',
-    lastName: '',
-    mobileNumber: '',
-    email: '',
-    dateOfBirth: '',
-    maritalStatus: '',
-    gender: '',
-    nationality: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
+    firstName: "",
+    lastName: "",
+    mobileNumber: "",
+    email: "",
+    dateOfBirth: "",
+    maritalStatus: "",
+    gender: "",
+    nationality: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
     profileImage: null,
   },
   professional: {
-    employeeId: '',
-    userName: '',
-    employeeType: '',
-    emailAddress: '',
-    department: '',
-    designation: '',
-    workingDays: '',
-    joiningDate: '',
-    officeLocation: '',
+    employeeId: "",
+    userName: "",
+    employeeType: "",
+    emailAddress: "",
+    department: "",
+    designation: "",
+    workingDays: "",
+    joiningDate: "",
+    officeLocation: "",
   },
   documents: {
-    appointmentLetter: '',
-    salarySlips: '',
-    relievingLetter: '',
-    experienceLetter: '',
+    appointmentLetter: "",
+    salarySlips: "",
+    relievingLetter: "",
+    experienceLetter: "",
   },
   account: {
-    emailAddress: '',
-    slackId: '',
-    skypeId: '',
-    githubId: '',
+    emailAddress: "",
+    slackId: "",
+    skypeId: "",
+    githubId: "",
   },
-  activeTab: 'personal',
+  activeTab: "personal",
   formSubmitted: false,
   formError: null,
   isLoading: false,
 };
 
 const employeeFormSlice = createSlice({
-  name: 'employeeForm',
+  name: "employeeForm",
   initialState,
   reducers: {
-    // Set active tab
     setActiveTab: (state, action: PayloadAction<string>) => {
       state.activeTab = action.payload;
     },
-    
-    // Update personal information
-    updatePersonalInfo: (state, action: PayloadAction<Partial<PersonalInfo>>) => {
+
+    updatePersonalInfo: (
+      state,
+      action: PayloadAction<Partial<PersonalInfo>>
+    ) => {
       state.personal = { ...state.personal, ...action.payload };
     },
-    
-    // Update professional information
-    updateProfessionalInfo: (state, action: PayloadAction<Partial<ProfessionalInfo>>) => {
+
+    updateProfessionalInfo: (
+      state,
+      action: PayloadAction<Partial<ProfessionalInfo>>
+    ) => {
       state.professional = { ...state.professional, ...action.payload };
     },
-    
-    // Update document information
-    updateDocumentInfo: (state, action: PayloadAction<Partial<DocumentInfo>>) => {
+
+    updateDocumentInfo: (
+      state,
+      action: PayloadAction<Partial<DocumentInfo>>
+    ) => {
       state.documents = { ...state.documents, ...action.payload };
     },
-    
-    // Update account information
+
     updateAccountInfo: (state, action: PayloadAction<Partial<AccountInfo>>) => {
       state.account = { ...state.account, ...action.payload };
     },
-    
-    // Form submission started
+
     submitFormStart: (state) => {
       state.isLoading = true;
       state.formError = null;
     },
-    
-    // Form submission success
+
     submitFormSuccess: (state) => {
       state.isLoading = false;
       state.formSubmitted = true;
     },
-    
-    // Form submission failure
+
     submitFormFailure: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.formError = action.payload;
     },
-    
-    // Reset form
+
     resetForm: (state) => {
       return initialState;
     },
   },
 });
 
-export const { 
-  setActiveTab, 
-  updatePersonalInfo, 
-  updateProfessionalInfo, 
-  updateDocumentInfo, 
+export const {
+  setActiveTab,
+  updatePersonalInfo,
+  updateProfessionalInfo,
+  updateDocumentInfo,
   updateAccountInfo,
   submitFormStart,
   submitFormSuccess,
   submitFormFailure,
-  resetForm
+  resetForm,
 } = employeeFormSlice.actions;
 
 export default employeeFormSlice.reducer;
