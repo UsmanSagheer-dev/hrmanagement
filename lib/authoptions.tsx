@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import db from "./prismadb";
 
+
 declare module "next-auth" {
   interface User {
     id: string;
@@ -78,7 +79,7 @@ export const authOptions: AuthOptions = {
       },
       profile(profile) {
         return {
-          id: profile.sub, // Google ID as temporary ID
+          id: profile.sub,
           name: profile.name,
           email: profile.email,
           image: profile.picture,
@@ -90,7 +91,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, 
   },
   pages: {
     signIn: "/auth/login",
@@ -112,10 +113,10 @@ export const authOptions: AuthOptions = {
                 avatar: user.image,
               },
             });
-            user.id = newUser.id; // Assign database ID
+            user.id = newUser.id; 
             console.log("New Google user created with ID:", newUser.id);
           } else {
-            user.id = existingUser.id; // Use existing database ID
+            user.id = existingUser.id; 
             if (user.image && user.image !== existingUser.avatar) {
               await db.user.update({
                 where: { id: existingUser.id },
