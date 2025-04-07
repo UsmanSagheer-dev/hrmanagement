@@ -8,14 +8,24 @@ import { MdLockOpen } from "react-icons/md";
 import InputField from "../../components/inputField/InputField";
 import Button from "../../components/button/Button";
 import { PersonalInformationFormProps } from "../../types/formTypes";
-import { maritalStatusOptions, genderOptions, nationalityOptions, cityOptions, stateOptions, zipCodeOptions } from "../../constants/formConstants";
+import {
+  maritalStatusOptions,
+  genderOptions,
+  nationalityOptions,
+  cityOptions,
+  stateOptions,
+  zipCodeOptions,
+} from "../../constants/formConstants";
 import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
 
-const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTabChange }) => {
+const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
+  onTabChange,
+}) => {
   const { formData, updateFormData } = useEmployeeFormContext();
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
-  
-  // Use local state only for form display, sync with context
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null
+  );
+
   const [localFormData, setLocalFormData] = useState(formData.personal);
 
   useEffect(() => {
@@ -51,23 +61,23 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateFormData("personal", localFormData);
-    onTabChange('professional');
+    onTabChange("professional");
   };
 
   const handleCancel = () => {
     const resetData = {
-      firstName: '',
-      lastName: '',
-      mobileNumber: '',
-      email: '',
-      dateOfBirth: '',
-      maritalStatus: '',
-      gender: '',
-      nationality: '',
-      address: '',
-      city: '',
-      state: '',
-      zipCode: '',
+      firstName: "",
+      lastName: "",
+      mobileNumber: "",
+      email: "",
+      dateOfBirth: "",
+      maritalStatus: "",
+      gender: "",
+      nationality: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
       profileImage: null,
     };
     setLocalFormData(resetData);
@@ -79,15 +89,19 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
     return (
       <div className="relative w-24 h-24 border border-[#A2A1A833] bg-[#A2A1A80D] rounded-lg flex items-center justify-center overflow-hidden">
         {profileImagePreview ? (
-          <img src={profileImagePreview} alt="Profile" className="w-full h-full object-cover" />
+          <img
+            src={profileImagePreview}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
         ) : (
           <div className="text-white">
             <FaCamera size={32} />
           </div>
         )}
-        <input 
-          type="file" 
-          className="absolute inset-0 opacity-0 cursor-pointer" 
+        <input
+          type="file"
+          className="absolute inset-0 opacity-0 cursor-pointer"
           onChange={(e) => e.target.files && handleImageChange(e.target.files)}
           accept="image/*"
         />
@@ -95,23 +109,29 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
     );
   };
 
-  const NavigationTab = ({ 
-    Icon, 
-    title, 
+  const NavigationTab = ({
+    Icon,
+    title,
     tabName,
-    isActive 
-  }: { 
-    Icon: any; 
-    title: string; 
+    isActive,
+  }: {
+    Icon: any;
+    title: string;
     tabName: string;
     isActive: boolean;
   }) => {
     return (
       <button
         onClick={() => onTabChange(tabName)}
-        className={`flex items-center ${isActive ? 'text-[#E25319] border-b-2 border-[#E25319]' : 'text-white'} pb-2 mr-6`}
+        className={`flex items-center ${
+          isActive ? "text-[#E25319] border-b-2 border-[#E25319]" : "text-white"
+        } pb-2 mr-6`}
       >
-        <div className={`w-6 h-6 ${isActive ? 'text-[#E25319]' : 'border-none'} flex items-center justify-center mr-2`}>
+        <div
+          className={`w-6 h-6 ${
+            isActive ? "text-[#E25319]" : "border-none"
+          } flex items-center justify-center mr-2`}
+        >
           <Icon className="text-lg" />
         </div>
         <span>{title}</span>
@@ -121,82 +141,98 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
 
   const inputFields = [
     {
-      section: 'name',
-      grid: 'grid-cols-1 md:grid-cols-2',
+      section: "name",
+      grid: "grid-cols-1 md:grid-cols-2",
       fields: [
-        { type: 'text' as const, placeholder: 'First Name', field: 'firstName' },
-        { type: 'text' as const, placeholder: 'Last Name', field: 'lastName' },
-      ]
+        {
+          type: "text" as const,
+          placeholder: "First Name",
+          field: "firstName",
+        },
+        { type: "text" as const, placeholder: "Last Name", field: "lastName" },
+      ],
     },
     {
-      section: 'contact',
-      grid: 'grid-cols-1 md:grid-cols-2',
+      section: "contact",
+      grid: "grid-cols-1 md:grid-cols-2",
       fields: [
-        { type: 'text' as const, placeholder: 'Mobile Number', field: 'mobileNumber' },
-        { type: 'email' as const, placeholder: 'Email Address', field: 'email' },
-      ]
+        {
+          type: "text" as const,
+          placeholder: "Mobile Number",
+          field: "mobileNumber",
+        },
+        {
+          type: "email" as const,
+          placeholder: "Email Address",
+          field: "email",
+        },
+      ],
     },
     {
-      section: 'personal',
-      grid: 'grid-cols-1 md:grid-cols-2',
+      section: "personal",
+      grid: "grid-cols-1 md:grid-cols-2",
       fields: [
-        { type: 'date' as const, placeholder: 'Date of Birth', field: 'dateOfBirth' },
-        { 
-          type: 'select' as const, 
-          placeholder: 'Marital Status', 
-          field: 'maritalStatus',
-          options: maritalStatusOptions 
+        {
+          type: "date" as const,
+          placeholder: "Date of Birth",
+          field: "dateOfBirth",
         },
-      ]
+        {
+          type: "select" as const,
+          placeholder: "Marital Status",
+          field: "maritalStatus",
+          options: maritalStatusOptions,
+        },
+      ],
     },
     {
-      section: 'identity',
-      grid: 'grid-cols-1 md:grid-cols-2',
+      section: "identity",
+      grid: "grid-cols-1 md:grid-cols-2",
       fields: [
-        { 
-          type: 'select' as const, 
-          placeholder: 'Gender', 
-          field: 'gender',
-          options: genderOptions 
+        {
+          type: "select" as const,
+          placeholder: "Gender",
+          field: "gender",
+          options: genderOptions,
         },
-        { 
-          type: 'select' as const, 
-          placeholder: 'Nationality', 
-          field: 'nationality',
-          options: nationalityOptions 
+        {
+          type: "select" as const,
+          placeholder: "Nationality",
+          field: "nationality",
+          options: nationalityOptions,
         },
-      ]
+      ],
     },
     {
-      section: 'address',
-      grid: 'grid-cols-1',
+      section: "address",
+      grid: "grid-cols-1",
       fields: [
-        { type: 'text' as const, placeholder: 'Address', field: 'address' },
-      ]
+        { type: "text" as const, placeholder: "Address", field: "address" },
+      ],
     },
     {
-      section: 'location',
-      grid: 'grid-cols-1 md:grid-cols-3',
+      section: "location",
+      grid: "grid-cols-1 md:grid-cols-3",
       fields: [
-        { 
-          type: 'select' as const, 
-          placeholder: 'City', 
-          field: 'city',
-          options: cityOptions 
+        {
+          type: "select" as const,
+          placeholder: "City",
+          field: "city",
+          options: cityOptions,
         },
-        { 
-          type: 'select' as const, 
-          placeholder: 'State', 
-          field: 'state',
-          options: stateOptions 
+        {
+          type: "select" as const,
+          placeholder: "State",
+          field: "state",
+          options: stateOptions,
         },
-        { 
-          type: 'select' as const, 
-          placeholder: 'ZIP Code', 
-          field: 'zipCode',
-          options: zipCodeOptions 
+        {
+          type: "select" as const,
+          placeholder: "ZIP Code",
+          field: "zipCode",
+          options: zipCodeOptions,
         },
-      ]
+      ],
     },
   ];
 
@@ -204,10 +240,30 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
     <div className="h-[84vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
         <div className="flex flex-wrap border-b border-gray-700">
-          <NavigationTab Icon={IoIosPerson} title="Personal Information" tabName="personal" isActive={true} />
-          <NavigationTab Icon={HiOutlineBriefcase} title="Professional Information" tabName="professional" isActive={false} />
-          <NavigationTab Icon={IoDocumentTextOutline} title="Documents" tabName="documents" isActive={false} />
-          <NavigationTab Icon={MdLockOpen} title="Account Access" tabName="account" isActive={false} />
+          <NavigationTab
+            Icon={IoIosPerson}
+            title="Personal Information"
+            tabName="personal"
+            isActive={true}
+          />
+          <NavigationTab
+            Icon={HiOutlineBriefcase}
+            title="Professional Information"
+            tabName="professional"
+            isActive={false}
+          />
+          <NavigationTab
+            Icon={IoDocumentTextOutline}
+            title="Documents"
+            tabName="documents"
+            isActive={false}
+          />
+          <NavigationTab
+            Icon={MdLockOpen}
+            title="Account Access"
+            tabName="account"
+            isActive={false}
+          />
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -216,17 +272,24 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
           </div>
 
           {inputFields.map((section) => (
-            <div key={section.section} className={`grid ${section.grid} gap-4 mb-5`}>
+            <div
+              key={section.section}
+              className={`grid ${section.grid} gap-4 mb-5`}
+            >
               {section.fields.map((input) => (
                 <InputField
                   key={input.field}
                   type={input.type}
                   placeholder={input.placeholder}
-                  value={localFormData[input.field as keyof typeof localFormData] as string}
+                  value={
+                    localFormData[
+                      input.field as keyof typeof localFormData
+                    ] as string
+                  }
                   onChange={(value) => handleInputChange(input.field, value)}
                   options={input.options}
                   required
-                  className='border border-[#A2A1A833]'
+                  className="border border-[#A2A1A833]"
                 />
               ))}
             </div>

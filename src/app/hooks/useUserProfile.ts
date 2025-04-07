@@ -23,7 +23,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
   const fetchUserData = useCallback(async () => {
     if (status !== "authenticated") return;
 
-    // If we don't have a user ID in the session, log it and return
     if (!session?.user?.id) {
       console.error("No user ID found in session:", session);
       setError("No user ID found in session");
@@ -33,7 +32,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
 
     const userId = session.user.id;
     
-    // Log to help debugging
     console.log("Fetching user data for ID:", userId);
 
     const cachedData = cache.get(userId);
@@ -51,7 +49,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
         headers: { 
           "Content-Type": "application/json"
         },
-        // Add cache control to ensure we get fresh data
         cache: "no-store"
       });
 
@@ -97,7 +94,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
 
         console.log("Updated user data:", data);
         
-        // Update local state and cache
         setUserData((prev) => {
           const updated = prev ? { ...prev, ...data } : data;
           const userId = session.user?.id;

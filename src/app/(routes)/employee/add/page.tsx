@@ -7,7 +7,8 @@ import ProfessionalInformationForm from "@/app/(form)/professionalInformationFor
 import DocumentsForm from "@/app/(form)/documentsForm/DocumentsForm";
 import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
 import { EmployeeFormProvider, useEmployeeFormContext } from "@/app/contexts/EmployeeFormContext";
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function EmployeeFormContent() {
   const { activeTab, handleTabChange } = useEmployeeFormContext();
@@ -43,6 +44,18 @@ function EmployeeFormContent() {
           <div className="">{renderContent()}</div>
         </div>
       </div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </div>
   );
 }

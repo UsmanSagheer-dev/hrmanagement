@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import Image from "next/image";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; 
 
 const ProfilePage: React.FC = () => {
   const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
@@ -43,13 +43,11 @@ const ProfilePage: React.FC = () => {
 
     const file = files[0];
     
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       toast.error("File size should be less than 2MB");
       return;
     }
     
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
@@ -59,7 +57,6 @@ const ProfilePage: React.FC = () => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      // For preview and upload preparation
       setPreviewImage(base64String);
       setFormData((prev) => ({ ...prev, avatar: base64String }));
     };
@@ -73,7 +70,6 @@ const ProfilePage: React.FC = () => {
     try {
       setIsSubmitting(true);
       
-      // Only send the fields that changed
       const updates: Record<string, any> = {};
       
       if (formData.name !== userData?.name) {
@@ -84,12 +80,10 @@ const ProfilePage: React.FC = () => {
         updates.avatar = formData.avatar;
       }
       
-      // Only include role if it changed AND user is an Admin
       if (userData?.role === "Admin" && formData.role !== userData.role) {
         updates.role = formData.role;
       }
       
-      // Only make API call if there are actual updates
       if (Object.keys(updates).length > 0) {
         const updatedData = await updateUser(updates);
         
@@ -99,7 +93,6 @@ const ProfilePage: React.FC = () => {
           avatar: updatedData.avatar,
         });
         
-        // Update preview with Cloudinary URL returned from server
         setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
         toast.success("Profile updated successfully");
       } else {

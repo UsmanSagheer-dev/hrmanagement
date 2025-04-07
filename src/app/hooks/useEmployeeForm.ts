@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface FormData {
   personal: {
@@ -48,7 +49,7 @@ export function useEmployeeForm() {
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState<FormData>({
     personal: {
       firstName: "",
@@ -95,7 +96,7 @@ export function useEmployeeForm() {
   }, []);
 
   const updateFormData = useCallback((section: keyof FormData, data: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
@@ -104,8 +105,13 @@ export function useEmployeeForm() {
     }));
   }, []);
 
-  const uploadFile = async (file: File): Promise<string> => {
-    return URL.createObjectURL(file); 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   const submitEmployeeData = async () => {
@@ -113,40 +119,40 @@ export function useEmployeeForm() {
       setIsLoading(true);
       setFormError(null);
 
-      const profileImageUrl = formData.personal.profileImage 
-        ? await uploadFile(formData.personal.profileImage) 
+      const profileImageBase64 = formData.personal.profileImage
+        ? await fileToBase64(formData.personal.profileImage)
         : null;
 
-      const documentUrls = {
-        appointmentLetter: formData.documents.appointmentLetter 
-          ? await uploadFile(formData.documents.appointmentLetter) 
+      const documentBase64 = {
+        appointmentLetter: formData.documents.appointmentLetter
+          ? await fileToBase64(formData.documents.appointmentLetter)
           : null,
-        salarySlips: formData.documents.salarySlips 
-          ? await uploadFile(formData.documents.salarySlips) 
+        salarySlips: formData.documents.salarySlips
+          ? await fileToBase64(formData.documents.salarySlips)
           : null,
-        relievingLetter: formData.documents.relievingLetter 
-          ? await uploadFile(formData.documents.relievingLetter) 
+        relievingLetter: formData.documents.relievingLetter
+          ? await fileToBase64(formData.documents.relievingLetter)
           : null,
-        experienceLetter: formData.documents.experienceLetter 
-          ? await uploadFile(formData.documents.experienceLetter) 
+        experienceLetter: formData.documents.experienceLetter
+          ? await fileToBase64(formData.documents.experienceLetter)
           : null,
       };
 
       const employeeData = {
         ...formData.personal,
         ...formData.professional,
-        ...documentUrls,
+        ...documentBase64,
         slackId: formData.account.slackId,
         skypeId: formData.account.skypeId,
         githubId: formData.account.githubId,
         workEmail: formData.professional.workEmail || formData.personal.email,
-        profileImage: profileImageUrl,
+        profileImage: profileImageBase64,
       };
 
-      const response = await fetch('/api/employee', {
-        method: 'POST',
+      const response = await fetch("/api/employee", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(employeeData),
       });
@@ -157,10 +163,24 @@ export function useEmployeeForm() {
         throw new Error(result.error || "Failed to save employee data");
       }
 
-      router.push('/employee/details');
+      const uploadedDocs = Object.values(result.employee).filter(
+        (value) =>
+          value && typeof value === "string" && value.includes("cloudinary.com")
+      );
+
+      if (uploadedDocs.length > 0) {
+        toast.success("Documents successfully uploaded to Cloudinary!");
+      } else {
+        toast.warn("No documents were uploaded to Cloudinary");
+      }
+
+      router.push("/employee/details");
     } catch (error: any) {
       console.error("Error submitting employee data:", error);
-      setFormError(error.message || "An error occurred while saving the employee data");
+      setFormError(
+        error.message || "An error occurred while saving the employee data"
+      );
+      toast.error("Failed to upload documents to Cloudinary");
     } finally {
       setIsLoading(false);
     }

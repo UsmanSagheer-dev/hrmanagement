@@ -2,20 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
+import { uploadToCloudinary } from "@/app/utils/cloudinary";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session) {
       return NextResponse.json(
         { error: "Unauthorized. Please sign in." },
         { status: 401 }
       );
     }
-    
+
     const data = await req.json();
-    
+
+    const documentUrls = {
+      appointmentLetter: data.appointmentLetter
+        ? await uploadToCloudinary(data.appointmentLetter)
+        : null,
+      salarySlips: data.salarySlips
+        ? await uploadToCloudinary(data.salarySlips)
+        : null,
+      relievingLetter: data.relievingLetter
+        ? await uploadToCloudinary(data.relievingLetter)
+        : null,
+      experienceLetter: data.experienceLetter
+        ? await uploadToCloudinary(data.experienceLetter)
+        : null,
+    };
+
     const formattedData = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -30,7 +46,7 @@ export async function POST(req: NextRequest) {
       state: data.state,
       zipCode: data.zipCode,
       profileImage: data.profileImage,
-      
+
       employeeId: data.employeeId,
       userName: data.userName,
       employeeType: data.employeeType,
@@ -40,12 +56,12 @@ export async function POST(req: NextRequest) {
       workingDays: data.workingDays,
       joiningDate: data.joiningDate ? new Date(data.joiningDate) : null,
       officeLocation: data.officeLocation,
-      
-      appointmentLetter: data.appointmentLetter,
-      salarySlips: data.salarySlips,
-      relievingLetter: data.relievingLetter,
-      experienceLetter: data.experienceLetter,
-      
+
+      appointmentLetter: documentUrls.appointmentLetter,
+      salarySlips: documentUrls.salarySlips,
+      relievingLetter: documentUrls.relievingLetter,
+      experienceLetter: documentUrls.experienceLetter,
+
       slackId: data.slackId,
       skypeId: data.skypeId,
       githubId: data.githubId,
@@ -56,16 +72,19 @@ export async function POST(req: NextRequest) {
         OR: [
           { employeeId: formattedData.employeeId },
           { email: formattedData.email },
-          { workEmail: formattedData.workEmail }
-        ]
+          { workEmail: formattedData.workEmail },
+        ],
       },
     });
 
     if (existingEmployee) {
       return NextResponse.json(
-        { 
+        {
           error: "Employee with this ID or email already exists",
-          field: existingEmployee.employeeId === formattedData.employeeId ? "employeeId" : "email"
+          field:
+            existingEmployee.employeeId === formattedData.employeeId
+              ? "employeeId"
+              : "email",
         },
         { status: 409 }
       );
@@ -74,14 +93,14 @@ export async function POST(req: NextRequest) {
     const employee = await db.employee.create({
       data: formattedData,
     });
-    
+
     return NextResponse.json(
       { message: "Employee data saved successfully", employee },
       { status: 201 }
     );
   } catch (error: any) {
     console.error("Error saving employee data:", error);
-    
+
     return NextResponse.json(
       { error: error.message || "Failed to save employee data" },
       { status: 500 }
@@ -92,18 +111,18 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session) {
       return NextResponse.json(
         { error: "Unauthorized. Please sign in." },
         { status: 401 }
       );
     }
-    
+
     const employees = await db.employee.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
-    
+
     return NextResponse.json(employees);
   } catch (error: any) {
     console.error("Error fetching employees:", error);

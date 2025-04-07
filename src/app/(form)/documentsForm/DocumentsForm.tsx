@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -16,7 +16,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   const { formData, updateFormData } = useEmployeeFormContext();
   const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     setUploadedFiles(formData.documents);
   }, [formData.documents]);
 
@@ -41,16 +41,14 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
 
   const handleNext = () => {
     updateFormData("documents", uploadedFiles);
-    if (Object.keys(uploadedFiles).length === documents.length) {
-      onTabChange("account");
-    }
+    onTabChange("account");
   };
 
   const documents = [
-    { id: "appointment-letter", title: "Appointment Letter" },
-    { id: "salary-slips", title: "Salary Slips" },
-    { id: "relieving-letter", title: "Relieving Letter" },
-    { id: "experience-letter", title: "Experience Letter" },
+    { id: "appointmentLetter", title: "Appointment Letter" },
+    { id: "salarySlips", title: "Salary Slips" },
+    { id: "relievingLetter", title: "Relieving Letter" },
+    { id: "experienceLetter", title: "Experience Letter" },
   ];
 
   const NavigationTab = ({
@@ -83,36 +81,14 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
     );
   };
 
-  const isNextDisabled = Object.keys(uploadedFiles).length < documents.length;
-
   return (
     <div className="h-[70vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
         <div className="flex border-b border-gray-700 flex-wrap">
-          <NavigationTab
-            Icon={IoIosPerson}
-            title="Personal Information"
-            tabName="personal"
-            isActive={false}
-          />
-          <NavigationTab
-            Icon={HiOutlineBriefcase}
-            title="Professional Information"
-            tabName="professional"
-            isActive={false}
-          />
-          <NavigationTab
-            Icon={IoDocumentTextOutline}
-            title="Documents"
-            tabName="documents"
-            isActive={true}
-          />
-          <NavigationTab
-            Icon={MdLockOpen}
-            title="Account Access"
-            tabName="account"
-            isActive={false}
-          />
+          <NavigationTab Icon={IoIosPerson} title="Personal Information" tabName="personal" isActive={false} />
+          <NavigationTab Icon={HiOutlineBriefcase} title="Professional Information" tabName="professional" isActive={false} />
+          <NavigationTab Icon={IoDocumentTextOutline} title="Documents" tabName="documents" isActive={true} />
+          <NavigationTab Icon={MdLockOpen} title="Account Access" tabName="account" isActive={false} />
         </div>
 
         <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,6 +98,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
                 id={doc.id}
                 title={doc.title}
                 onFileUpload={handleFileUpload}
+                accept="application/pdf" 
               />
               {uploadedFiles[doc.id] && (
                 <p className="text-sm text-gray-400 mt-2">{uploadedFiles[doc.id].name}</p>
@@ -139,12 +116,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
           <Button
             title="Next"
             onClick={handleNext}
-            disabled={isNextDisabled}
-            className={`w-[91px] h-[50px] rounded-lg transition-colors cursor-pointer ${
-              isNextDisabled
-                ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                : "bg-[#E25319] text-white hover:bg-[#d14917]"
-            }`}
+            className="w-[91px] h-[50px] rounded-lg transition-colors cursor-pointer bg-[#E25319] text-white hover:bg-[#d14917]"
           />
         </div>
       </div>
