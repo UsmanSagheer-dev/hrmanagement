@@ -1,170 +1,178 @@
-// hooks/useEmployeeForm.ts
-'use client';
+"use client";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../redux/store';
-import {
-  updatePersonalInfo,
-  updateProfessionalInfo,
-  updateDocumentInfo,
-  updateAccountInfo,
-  setActiveTab,
-  submitFormStart,
-  submitFormSuccess,
-  submitFormFailure,
-} from '../redux/slices/employeeFormSlice';
-import { useRouter } from 'next/navigation';
+interface FormData {
+  personal: {
+    firstName: string;
+    lastName: string;
+    mobileNumber: string;
+    email: string;
+    dateOfBirth: string;
+    maritalStatus: string;
+    gender: string;
+    nationality: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    profileImage?: File | null;
+  };
+  professional: {
+    employeeId: string;
+    userName: string;
+    employeeType: string;
+    workEmail: string;
+    department: string;
+    designation: string;
+    workingDays: string;
+    joiningDate: string;
+    officeLocation: string;
+  };
+  documents: {
+    appointmentLetter?: File | null;
+    salarySlips?: File | null;
+    relievingLetter?: File | null;
+    experienceLetter?: File | null;
+  };
+  account: {
+    emailAddress: string;
+    slackId: string;
+    skypeId: string;
+    githubId: string;
+  };
+}
 
-export const useEmployeeForm = () => {
-  const dispatch = useDispatch<AppDispatch>();
+export function useEmployeeForm() {
   const router = useRouter();
-  const { personal, professional, documents, account, activeTab, isLoading, formError } = useSelector(
-    (state: RootState) => state.employeeForm
-  );
+  const [activeTab, setActiveTab] = useState<string>("personal");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  
+  const [formData, setFormData] = useState<FormData>({
+    personal: {
+      firstName: "",
+      lastName: "",
+      mobileNumber: "",
+      email: "",
+      dateOfBirth: "",
+      maritalStatus: "",
+      gender: "",
+      nationality: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      profileImage: null,
+    },
+    professional: {
+      employeeId: "",
+      userName: "",
+      employeeType: "",
+      workEmail: "",
+      department: "",
+      designation: "",
+      workingDays: "",
+      joiningDate: "",
+      officeLocation: "",
+    },
+    documents: {
+      appointmentLetter: null,
+      salarySlips: null,
+      relievingLetter: null,
+      experienceLetter: null,
+    },
+    account: {
+      emailAddress: "",
+      slackId: "",
+      skypeId: "",
+      githubId: "",
+    },
+  });
 
-  // File conversion with error handling
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      if (!file.type.match(/^image\/(png|jpeg|jpg)|application\/pdf$/)) {
-        reject(new Error('Invalid file type. Only images (PNG, JPEG, JPG) and PDFs are allowed.'));
-        return;
-      }
+  const handleTabChange = useCallback((tabName: string) => {
+    setActiveTab(tabName);
+  }, []);
 
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        reject(new Error('File size too large. Maximum allowed size is 5MB.'));
-        return;
-      }
+  const updateFormData = useCallback((section: keyof FormData, data: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        ...data,
+      },
+    }));
+  }, []);
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Error reading file. Please try again.'));
-    });
+  const uploadFile = async (file: File): Promise<string> => {
+    return URL.createObjectURL(file); 
   };
 
-  // Enhanced form submission handler
   const submitEmployeeData = async () => {
-    dispatch(submitFormStart());
-    
     try {
+      setIsLoading(true);
+      setFormError(null);
+
+      const profileImageUrl = formData.personal.profileImage 
+        ? await uploadFile(formData.personal.profileImage) 
+        : null;
+
+      const documentUrls = {
+        appointmentLetter: formData.documents.appointmentLetter 
+          ? await uploadFile(formData.documents.appointmentLetter) 
+          : null,
+        salarySlips: formData.documents.salarySlips 
+          ? await uploadFile(formData.documents.salarySlips) 
+          : null,
+        relievingLetter: formData.documents.relievingLetter 
+          ? await uploadFile(formData.documents.relievingLetter) 
+          : null,
+        experienceLetter: formData.documents.experienceLetter 
+          ? await uploadFile(formData.documents.experienceLetter) 
+          : null,
+      };
+
       const employeeData = {
-        personal: { ...personal },
-        professional: { ...professional },
-        documents: { ...documents },
-        account: { ...account },
-        timestamp: new Date().toISOString()
+        ...formData.personal,
+        ...formData.professional,
+        ...documentUrls,
+        slackId: formData.account.slackId,
+        skypeId: formData.account.skypeId,
+        githubId: formData.account.githubId,
+        workEmail: formData.professional.workEmail || formData.personal.email,
+        profileImage: profileImageUrl,
       };
 
       const response = await fetch('/api/employee', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest' // CSRF protection
         },
-        credentials: 'include',
         body: JSON.stringify(employeeData),
-        signal: AbortSignal.timeout(20000) // 10-second timeout
       });
 
-      // Handle HTTP errors
-      if (!response.ok) {
-        const errorData = await response.json();
-        
-        // Handle session expiration
-        if (response.status === 401) {
-          router.push(`/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-          throw new Error('Session expired. Please login again.');
-        }
-
-        // Handle validation errors
-        if (response.status === 400) {
-          throw new Error(errorData.errors?.join(', ') || 'Invalid input data');
-        }
-
-        throw new Error(errorData.message || 'Request failed');
-      }
-
-      // Handle successful response
       const result = await response.json();
-      dispatch(submitFormSuccess());
-      router.push(`/employee/${result.id}/confirmation`);
 
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to save employee data");
+      }
+
+      router.push('/employee/details');
     } catch (error: any) {
-      // Handle different error types
-      let errorMessage = 'Submission failed. Please try again.';
-      
-      if (error.name === 'AbortError') {
-        errorMessage = 'Request timed out. Check your network connection.';
-      } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        errorMessage = 'Network error. Please check your internet connection.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      dispatch(submitFormFailure(errorMessage));
-      console.error('Submission Error:', error);
+      console.error("Error submitting employee data:", error);
+      setFormError(error.message || "An error occurred while saving the employee data");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Form field validators
-  const validateEmail = (email: string): boolean => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
-  };
-
-  const validatePhone = (phone: string): boolean => {
-    const re = /^\+?[1-9]\d{1,14}$/; 
-    return re.test(phone);
-  };
-
-  const updatePersonal = async (data: any) => {
-    if (!validateEmail(data.email)) {
-      throw new Error('Invalid email format');
-    }
-
-    if (!validatePhone(data.phone)) {
-      throw new Error('Invalid phone number format');
-    }
-
-    // File processing
-    let updatedData = { ...data };
-    if (data.profileImage instanceof File) {
-      try {
-        updatedData.profileImage = await fileToBase64(data.profileImage);
-      } catch (error: any) {
-        throw new Error(`Profile image: ${error.message}`);
-      }
-    }
-
-    dispatch(updatePersonalInfo(updatedData));
-  };
-
-  // Return public API
   return {
-    personal,
-    professional,
-    documents,
-    account,
     activeTab,
+    handleTabChange,
+    formData,
+    updateFormData,
+    submitEmployeeData,
     isLoading,
     formError,
-    handleTabChange: (tabName: string) => dispatch(setActiveTab(tabName)),
-    updatePersonal,
-    updateProfessional: (data: any) => dispatch(updateProfessionalInfo(data)),
-    updateDocuments: async (fileType: string, file: File) => {
-      try {
-        const base64File = await fileToBase64(file);
-        dispatch(updateDocumentInfo({ [fileType]: base64File }));
-      } catch (error: any) {
-        throw new Error(`${fileType}: ${error.message}`);
-      }
-    },
-    updateAccount: (data: any) => {
-      if (data.password && data.password.length < 8) {
-        throw new Error('Password must be at least 8 characters');
-      }
-      dispatch(updateAccountInfo(data));
-    },
-    submitEmployeeData
   };
-};
+}

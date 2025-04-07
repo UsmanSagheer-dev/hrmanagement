@@ -4,22 +4,14 @@ import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
-import InputField from "../../components/inputField/InputField";
-import Button from "../../components/button/Button";
 
-import { PersonalForm, ProfessionalInformationFormProps } from "../../types/formTypes";
-import {
-  employeeTypeOptions,
-  departmentOptions,
-  workingDaysOptions,
-  officeLocationOptions,
-} from "../../constants/formConstants";
+import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
+import { employeeTypeOptions, departmentOptions, workingDaysOptions, officeLocationOptions } from "../../constants/formConstants";
+import { PersonalForm, ProfessionalInformationFormProps } from "@/app/types/formTypes";
+import InputField from "@/app/components/inputField/InputField";
+import Button from "@/app/components/button/Button";
 
-
-
-const ProfessionalInformationForm: React.FC<
-  ProfessionalInformationFormProps
-> = ({ onTabChange }) => {
+const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = ({ onTabChange }) => {
   const [formData, setFormData] = useState<PersonalForm>({
     employeeId: "",
     userName: "",
@@ -31,19 +23,16 @@ const ProfessionalInformationForm: React.FC<
     joiningDate: "",
     officeLocation: "",
   });
-
   const handleInputChange = (field: keyof PersonalForm, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onTabChange("documents");
   };
-
   const handleCancel = () => {
     setFormData({
       employeeId: "",
@@ -57,7 +46,6 @@ const ProfessionalInformationForm: React.FC<
       officeLocation: "",
     });
   };
-
   const NavigationTab = ({
     Icon,
     title,
@@ -87,7 +75,6 @@ const ProfessionalInformationForm: React.FC<
       </button>
     );
   };
-
   return (
     <div className="h-[67vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">

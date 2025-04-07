@@ -1,16 +1,17 @@
-// app/EmployeeFormPage.tsx
 "use client";
-import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
+import React from "react";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import Header from "@/app/header/Header";
 import PersonalInformationForm from "@/app/(form)/personalInformationForm/PersonalInformationForm";
 import ProfessionalInformationForm from "@/app/(form)/professionalInformationForm/ProfessionalInformationForm";
-import React from "react";
 import DocumentsForm from "@/app/(form)/documentsForm/DocumentsForm";
-import { useEmployeeForm } from "../../../hooks/useEmployeeForm";
+import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
+import { EmployeeFormProvider, useEmployeeFormContext } from "@/app/contexts/EmployeeFormContext";
 
-function EmployeeFormPage() {
-  const { activeTab, handleTabChange } = useEmployeeForm();
+
+// Inner component that uses the context
+function EmployeeFormContent() {
+  const { activeTab, handleTabChange } = useEmployeeFormContext();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -34,7 +35,7 @@ function EmployeeFormPage() {
           <Sidebar />
         </div>
         <div className="w-full flex flex-col gap-4">
-          <div className="w-full ">
+          <div className="w-full">
             <Header
               title="All Employees"
               description="All Employee > Add New Employee"
@@ -44,6 +45,15 @@ function EmployeeFormPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Parent component with provider
+function EmployeeFormPage() {
+  return (
+    <EmployeeFormProvider>
+      <EmployeeFormContent />
+    </EmployeeFormProvider>
   );
 }
 

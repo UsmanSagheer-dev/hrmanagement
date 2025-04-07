@@ -1,63 +1,61 @@
-'use client';
-import React, { useState } from 'react';
-import { FaCamera } from 'react-icons/fa';
-import { IoIosPerson } from 'react-icons/io';
-import { HiOutlineBriefcase } from 'react-icons/hi2';
-import { IoDocumentTextOutline } from 'react-icons/io5';
-import { MdLockOpen } from 'react-icons/md';
-import InputField from '../../components/inputField/InputField';
-import Button from '../../components/button/Button';
-import { PersonalInformationFormProps, FormData } from "../../types/formTypes";
+"use client";
+import React, { useState, useEffect } from "react";
+import { FaCamera } from "react-icons/fa";
+import { IoIosPerson } from "react-icons/io";
+import { HiOutlineBriefcase } from "react-icons/hi2";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { MdLockOpen } from "react-icons/md";
+import InputField from "../../components/inputField/InputField";
+import Button from "../../components/button/Button";
+import { PersonalInformationFormProps } from "../../types/formTypes";
 import { maritalStatusOptions, genderOptions, nationalityOptions, cityOptions, stateOptions, zipCodeOptions } from "../../constants/formConstants";
+import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
 
 const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTabChange }) => {
+  const { formData, updateFormData } = useEmployeeFormContext();
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
-    mobileNumber: '',
-    email: '',
-    dateOfBirth: '',
-    maritalStatus: '',
-    gender: '',
-    nationality: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    profileImage: null,
-  });
+  
+  // Use local state only for form display, sync with context
+  const [localFormData, setLocalFormData] = useState(formData.personal);
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({
+  useEffect(() => {
+    setLocalFormData(formData.personal);
+    if (formData.personal.profileImage) {
+      if (formData.personal.profileImage instanceof File) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            setProfileImagePreview(event.target.result as string);
+          }
+        };
+        reader.readAsDataURL(formData.personal.profileImage);
+      } else if (typeof formData.personal.profileImage === "string") {
+        setProfileImagePreview(formData.personal.profileImage);
+      }
+    }
+  }, [formData.personal]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setLocalFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    updateFormData("personal", { [field]: value });
   };
 
   const handleImageChange = (files: FileList) => {
     const file = files[0];
-    setFormData((prev) => ({
-      ...prev,
-      profileImage: file,
-    }));
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setProfileImagePreview(event.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+    updateFormData("personal", { profileImage: file });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    updateFormData("personal", localFormData);
     onTabChange('professional');
   };
 
   const handleCancel = () => {
-    setFormData({
+    const resetData = {
       firstName: '',
       lastName: '',
       mobileNumber: '',
@@ -71,7 +69,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
       state: '',
       zipCode: '',
       profileImage: null,
-    });
+    };
+    setLocalFormData(resetData);
+    updateFormData("personal", resetData);
     setProfileImagePreview(null);
   };
 
@@ -124,27 +124,27 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
       section: 'name',
       grid: 'grid-cols-1 md:grid-cols-2',
       fields: [
-        { type: 'text' as const, placeholder: 'First Name', field: 'firstName' as keyof FormData },
-        { type: 'text' as const, placeholder: 'Last Name', field: 'lastName' as keyof FormData },
+        { type: 'text' as const, placeholder: 'First Name', field: 'firstName' },
+        { type: 'text' as const, placeholder: 'Last Name', field: 'lastName' },
       ]
     },
     {
       section: 'contact',
       grid: 'grid-cols-1 md:grid-cols-2',
       fields: [
-        { type: 'text' as const, placeholder: 'Mobile Number', field: 'mobileNumber' as keyof FormData },
-        { type: 'email' as const, placeholder: 'Email Address', field: 'email' as keyof FormData },
+        { type: 'text' as const, placeholder: 'Mobile Number', field: 'mobileNumber' },
+        { type: 'email' as const, placeholder: 'Email Address', field: 'email' },
       ]
     },
     {
       section: 'personal',
       grid: 'grid-cols-1 md:grid-cols-2',
       fields: [
-        { type: 'date' as const, placeholder: 'Date of Birth', field: 'dateOfBirth' as keyof FormData },
+        { type: 'date' as const, placeholder: 'Date of Birth', field: 'dateOfBirth' },
         { 
           type: 'select' as const, 
           placeholder: 'Marital Status', 
-          field: 'maritalStatus' as keyof FormData,
+          field: 'maritalStatus',
           options: maritalStatusOptions 
         },
       ]
@@ -156,13 +156,13 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
         { 
           type: 'select' as const, 
           placeholder: 'Gender', 
-          field: 'gender' as keyof FormData,
+          field: 'gender',
           options: genderOptions 
         },
         { 
           type: 'select' as const, 
           placeholder: 'Nationality', 
-          field: 'nationality' as keyof FormData,
+          field: 'nationality',
           options: nationalityOptions 
         },
       ]
@@ -171,7 +171,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
       section: 'address',
       grid: 'grid-cols-1',
       fields: [
-        { type: 'text' as const, placeholder: 'Address', field: 'address' as keyof FormData },
+        { type: 'text' as const, placeholder: 'Address', field: 'address' },
       ]
     },
     {
@@ -181,19 +181,19 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
         { 
           type: 'select' as const, 
           placeholder: 'City', 
-          field: 'city' as keyof FormData,
+          field: 'city',
           options: cityOptions 
         },
         { 
           type: 'select' as const, 
           placeholder: 'State', 
-          field: 'state' as keyof FormData,
+          field: 'state',
           options: stateOptions 
         },
         { 
           type: 'select' as const, 
           placeholder: 'ZIP Code', 
-          field: 'zipCode' as keyof FormData,
+          field: 'zipCode',
           options: zipCodeOptions 
         },
       ]
@@ -222,7 +222,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({ onTab
                   key={input.field}
                   type={input.type}
                   placeholder={input.placeholder}
-                  value={formData[input.field]}
+                  value={localFormData[input.field as keyof typeof localFormData] as string}
                   onChange={(value) => handleInputChange(input.field, value)}
                   options={input.options}
                   required

@@ -6,41 +6,41 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import FileUpload from "../../components/fileUpload/UploadFile";
 import Button from "../../components/button/Button";
+import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
 
 type DocumentsTabProps = {
   onTabChange: (tabName: string) => void;
 };
 
-type FormData = {
-  employeeId: string;
-};
-
 const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
-  const [formData, setFormData] = useState<FormData>({
-    employeeId: "",
-  });
+  const { formData, updateFormData } = useEmployeeFormContext();
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
 
-  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>(
-    {}
-  );
+  React.useEffect(() => {
+    setUploadedFiles(formData.documents);
+  }, [formData.documents]);
 
   const handleFileUpload = (file: File, type: string) => {
     setUploadedFiles((prev) => ({
       ...prev,
       [type]: file,
     }));
-    console.log(`${type} uploaded:`, file.name);
+    updateFormData("documents", { [type]: file });
   };
 
   const handleCancel = () => {
-    setFormData({
-      employeeId: "",
-    });
     setUploadedFiles({});
+    updateFormData("documents", {
+      appointmentLetter: null,
+      salarySlips: null,
+      relievingLetter: null,
+      experienceLetter: null,
+    });
     onTabChange("professional");
   };
 
   const handleNext = () => {
+    updateFormData("documents", uploadedFiles);
     if (Object.keys(uploadedFiles).length === documents.length) {
       onTabChange("account");
     }
@@ -68,7 +68,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
       <button
         onClick={() => onTabChange(tabName)}
         className={`flex items-center ${
-          isActive ? "text-[#E25319] border-b-2 border-[#E25319]" : "text-white"
+          isActive ? "text-[#E25319] border-b-2 border-[#E74219]" : "text-white"
         } pb-2 mr-6`}
       >
         <div
@@ -78,7 +78,6 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
         >
           <Icon className="text-lg" />
         </div>
-
         <span>{title}</span>
       </button>
     );
