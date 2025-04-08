@@ -7,10 +7,8 @@ import { MdLockOpen } from "react-icons/md";
 import FileUpload from "../../components/fileUpload/UploadFile";
 import Button from "../../components/button/Button";
 import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
+import { DocumentsTabProps } from "@/app/types/types";
 
-type DocumentsTabProps = {
-  onTabChange: (tabName: string) => void;
-};
 
 const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   const { formData, updateFormData } = useEmployeeFormContext();

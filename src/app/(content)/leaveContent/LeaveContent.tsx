@@ -1,5 +1,6 @@
 import React from "react";
-import Table, { Column } from "../../components/table/Table";
+import Table from "../../components/table/Table";
+import { Column } from "@/app/types/types";
 
 interface LeaveRecord {
   date: string;

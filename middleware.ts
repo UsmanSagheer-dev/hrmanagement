@@ -5,7 +5,7 @@ import { authOptions } from "./lib/authoptions";
 
 export async function middleware(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  console.log("Middleware Session:", session); // Debug
+  console.log("Middleware Session:", session); 
 
   const path = request.nextUrl.pathname;
 

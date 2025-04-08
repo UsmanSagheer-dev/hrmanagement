@@ -1,16 +1,12 @@
 import React from "react";
-import { UserData } from "../../types/types";
+import { ProfileContentProps, UserData } from "../../types/types";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import FileList from "../../components/fileList/FileList";
 
-interface ProfileContentProps {
-  userData: UserData;
-  activeProfileTab: string;
-  setActiveProfileTab: (tab: string) => void;
-}
+
 
 const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
   <button

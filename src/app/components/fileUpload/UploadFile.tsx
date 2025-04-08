@@ -5,6 +5,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 type FileUploadProps = {
   id: string;
   title: string;
+  accept?: string;
   onFileUpload: (file: File, type: string) => void;
 };
 

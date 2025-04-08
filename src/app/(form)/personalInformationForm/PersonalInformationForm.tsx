@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FaCamera } from "react-icons/fa";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
@@ -16,98 +16,42 @@ import {
   stateOptions,
   zipCodeOptions,
 } from "../../constants/formConstants";
-import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
+import { usePersonalInformationForm } from "./usePersonalInformationForm";
+import { inputFields } from "@/app/constants/inputFields";
 
 const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   onTabChange,
 }) => {
-  const { formData, updateFormData } = useEmployeeFormContext();
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
-    null
-  );
+  const {
+    localFormData,
+    profileImagePreview,
+    handleInputChange,
+    handleImageChange,
+    handleSubmit,
+    handleCancel,
+  } = usePersonalInformationForm({ onTabChange });
 
-  const [localFormData, setLocalFormData] = useState(formData.personal);
-
-  useEffect(() => {
-    setLocalFormData(formData.personal);
-    if (formData.personal.profileImage) {
-      if (formData.personal.profileImage instanceof File) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setProfileImagePreview(event.target.result as string);
-          }
-        };
-        reader.readAsDataURL(formData.personal.profileImage);
-      } else if (typeof formData.personal.profileImage === "string") {
-        setProfileImagePreview(formData.personal.profileImage);
-      }
-    }
-  }, [formData.personal]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setLocalFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-    updateFormData("personal", { [field]: value });
-  };
-
-  const handleImageChange = (files: FileList) => {
-    const file = files[0];
-    updateFormData("personal", { profileImage: file });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFormData("personal", localFormData);
-    onTabChange("professional");
-  };
-
-  const handleCancel = () => {
-    const resetData = {
-      firstName: "",
-      lastName: "",
-      mobileNumber: "",
-      email: "",
-      dateOfBirth: "",
-      maritalStatus: "",
-      gender: "",
-      nationality: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      profileImage: null,
-    };
-    setLocalFormData(resetData);
-    updateFormData("personal", resetData);
-    setProfileImagePreview(null);
-  };
-
-  const ProfileImageUpload = () => {
-    return (
-      <div className="relative w-24 h-24 border border-[#A2A1A833] bg-[#A2A1A80D] rounded-lg flex items-center justify-center overflow-hidden">
-        {profileImagePreview ? (
-          <img
-            src={profileImagePreview}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="text-white">
-            <FaCamera size={32} />
-          </div>
-        )}
-        <input
-          type="file"
-          className="absolute inset-0 opacity-0 cursor-pointer"
-          onChange={(e) => e.target.files && handleImageChange(e.target.files)}
-          accept="image/*"
+  const ProfileImageUpload = () => (
+    <div className="relative w-24 h-24 border border-[#A2A1A833] bg-[#A2A1A80D] rounded-lg flex items-center justify-center overflow-hidden">
+      {profileImagePreview ? (
+        <img
+          src={profileImagePreview}
+          alt="Profile"
+          className="w-full h-full object-cover"
         />
-      </div>
-    );
-  };
+      ) : (
+        <div className="text-white">
+          <FaCamera size={32} />
+        </div>
+      )}
+      <input
+        type="file"
+        className="absolute inset-0 opacity-0 cursor-pointer"
+        onChange={(e) => e.target.files && handleImageChange(e.target.files)}
+        accept="image/*"
+      />
+    </div>
+  );
 
   const NavigationTab = ({
     Icon,
@@ -119,122 +63,25 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
     title: string;
     tabName: string;
     isActive: boolean;
-  }) => {
-    return (
-      <button
-        onClick={() => onTabChange(tabName)}
-        className={`flex items-center ${
-          isActive ? "text-[#E25319] border-b-2 border-[#E25319]" : "text-white"
-        } pb-2 mr-6`}
+  }) => (
+    <button
+      onClick={() => onTabChange(tabName)}
+      className={`flex items-center ${
+        isActive ? "text-[#E25319] border-b-2 border-[#E25319]" : "text-white"
+      } pb-2 mr-6`}
+    >
+      <div
+        className={`w-6 h-6 ${
+          isActive ? "text-[#E25319]" : "border-none"
+        } flex items-center justify-center mr-2`}
       >
-        <div
-          className={`w-6 h-6 ${
-            isActive ? "text-[#E25319]" : "border-none"
-          } flex items-center justify-center mr-2`}
-        >
-          <Icon className="text-lg" />
-        </div>
-        <span>{title}</span>
-      </button>
-    );
-  };
+        <Icon className="text-lg" />
+      </div>
+      <span>{title}</span>
+    </button>
+  );
 
-  const inputFields = [
-    {
-      section: "name",
-      grid: "grid-cols-1 md:grid-cols-2",
-      fields: [
-        {
-          type: "text" as const,
-          placeholder: "First Name",
-          field: "firstName",
-        },
-        { type: "text" as const, placeholder: "Last Name", field: "lastName" },
-      ],
-    },
-    {
-      section: "contact",
-      grid: "grid-cols-1 md:grid-cols-2",
-      fields: [
-        {
-          type: "text" as const,
-          placeholder: "Mobile Number",
-          field: "mobileNumber",
-        },
-        {
-          type: "email" as const,
-          placeholder: "Email Address",
-          field: "email",
-        },
-      ],
-    },
-    {
-      section: "personal",
-      grid: "grid-cols-1 md:grid-cols-2",
-      fields: [
-        {
-          type: "date" as const,
-          placeholder: "Date of Birth",
-          field: "dateOfBirth",
-        },
-        {
-          type: "select" as const,
-          placeholder: "Marital Status",
-          field: "maritalStatus",
-          options: maritalStatusOptions,
-        },
-      ],
-    },
-    {
-      section: "identity",
-      grid: "grid-cols-1 md:grid-cols-2",
-      fields: [
-        {
-          type: "select" as const,
-          placeholder: "Gender",
-          field: "gender",
-          options: genderOptions,
-        },
-        {
-          type: "select" as const,
-          placeholder: "Nationality",
-          field: "nationality",
-          options: nationalityOptions,
-        },
-      ],
-    },
-    {
-      section: "address",
-      grid: "grid-cols-1",
-      fields: [
-        { type: "text" as const, placeholder: "Address", field: "address" },
-      ],
-    },
-    {
-      section: "location",
-      grid: "grid-cols-1 md:grid-cols-3",
-      fields: [
-        {
-          type: "select" as const,
-          placeholder: "City",
-          field: "city",
-          options: cityOptions,
-        },
-        {
-          type: "select" as const,
-          placeholder: "State",
-          field: "state",
-          options: stateOptions,
-        },
-        {
-          type: "select" as const,
-          placeholder: "ZIP Code",
-          field: "zipCode",
-          options: zipCodeOptions,
-        },
-      ],
-    },
-  ];
+ 
 
   return (
     <div className="h-[84vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
@@ -299,7 +146,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
             <Button
               title="Cancel"
               onClick={handleCancel}
-              className="w-[91px] h-[50px] cursor-pointer bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors "
+              className="w-[91px] h-[50px] cursor-pointer bg-transparent border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
             />
             <Button
               title="Next"

@@ -1,13 +1,8 @@
 import React from "react";
-import Table, { Column } from "../../components/table/Table";
+import Table from "../../components/table/Table";
+import { Column, ProjectRecord } from "@/app/types/types";
 
-interface ProjectRecord {
-  srNo: number;
-  projectName: string;
-  startDate: string;
-  finishDate: string;
-  status: string;
-}
+
 
 export const ProjectsContent: React.FC = () => {
   const projectData: ProjectRecord[] = [

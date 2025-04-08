@@ -1,14 +1,4 @@
-export interface Column<T> {
-  key: keyof T | string;
-  header: string;
-  render?: (item: T) => React.ReactNode;
-}
-
-interface TableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-}
-
+import { TableProps } from "@/app/types/types";
 const Table = <T,>({ data, columns }: TableProps<T>) => {
   return (
     <div className="w-full">

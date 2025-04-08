@@ -1,14 +1,6 @@
 import React from "react";
-import Table, { Column } from "../../components/table/Table";
-
-interface AttendanceRecord {
-  date: string;
-  checkIn: string;
-  checkOut: string;
-  breakTime: string;
-  workingHours: string;
-  status: string;
-}
+import Table from "../../components/table/Table";
+import { AttendanceRecord, Column } from "@/app/types/types";
 
 const AttendanceContent: React.FC = () => {
   const attendanceData: AttendanceRecord[] = [
