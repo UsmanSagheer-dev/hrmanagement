@@ -119,6 +119,7 @@ export function useEmployeeForm() {
       setIsLoading(true);
       setFormError(null);
 
+      // Convert all files to Base64 for Cloudinary upload
       const profileImageBase64 = formData.personal.profileImage
         ? await fileToBase64(formData.personal.profileImage)
         : null;
@@ -169,9 +170,9 @@ export function useEmployeeForm() {
       );
 
       if (uploadedDocs.length > 0) {
-        toast.success("Documents successfully uploaded to Cloudinary!");
+        toast.success("Documents and profile image successfully uploaded to Cloudinary!");
       } else {
-        toast.warn("No documents were uploaded to Cloudinary");
+        toast.warn("No documents or profile image were uploaded to Cloudinary");
       }
 
       router.push("/employee/details");
@@ -180,7 +181,7 @@ export function useEmployeeForm() {
       setFormError(
         error.message || "An error occurred while saving the employee data"
       );
-      toast.error("Failed to upload documents to Cloudinary");
+      toast.error("Failed to upload documents or profile image to Cloudinary");
     } finally {
       setIsLoading(false);
     }

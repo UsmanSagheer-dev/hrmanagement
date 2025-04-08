@@ -56,10 +56,10 @@ export const useSignUp = () => {
 
       if (data.role === "Admin") {
         toast.success("Admin account created successfully!");
-        router.push("/dashboard");
+        router.push("/auth/login");
       } else {
         toast.success("Employee account created successfully!");
-        router.push("/employee/add");
+        router.push("/auth/login");
       }
 
     } catch (error) {

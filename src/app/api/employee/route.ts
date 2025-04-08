@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json();
 
+    // Upload all files (including profileImage) to Cloudinary
     const documentUrls = {
       appointmentLetter: data.appointmentLetter
         ? await uploadToCloudinary(data.appointmentLetter)
@@ -30,6 +31,9 @@ export async function POST(req: NextRequest) {
       experienceLetter: data.experienceLetter
         ? await uploadToCloudinary(data.experienceLetter)
         : null,
+      profileImage: data.profileImage
+        ? await uploadToCloudinary(data.profileImage)
+        : null, // Add profileImage upload
     };
 
     const formattedData = {
@@ -45,7 +49,7 @@ export async function POST(req: NextRequest) {
       city: data.city,
       state: data.state,
       zipCode: data.zipCode,
-      profileImage: data.profileImage,
+      profileImage: documentUrls.profileImage, // Use Cloudinary URL
 
       employeeId: data.employeeId,
       userName: data.userName,
@@ -100,7 +104,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("Error saving employee data:", error);
-
     return NextResponse.json(
       { error: error.message || "Failed to save employee data" },
       { status: 500 }
@@ -108,6 +111,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// GET function remains unchanged
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
