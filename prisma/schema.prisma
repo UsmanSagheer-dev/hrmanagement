@@ -18,14 +18,15 @@ model User {
   hashedPassword String?
   name          String?
   emailVerified DateTime?
-  avatar    String?
+  avatar        String?
   image         String?
-  role          String?  @default("Employee") // Admin, HRManager, Employee
+  role          String?  @default("Employee")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   accounts      Account[]
   sessions      Session[]
-    authenticators Authenticator[]
+  authenticators Authenticator[]
+  employee      Employee? @relation // One-to-one relation with Employee
 }
 
 model Account {
@@ -79,7 +80,7 @@ model Authenticator {
 }
 
 model Employee {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                 String    @id @map("_id") @db.ObjectId // Remove @default(auto()), use User's id
   firstName          String
   lastName           String
   mobileNumber       String?
@@ -111,10 +112,11 @@ model Employee {
   relievingLetter    String?
   experienceLetter   String?
   
-  // Account Access
   slackId            String?
   skypeId            String?
   githubId           String?
+  
+  user               User      @relation(fields: [id], references: [id], onDelete: Cascade)
   
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt

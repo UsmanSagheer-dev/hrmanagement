@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized. Please sign in." },
         { status: 401 }
@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json();
 
-    // Upload all files (including profileImage) to Cloudinary
     const documentUrls = {
       appointmentLetter: data.appointmentLetter
         ? await uploadToCloudinary(data.appointmentLetter)
@@ -33,10 +32,11 @@ export async function POST(req: NextRequest) {
         : null,
       profileImage: data.profileImage
         ? await uploadToCloudinary(data.profileImage)
-        : null, // Add profileImage upload
+        : null,
     };
 
     const formattedData = {
+      id: session.user.id, // Use the User's id as the Employee's id
       firstName: data.firstName,
       lastName: data.lastName,
       mobileNumber: data.mobileNumber,
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       city: data.city,
       state: data.state,
       zipCode: data.zipCode,
-      profileImage: documentUrls.profileImage, // Use Cloudinary URL
+      profileImage: documentUrls.profileImage,
 
       employeeId: data.employeeId,
       userName: data.userName,
@@ -71,7 +71,18 @@ export async function POST(req: NextRequest) {
       githubId: data.githubId,
     };
 
-    const existingEmployee = await db.employee.findFirst({
+    const existingEmployee = await db.employee.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (existingEmployee) {
+      return NextResponse.json(
+        { error: "An employee record already exists for this user" },
+        { status: 409 }
+      );
+    }
+
+    const duplicateCheck = await db.employee.findFirst({
       where: {
         OR: [
           { employeeId: formattedData.employeeId },
@@ -81,14 +92,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (existingEmployee) {
+    if (duplicateCheck) {
       return NextResponse.json(
         {
           error: "Employee with this ID or email already exists",
           field:
-            existingEmployee.employeeId === formattedData.employeeId
+            duplicateCheck.employeeId === formattedData.employeeId
               ? "employeeId"
-              : "email",
+              : duplicateCheck.email === formattedData.email
+              ? "email"
+              : "workEmail",
         },
         { status: 409 }
       );
@@ -100,8 +113,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Employee data saved successfully", employee },
-      { status: 201 }
-    );
+      { status: 201 
+    });
   } catch (error: any) {
     console.error("Error saving employee data:", error);
     return NextResponse.json(
@@ -111,22 +124,21 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET function remains unchanged
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const id = searchParams.get("id"); 
 
     if (id) {
       const employee = await db.employee.findUnique({
-        where: { employeeId: id },
+        where: { id }, 
       });
-      return NextResponse.json(employee);
+      return NextResponse.json(employee || { error: "Employee not found" }, { status: employee ? 200 : 404 });
     }
 
     const employees = await db.employee.findMany({

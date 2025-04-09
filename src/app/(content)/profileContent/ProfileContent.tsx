@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { ProfileContentProps, UserData } from "../../types/types";
+import React from "react";
+import { ProfileContentProps } from "../../types/types";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import FileList from "../../components/fileList/FileList";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useUserData from "./useUserData";
 
 const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
   <button
@@ -14,9 +17,7 @@ const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
     } pb-2 mr-6`}
   >
     <div
-      className={`w-6 h-6 ${
-        isActive ? "text-[#E25319]" : "border-none"
-      } flex items-center justify-center mr-2`}
+      className={`w-6 h-6 ${isActive ? "text-[#E25319]" : "border-none"} flex items-center justify-center mr-2`}
     >
       <Icon className="text-lg" />
     </div>
@@ -27,48 +28,16 @@ const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
 const InfoSection = ({ label, value }: { label: string; value: any }) => (
   <div className="mb- border-b-[1px] border-[#A2A1A81A]">
     <p className="text-gray-500 text-sm font-light mb-1">{label}</p>
-    <p className="text-white text-[16px] font-light mb-[8px]">
-      {value || "N/A"}
-    </p>
+    <p className="text-white text-[16px] font-light mb-[8px]">{value || "N/A"}</p>
   </div>
 );
 
 export const ProfileContent: React.FC<ProfileContentProps> = ({
   activeProfileTab,
   setActiveProfileTab,
+  employeeId,
 }) => {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchEmployeeData = async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch("/api/employee", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch employee data");
-        }
-
-        const data = await response.json();
-
-        setUserData(data[0]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployeeData();
-  }, []);
+  const { userData, loading, error } = useUserData(employeeId); 
 
   const getDocumentFiles = () => {
     if (!userData) return [];
@@ -111,16 +80,9 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
             <InfoSection label="Email Address" value={userData.email} />
             <InfoSection
               label="Date of Birth"
-              value={
-                userData.dateOfBirth
-                  ? new Date(userData.dateOfBirth).toLocaleDateString()
-                  : null
-              }
+              value={userData.dateOfBirth ? new Date(userData.dateOfBirth).toLocaleDateString() : null}
             />
-            <InfoSection
-              label="Marital Status"
-              value={userData.maritalStatus}
-            />
+            <InfoSection label="Marital Status" value={userData.maritalStatus} />
             <InfoSection label="Gender" value={userData.gender} />
             <InfoSection label="Nationality" value={userData.nationality} />
             <InfoSection label="Address" value={userData.address} />
@@ -141,16 +103,9 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
             <InfoSection label="Working Days" value={userData.workingDays} />
             <InfoSection
               label="Joining Date"
-              value={
-                userData.joiningDate
-                  ? new Date(userData.joiningDate).toLocaleDateString()
-                  : null
-              }
+              value={userData.joiningDate ? new Date(userData.joiningDate).toLocaleDateString() : null}
             />
-            <InfoSection
-              label="Office Location"
-              value={userData.officeLocation}
-            />
+            <InfoSection label="Office Location" value={userData.officeLocation} />
           </div>
         );
       case "documents":
@@ -176,8 +131,6 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-7">
             <InfoSection label="Work Email" value={userData.workEmail} />
-           
-
             <InfoSection label="Slack ID" value={userData.slackId} />
             <InfoSection label="Skype ID" value={userData.skypeId} />
             <InfoSection label="Github ID" value={userData.githubId} />
@@ -189,38 +142,41 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap border-b border-gray-700">
-        <NavigationTab
-          Icon={IoIosPerson}
-          title="Personal Information"
-          tabName="personal"
-          isActive={activeProfileTab === "personal"}
-          onClick={setActiveProfileTab}
-        />
-        <NavigationTab
-          Icon={HiOutlineBriefcase}
-          title="Professional Information"
-          tabName="professional"
-          isActive={activeProfileTab === "professional"}
-          onClick={setActiveProfileTab}
-        />
-        <NavigationTab
-          Icon={IoDocumentTextOutline}
-          title="Documents"
-          tabName="documents"
-          isActive={activeProfileTab === "documents"}
-          onClick={setActiveProfileTab}
-        />
-        <NavigationTab
-          Icon={MdLockOpen}
-          title="Account Access"
-          tabName="account"
-          isActive={activeProfileTab === "account"}
-          onClick={setActiveProfileTab}
-        />
+    <>
+      <div>
+        <div className="flex flex-wrap border-b border-gray-700">
+          <NavigationTab
+            Icon={IoIosPerson}
+            title="Personal Information"
+            tabName="personal"
+            isActive={activeProfileTab === "personal"}
+            onClick={setActiveProfileTab}
+          />
+          <NavigationTab
+            Icon={HiOutlineBriefcase}
+            title="Professional Information"
+            tabName="professional"
+            isActive={activeProfileTab === "professional"}
+            onClick={setActiveProfileTab}
+          />
+          <NavigationTab
+            Icon={IoDocumentTextOutline}
+            title="Documents"
+            tabName="documents"
+            isActive={activeProfileTab === "documents"}
+            onClick={setActiveProfileTab}
+          />
+          <NavigationTab
+            Icon={MdLockOpen}
+            title="Account Access"
+            tabName="account"
+            isActive={activeProfileTab === "account"}
+            onClick={setActiveProfileTab}
+          />
+        </div>
+        {renderProfileTabContent()}
       </div>
-      {renderProfileTabContent()}
-    </div>
+      <ToastContainer position="top-right" autoClose={3000} />
+    </>
   );
 };

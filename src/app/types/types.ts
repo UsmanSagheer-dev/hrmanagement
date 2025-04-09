@@ -1,36 +1,59 @@
 export type UserData = {
-    firstName: string;
-    lastName: string;
-    mobileNumber: string;
-    email: string;
-    dateOfBirth: string;
-    maritalStatus: string;
-    gender: string;
-    nationality: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    profileImage?: string | null;
-    jobTitle: string;
-    attendance?: {
-      presentDays: number;
-      absentDays: number;
-      lastCheckIn: string;
-    };
-    employeeID?: string;
+  firstName: string;
+  lastName: string;
+  mobileNumber: string;
+  email: string;
+  dateOfBirth: string;
+  maritalStatus: string;
+  gender: string;
+  nationality: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  profileImage?: string | null;
+  jobTitle: string;
+  attendance?: {
+    presentDays: number;
+    absentDays: number;
+    lastCheckIn: string;
+  };
+  appointmentLetter?: string | null;
+  salarySlips?: string | null;
+  relievingLetter?: string | null;
+  experienceLetter?: string | null;
+  employeeId?: string;
   userName?: string;
+  workEmail?: string;
   employeeType?: string;
-  emailAdress?: string; 
+  emailAddress?: string;
   department?: string;
   designation?: string;
   workingDays?: string;
-  joinDate?: string;
+  joiningDate?: string;
   officeLocation?: string;
-  skypeID?: string;
-  slackID?: string;
-  githubID?: string;
-  };
+  slackId?: string;
+  skypeId?: string;
+  githubId?: string;
+  
+  
+};
+
+
+
+
+export type EmployeeData = {
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
+  email: string;
+  profileImage?: string | null;
+};
+
+export type UserInfoSectionProps = {
+  employeeId?: string;
+  handleEditProfile: () => void;
+};
 
   export interface User {
   id: string;
@@ -105,3 +128,7 @@ export type AccountAccessFormProps = {
 export type DocumentsTabProps = {
   onTabChange: (tabName: string) => void;
 };
+export type ProfileDetailsProps = {
+  onTabChange: (tabName: string) => void;
+};
+

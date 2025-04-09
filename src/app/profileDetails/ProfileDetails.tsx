@@ -1,57 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import { FaCamera, FaEdit } from "react-icons/fa";
-import Button from "../components/button/Button";
 import IMAGES from "../assets/images";
 import { ProfileContent } from "../(content)/profileContent/ProfileContent";
 import { ProjectsContent } from "../(content)/projectsContent/ProjectsContent";
 import { IoIosPerson } from "react-icons/io";
 import { LuCalendarCheck, LuCalendarRange } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
-import { HiOutlineBriefcase } from "react-icons/hi2";
-import { HiOutlineMail } from "react-icons/hi";
 import AttendanceContent from "../(content)/attendanceContent/AttendanceContent";
 import LeaveContent from "../(content)/leaveContent/LeaveContent";
 import { useRouter } from "next/navigation";
 import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
+import { ProfileDetailsProps, UserData } from "../types/types";
 
-type ProfileDetailsProps = {
-  onTabChange: (tabName: string) => void;
-};
-
-type UserData = {
-  firstName: string;
-  lastName: string;
-  mobileNumber: string;
-  email: string;
-  dateOfBirth: string;
-  maritalStatus: string;
-  gender: string;
-  nationality: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  profileImage?: string | null;
-  jobTitle: string;
-  attendance?: {
-    presentDays: number;
-    absentDays: number;
-    lastCheckIn: string;
-  };
-  employeeID?: string;
-  userName?: string;
-  employeeType?: string;
-  emailAdress?: string;
-  department?: string;
-  designation?: string;
-  workingDays?: string;
-  joinDate?: string;
-  officeLocation?: string;
-  skypeID?: string;
-  githubID?: string;
-  slackID?: string;
-};
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
   const router = useRouter();
@@ -75,18 +35,18 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
       absentDays: 3,
       lastCheckIn: "March 10, 2025 9:00 AM",
     },
-    employeeID: "EMP001",
+    employeeId: "EMP001",
     userName: "dina_coneva",
     employeeType: "Full-time",
-    emailAdress: "dina.c@gmail.com",
+    emailAddress: "dina.c@gmail.com",
     department: "IT",
     designation: "Project Manager",
     workingDays: "30 days",
-    joinDate: "January 10, 2021",
+    joiningDate: "January 10, 2021",
     officeLocation: "Chisinau",
-    skypeID: "usman",
-    githubID: "dina_coneva",
-    slackID: "dina_coneva",
+    skypeId: "usman",
+    githubId: "dina_coneva",
+    slackId: "dina_coneva",
   });
   const handleEditProfile = () => {
     router.push("/employee/add");

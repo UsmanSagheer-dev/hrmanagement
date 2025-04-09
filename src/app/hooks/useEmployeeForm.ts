@@ -2,47 +2,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
-interface FormData {
-  personal: {
-    firstName: string;
-    lastName: string;
-    mobileNumber: string;
-    email: string;
-    dateOfBirth: string;
-    maritalStatus: string;
-    gender: string;
-    nationality: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    profileImage?: File | null;
-  };
-  professional: {
-    employeeId: string;
-    userName: string;
-    employeeType: string;
-    workEmail: string;
-    department: string;
-    designation: string;
-    workingDays: string;
-    joiningDate: string;
-    officeLocation: string;
-  };
-  documents: {
-    appointmentLetter?: File | null;
-    salarySlips?: File | null;
-    relievingLetter?: File | null;
-    experienceLetter?: File | null;
-  };
-  account: {
-    emailAddress: string;
-    slackId: string;
-    skypeId: string;
-    githubId: string;
-  };
-}
+import { FormData } from "../types/formTypes";
 
 export function useEmployeeForm() {
   const router = useRouter();
@@ -119,7 +79,6 @@ export function useEmployeeForm() {
       setIsLoading(true);
       setFormError(null);
 
-      // Convert all files to Base64 for Cloudinary upload
       const profileImageBase64 = formData.personal.profileImage
         ? await fileToBase64(formData.personal.profileImage)
         : null;
@@ -170,12 +129,14 @@ export function useEmployeeForm() {
       );
 
       if (uploadedDocs.length > 0) {
-        toast.success("Documents and profile image successfully uploaded to Cloudinary!");
+        toast.success(
+          "Documents and profile image successfully uploaded to Cloudinary!"
+        );
       } else {
         toast.warn("No documents or profile image were uploaded to Cloudinary");
       }
 
-      router.push("/employee/details");
+      router.push("/viewemployeedetail");
     } catch (error: any) {
       console.error("Error submitting employee data:", error);
       setFormError(
