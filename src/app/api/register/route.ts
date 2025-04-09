@@ -16,7 +16,10 @@ export async function POST(req: Request) {
     });
 
     if (userAlreadyExist?.id) {
-      return NextResponse.json({ error: "User already exists" }, { status: 409 });
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -28,7 +31,7 @@ export async function POST(req: Request) {
         email,
         name,
         hashedPassword,
-        role: isFirstUser ? "Admin" : "Employee"
+        role: isFirstUser ? "Admin" : "Employee",
       },
     });
 
@@ -46,7 +49,7 @@ export async function GET(req: Request) {
   try {
     const adminUser = await db.user.findFirst({
       where: {
-        role: "Admin"
+        role: "Admin",
       },
       select: {
         id: true,
@@ -54,8 +57,8 @@ export async function GET(req: Request) {
         email: true,
         role: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
 
     if (!adminUser) {
@@ -81,7 +84,7 @@ export async function PUT(req: Request) {
     const { name, email, password } = body;
 
     const adminUser = await db.user.findFirst({
-      where: { role: "Admin" }
+      where: { role: "Admin" },
     });
 
     if (!adminUser) {
@@ -105,8 +108,8 @@ export async function PUT(req: Request) {
         email: true,
         role: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
 
     return NextResponse.json(updatedUser, { status: 200 });
@@ -122,7 +125,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const adminUser = await db.user.findFirst({
-      where: { role: "Admin" }
+      where: { role: "Admin" },
     });
 
     if (!adminUser) {
@@ -133,7 +136,7 @@ export async function DELETE(req: Request) {
     }
 
     await db.user.delete({
-      where: { id: adminUser.id }
+      where: { id: adminUser.id },
     });
 
     return NextResponse.json(

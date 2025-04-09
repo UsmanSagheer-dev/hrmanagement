@@ -1,24 +1,7 @@
 "use client";
+import { PersonalInfoContentProps } from "@/app/types/types";
 import React from "react";
 
-
-type PersonalInfoContentProps = {
-  userData: {
-    firstName: string;
-    lastName: string;
-    mobileNumber: string;
-    email: string;
-    dateOfBirth: string;
-    maritalStatus: string;
-    gender: string;
-    nationality: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
-  onTabChange: (tabName: string) => void;
-};
 
 
 const InfoSection = ({ label, value }: { label: string; value: string }) => {
@@ -32,11 +15,9 @@ const InfoSection = ({ label, value }: { label: string; value: string }) => {
 
 const PersonalInfoContent: React.FC<PersonalInfoContentProps> = ({
   userData,
-
 }) => {
   return (
     <div>
-     
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         <InfoSection label="First Name" value={userData.firstName} />
         <InfoSection label="Last Name" value={userData.lastName} />

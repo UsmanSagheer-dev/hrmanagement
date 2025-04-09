@@ -11,10 +11,8 @@ export function useLogin() {
   const router = useRouter();
   const { data: session, status, update } = useSession();
 
-  // Monitor session status changes
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      // Redirect based on role when session is available
       if (session.user.role === "Admin") {
         router.push("/dashboard");
       } else {
@@ -29,7 +27,7 @@ export function useLogin() {
       setError("Email and password are required");
       return;
     }
-    
+
     setLoading(true);
     setError("");
 
@@ -47,10 +45,7 @@ export function useLogin() {
       }
 
       if (result?.ok) {
-        // Force session update after successful login
         await update();
-        
-        // Note: The useEffect above will handle redirection once session is updated
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -84,6 +79,6 @@ export function useLogin() {
     handleSubmit,
     handleGoogleLogin,
     session,
-    sessionStatus: status
+    sessionStatus: status,
   };
 }

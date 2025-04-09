@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
 import "./globals.css";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
-import { extractRouterConfig } from "uploadthing/server"; // Import this
-import { ourFileRouter } from "@/app/api/uploadthing/core"; // Adjust path as needed
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 
 import NextAuthSessionProvider from "../../providers/NextAuthSessionProvider";
 import ToastProvider from "../../providers/ToastProvider";
 import { Providers } from "../../providers/StoreProvider";
 
-const inter = Lexend({ subsets: ["latin"] });
+import "@fontsource/lexend/400.css";
+import "@fontsource/lexend/500.css";
+import "@fontsource/lexend/700.css";
 
 export const metadata: Metadata = {
   title: "Hr Management",
@@ -23,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className="font-lexend">
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <ToastProvider />
         <Providers>

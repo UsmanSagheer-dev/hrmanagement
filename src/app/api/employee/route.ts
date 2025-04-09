@@ -1,192 +1,151 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-
-import { EMPLOYEE_VALIDATION_FORM_ITEMS } from "../../constants/formConstants";
-import db from "../../../../lib/prismadb";
 import { authOptions } from "../../../../lib/authoptions";
+import db from "../../../../lib/prismadb";
+import { uploadToCloudinary } from "@/app/utils/cloudinary";
 
-export const POST = async (request: NextRequest) => {
+export async function POST(req: NextRequest) {
   try {
-    // Authentication Check
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+
+    if (!session || !session.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized - Please login" },
+        { error: "Unauthorized. Please sign in." },
         { status: 401 }
       );
     }
 
-    // Authorization Check (Example: Only HR/Admin can create)
-    if (!["HR", "Admin"].includes(session.user.role)) {
+    const data = await req.json();
+
+    const documentUrls = {
+      appointmentLetter: data.appointmentLetter
+        ? await uploadToCloudinary(data.appointmentLetter)
+        : null,
+      salarySlips: data.salarySlips
+        ? await uploadToCloudinary(data.salarySlips)
+        : null,
+      relievingLetter: data.relievingLetter
+        ? await uploadToCloudinary(data.relievingLetter)
+        : null,
+      experienceLetter: data.experienceLetter
+        ? await uploadToCloudinary(data.experienceLetter)
+        : null,
+      profileImage: data.profileImage
+        ? await uploadToCloudinary(data.profileImage)
+        : null,
+    };
+
+    const formattedData = {
+      id: session.user.id, // Use the User's id as the Employee's id
+      firstName: data.firstName,
+      lastName: data.lastName,
+      mobileNumber: data.mobileNumber,
+      email: data.email,
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      maritalStatus: data.maritalStatus,
+      gender: data.gender,
+      nationality: data.nationality,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      zipCode: data.zipCode,
+      profileImage: documentUrls.profileImage,
+
+      employeeId: data.employeeId,
+      userName: data.userName,
+      employeeType: data.employeeType,
+      workEmail: data.workEmail,
+      department: data.department,
+      designation: data.designation,
+      workingDays: data.workingDays,
+      joiningDate: data.joiningDate ? new Date(data.joiningDate) : null,
+      officeLocation: data.officeLocation,
+
+      appointmentLetter: documentUrls.appointmentLetter,
+      salarySlips: documentUrls.salarySlips,
+      relievingLetter: documentUrls.relievingLetter,
+      experienceLetter: documentUrls.experienceLetter,
+
+      slackId: data.slackId,
+      skypeId: data.skypeId,
+      githubId: data.githubId,
+    };
+
+    const existingEmployee = await db.employee.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (existingEmployee) {
       return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 }
+        { error: "An employee record already exists for this user" },
+        { status: 409 }
       );
     }
 
-    const employeeData = await request.json();
-    
-    // Field Validation
-    const requiredFields = EMPLOYEE_VALIDATION_FORM_ITEMS;
-    for (const field of requiredFields) {
-      if (!employeeData[field]) {
-        return NextResponse.json(
-          { error: `Missing required field: ${field}` },
-          { status: 400 }
-        );
-      }
+    const duplicateCheck = await db.employee.findFirst({
+      where: {
+        OR: [
+          { employeeId: formattedData.employeeId },
+          { email: formattedData.email },
+          { workEmail: formattedData.workEmail },
+        ],
+      },
+    });
+
+    if (duplicateCheck) {
+      return NextResponse.json(
+        {
+          error: "Employee with this ID or email already exists",
+          field:
+            duplicateCheck.employeeId === formattedData.employeeId
+              ? "employeeId"
+              : duplicateCheck.email === formattedData.email
+              ? "email"
+              : "workEmail",
+        },
+        { status: 409 }
+      );
     }
 
-    // Link employee to logged-in user
     const employee = await db.employee.create({
-      data: {
-        ...employeeData,
-        userId: session.user.id // Add user relationship
-      }
+      data: formattedData,
     });
 
     return NextResponse.json(
-      { data: employee, success: true },
-      { status: 201 }
-    );
-    
-  } catch (error) {
-    console.error("Error:", error);
+      { message: "Employee data saved successfully", employee },
+      { status: 201 
+    });
+  } catch (error: any) {
+    console.error("Error saving employee data:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: error.message || "Failed to save employee data" },
       { status: 500 }
     );
   }
-};
+}
 
-export const GET = async (request: NextRequest) => {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized - Please login" },
-        { status: 401 }
-      );
+    if (!session || !session.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Role-based data filtering
-    let whereClause = {};
-    if (session.user.role === "HR") {
-      whereClause = { department: "HR" };
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id"); 
+
+    if (id) {
+      const employee = await db.employee.findUnique({
+        where: { id }, 
+      });
+      return NextResponse.json(employee || { error: "Employee not found" }, { status: employee ? 200 : 404 });
     }
 
     const employees = await db.employee.findMany({
-      where: whereClause
+      orderBy: { createdAt: "desc" },
     });
-
-    return NextResponse.json(
-      { data: employees, success: true },
-      { status: 200 }
-    );
-    
-  } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json(employees);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-};
-
-export const PUT = async (request: NextRequest) => {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized - Please login" },
-        { status: 401 }
-      );
-    }
-
-    const { id, ...data } = await request.json();
-    
-    if (!id) {
-      return NextResponse.json(
-        { error: "Missing employee ID" },
-        { status: 400 }
-      );
-    }
-
-    // Ownership check
-    const existingEmployee = await db.employee.findUnique({
-      where: { id }
-    });
-
-    if (
-      session.user.role !== "Admin" &&
-      existingEmployee?.userId !== session.user.id
-    ) {
-      return NextResponse.json(
-        { error: "Not authorized to update this employee" },
-        { status: 403 }
-      );
-    }
-
-    const updatedEmployee = await db.employee.update({
-      where: { id },
-      data
-    });
-
-    return NextResponse.json(
-      { data: updatedEmployee, success: true },
-      { status: 200 }
-    );
-    
-  } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-};
-
-export const DELETE = async (request: NextRequest) => {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized - Please login" },
-        { status: 401 }
-      );
-    }
-
-    const { id } = await request.json();
-    
-    if (!id) {
-      return NextResponse.json(
-        { error: "Missing employee ID" },
-        { status: 400 }
-      );
-    }
-
-    // Admin-only deletion
-    if (session.user.role !== "Admin") {
-      return NextResponse.json(
-        { error: "Only admins can delete employees" },
-        { status: 403 }
-      );
-    }
-
-    await db.employee.delete({
-      where: { id }
-    });
-
-    return NextResponse.json(
-      { success: true },
-      { status: 200 }
-    );
-    
-  } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-};
+}

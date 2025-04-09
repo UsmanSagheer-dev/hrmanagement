@@ -4,7 +4,7 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import Header from "../../../header/Header";
 import DepartmentList from "../../../components/departmentList/DepartmentList";
 import SearchBar from "../../../components/searchBar/SearchBar";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface Member {
   id: number;
@@ -148,9 +148,9 @@ function AllDepartment() {
     },
   ]);
 
-const handleViewAll = (departmentName: string) => {
-  router.push(`/department${departmentName.toLowerCase()}`);
-};
+  const handleViewAll = (departmentName: string) => {
+    router.push(`/department${departmentName.toLowerCase()}`);
+  };
 
   return (
     <div className="h-screen bg-[#131313] p-[20px]">

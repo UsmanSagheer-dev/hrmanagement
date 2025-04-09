@@ -4,25 +4,6 @@ import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import db from "./prismadb";
 
-declare module "next-auth" {
-  interface User {
-    id: string;
-    email: string;
-    name: string | null;
-    role: string;
-    avatar?: string | null;
-  }
-
-  interface Session {
-    user: {
-      id: string;
-      email: string;
-      name: string | null;
-      role: string;
-      avatar?: string | null;
-    };
-  }
-}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -78,7 +59,7 @@ export const authOptions: AuthOptions = {
       },
       profile(profile) {
         return {
-          id: profile.sub, // Google ID as temporary ID
+          id: profile.sub, 
           name: profile.name,
           email: profile.email,
           image: profile.picture,
@@ -90,7 +71,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, 
   },
   pages: {
     signIn: "/auth/login",

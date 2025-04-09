@@ -1,16 +1,17 @@
-// app/EmployeeFormPage.tsx
 "use client";
-import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
+import React from "react";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import Header from "@/app/header/Header";
 import PersonalInformationForm from "@/app/(form)/personalInformationForm/PersonalInformationForm";
 import ProfessionalInformationForm from "@/app/(form)/professionalInformationForm/ProfessionalInformationForm";
-import React from "react";
 import DocumentsForm from "@/app/(form)/documentsForm/DocumentsForm";
-import { useEmployeeForm } from "../../../hooks/useEmployeeForm";
+import AccountAccessForm from "@/app/(form)/accountAccessForm/AccountAccessForm";
+import { EmployeeFormProvider, useEmployeeFormContext } from "@/app/contexts/EmployeeFormContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function EmployeeFormPage() {
-  const { activeTab, handleTabChange } = useEmployeeForm();
+function EmployeeFormContent() {
+  const { activeTab, handleTabChange } = useEmployeeFormContext();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -34,7 +35,7 @@ function EmployeeFormPage() {
           <Sidebar />
         </div>
         <div className="w-full flex flex-col gap-4">
-          <div className="w-full ">
+          <div className="w-full">
             <Header
               title="All Employees"
               description="All Employee > Add New Employee"
@@ -43,7 +44,27 @@ function EmployeeFormPage() {
           <div className="">{renderContent()}</div>
         </div>
       </div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </div>
+  );
+}
+
+function EmployeeFormPage() {
+  return (
+    <EmployeeFormProvider>
+      <EmployeeFormContent />
+    </EmployeeFormProvider>
   );
 }
 

@@ -1,61 +1,51 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
-import InputField from "../../components/inputField/InputField";
-import Button from "../../components/button/Button";
+import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
+import { employeeTypeOptions, departmentOptions, workingDaysOptions, officeLocationOptions } from "../../constants/formConstants";
+import { ProfessionalInformationFormProps } from "@/app/types/formTypes";
+import InputField from "@/app/components/inputField/InputField";
+import Button from "@/app/components/button/Button";
 
-import { PersonalForm, ProfessionalInformationFormProps } from "../../types/formTypes";
-import {
-  employeeTypeOptions,
-  departmentOptions,
-  workingDaysOptions,
-  officeLocationOptions,
-} from "../../constants/formConstants";
+const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = ({ onTabChange }) => {
+  const { formData, updateFormData } = useEmployeeFormContext();
+  const [localFormData, setLocalFormData] = useState(formData.professional);
 
+  useEffect(() => {
+    setLocalFormData(formData.professional);
+  }, [formData.professional]);
 
-
-const ProfessionalInformationForm: React.FC<
-  ProfessionalInformationFormProps
-> = ({ onTabChange }) => {
-  const [formData, setFormData] = useState<PersonalForm>({
-    employeeId: "",
-    userName: "",
-    employeeType: "",
-    emailAddress: "",
-    department: "",
-    designation: "",
-    workingDays: "",
-    joiningDate: "",
-    officeLocation: "",
-  });
-
-  const handleInputChange = (field: keyof PersonalForm, value: string) => {
-    setFormData((prev) => ({
+  const handleInputChange = (field: string, value: string) => {
+    setLocalFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    updateFormData("professional", { [field]: value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    updateFormData("professional", localFormData);
     onTabChange("documents");
   };
 
   const handleCancel = () => {
-    setFormData({
+    const resetData = {
       employeeId: "",
       userName: "",
       employeeType: "",
-      emailAddress: "",
+      workEmail: "",
       department: "",
       designation: "",
       workingDays: "",
       joiningDate: "",
       officeLocation: "",
-    });
+    };
+    setLocalFormData(resetData);
+    updateFormData("professional", resetData);
   };
 
   const NavigationTab = ({
@@ -92,30 +82,10 @@ const ProfessionalInformationForm: React.FC<
     <div className="h-[67vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
         <div className="flex border-b border-gray-700 flex-wrap">
-          <NavigationTab
-            Icon={IoIosPerson}
-            title="Personal Information"
-            tabName="personal"
-            isActive={false}
-          />
-          <NavigationTab
-            Icon={HiOutlineBriefcase}
-            title="Professional Information"
-            tabName="professional"
-            isActive={true}
-          />
-          <NavigationTab
-            Icon={IoDocumentTextOutline}
-            title="Documents"
-            tabName="documents"
-            isActive={false}
-          />
-          <NavigationTab
-            Icon={MdLockOpen}
-            title="Account Access"
-            tabName="account"
-            isActive={false}
-          />
+          <NavigationTab Icon={IoIosPerson} title="Personal Information" tabName="personal" isActive={false} />
+          <NavigationTab Icon={HiOutlineBriefcase} title="Professional Information" tabName="professional" isActive={true} />
+          <NavigationTab Icon={IoDocumentTextOutline} title="Documents" tabName="documents" isActive={false} />
+          <NavigationTab Icon={MdLockOpen} title="Account Access" tabName="account" isActive={false} />
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -124,7 +94,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="text"
                 placeholder="Employee ID"
-                value={formData.employeeId}
+                value={localFormData.employeeId}
                 onChange={(value) => handleInputChange("employeeId", value)}
                 required
                 className="border border-[#A2A1A833]"
@@ -132,7 +102,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="text"
                 placeholder="User Name"
-                value={formData.userName}
+                value={localFormData.userName}
                 onChange={(value) => handleInputChange("userName", value)}
                 required
                 className="border border-[#A2A1A833]"
@@ -143,7 +113,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="select"
                 placeholder="Select Employee Type"
-                value={formData.employeeType}
+                value={localFormData.employeeType}
                 onChange={(value) => handleInputChange("employeeType", value)}
                 options={employeeTypeOptions}
                 required
@@ -151,9 +121,9 @@ const ProfessionalInformationForm: React.FC<
               />
               <InputField
                 type="email"
-                placeholder="Email Address"
-                value={formData.emailAddress}
-                onChange={(value) => handleInputChange("emailAddress", value)}
+                placeholder="Work Email Address"
+                value={localFormData.workEmail}
+                onChange={(value) => handleInputChange("workEmail", value)}
                 required
                 className="border border-[#A2A1A833]"
               />
@@ -163,7 +133,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="select"
                 placeholder="Select Department"
-                value={formData.department}
+                value={localFormData.department}
                 onChange={(value) => handleInputChange("department", value)}
                 options={departmentOptions}
                 required
@@ -172,7 +142,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="text"
                 placeholder="Enter Designation"
-                value={formData.designation}
+                value={localFormData.designation}
                 onChange={(value) => handleInputChange("designation", value)}
                 required
                 className="border border-[#A2A1A833]"
@@ -183,7 +153,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="select"
                 placeholder="Select Working Days"
-                value={formData.workingDays}
+                value={localFormData.workingDays}
                 onChange={(value) => handleInputChange("workingDays", value)}
                 options={workingDaysOptions}
                 required
@@ -192,7 +162,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="date"
                 placeholder="Select Joining Date"
-                value={formData.joiningDate}
+                value={localFormData.joiningDate}
                 onChange={(value) => handleInputChange("joiningDate", value)}
                 required
                 className="border border-[#A2A1A833]"
@@ -203,7 +173,7 @@ const ProfessionalInformationForm: React.FC<
               <InputField
                 type="select"
                 placeholder="Select Office Location"
-                value={formData.officeLocation}
+                value={localFormData.officeLocation}
                 onChange={(value) => handleInputChange("officeLocation", value)}
                 options={officeLocationOptions}
                 required

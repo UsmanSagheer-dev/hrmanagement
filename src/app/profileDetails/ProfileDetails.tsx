@@ -1,61 +1,20 @@
 "use client";
 import React, { useState } from "react";
-import { FaCamera, FaEdit } from "react-icons/fa";
-import Button from "../components/button/Button";
 import IMAGES from "../assets/images";
 import { ProfileContent } from "../(content)/profileContent/ProfileContent";
-// import AttendanceContent from "../attendanceContent/AttendanceContent";
 import { ProjectsContent } from "../(content)/projectsContent/ProjectsContent";
-// import { LeaveContent } from "../leaveContent/LeaveContent";
 import { IoIosPerson } from "react-icons/io";
 import { LuCalendarCheck, LuCalendarRange } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
-import { HiOutlineBriefcase } from "react-icons/hi2";
-import { HiOutlineMail } from "react-icons/hi";
 import AttendanceContent from "../(content)/attendanceContent/AttendanceContent";
 import LeaveContent from "../(content)/leaveContent/LeaveContent";
 import { useRouter } from "next/navigation";
+import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
+import { ProfileDetailsProps, UserData } from "../types/types";
 
-type ProfileDetailsProps = {
-  onTabChange: (tabName: string) => void;
-};
-
-type UserData = {
-  firstName: string;
-  lastName: string;
-  mobileNumber: string;
-  email: string;
-  dateOfBirth: string;
-  maritalStatus: string;
-  gender: string;
-  nationality: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  profileImage?: string | null;
-  jobTitle: string;
-  attendance?: {
-    presentDays: number;
-    absentDays: number;
-    lastCheckIn: string;
-  };
-  employeeID?: string;
-  userName?: string;
-  employeeType?: string;
-  emailAdress?: string;
-  department?: string;
-  designation?: string;
-  workingDays?: string;
-  joinDate?: string;
-  officeLocation?: string;
-  skypeID?: string;
-  githubID?: string;
-  slackID?: string;
-};
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
-const router = useRouter();
+  const router = useRouter();
   const [userData] = useState<UserData>({
     firstName: "Dina",
     lastName: "Coneva",
@@ -76,22 +35,22 @@ const router = useRouter();
       absentDays: 3,
       lastCheckIn: "March 10, 2025 9:00 AM",
     },
-    employeeID: "EMP001",
+    employeeId: "EMP001",
     userName: "dina_coneva",
     employeeType: "Full-time",
-    emailAdress: "dina.c@gmail.com",
+    emailAddress: "dina.c@gmail.com",
     department: "IT",
     designation: "Project Manager",
     workingDays: "30 days",
-    joinDate: "January 10, 2021",
+    joiningDate: "January 10, 2021",
     officeLocation: "Chisinau",
-    skypeID: "usman",
-    githubID: "dina_coneva",
-    slackID: "dina_coneva",
+    skypeId: "usman",
+    githubId: "dina_coneva",
+    slackId: "dina_coneva",
   });
-const handleEditProfile = () => {
-  router.push("/employee/add");
-};
+  const handleEditProfile = () => {
+    router.push("/employee/add");
+  };
   const [activeSection, setActiveSection] = useState("profile");
   const [activeProfileTab, setActiveProfileTab] = useState("personal");
 
@@ -135,37 +94,7 @@ const handleEditProfile = () => {
   return (
     <div className="h-auto max-h-[81vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 ">
-        <div className="flex items-center mt-[20px] border-b border-[#A2A1A833]  ">
-          <div className="flex flex-wrap border-gray mb-[30px] gap-2 items-center ">
-            <ProfileImage />
-            <div className="">
-              <h2 className="text-white text-xl font-medium">
-                {userData.firstName} {userData.lastName}
-              </h2>
-              <div className="flex items-center gap-1 ">
-                <HiOutlineBriefcase color="white" size={24} />
-                <p className="text-white text-[16px] font-light">
-                  {userData.jobTitle}
-                </p>
-              </div>
-              <div className="flex items-center  gap-1">
-                <HiOutlineMail color="white" size={24} />
-                <p className="text-white text-[16px] font-light">
-                  {userData.email}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="ml-auto">
-            <Button
-              title="Edit Profile"
-              onClick={handleEditProfile}
-              icon={FaEdit}
-              className="bg-[#E25319] text-white px-4 py-2 rounded-lg hover:bg-[#d14917] transition-colors flex items-center"
-            />
-          </div>
-        </div>
+        <UserInfoSection userData={userData} handleEditProfile={handleEditProfile} />
         <div className="flex flex-wrap scroll-auto overflow-auto mt-[30px] mb-[30px] md:flex-nowrap">
           <div className="w-full md:w-[242px] mb-4 md:mb-0">
             <div className="border border-[#A2A1A833] rounded-md">

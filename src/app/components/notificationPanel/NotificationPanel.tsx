@@ -1,4 +1,3 @@
-// components/NotificationPanel.tsx
 import React from "react";
 
 interface Notification {
@@ -6,8 +5,8 @@ interface Notification {
   category: string;
   message: string;
   time: string;
-  icon?: string; // Optional icon for category
-  avatar?: string; // Optional avatar
+  icon?: string;
+  avatar?: string;
 }
 
 interface NotificationPanelProps {

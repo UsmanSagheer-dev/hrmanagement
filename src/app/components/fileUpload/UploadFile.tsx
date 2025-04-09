@@ -5,6 +5,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 type FileUploadProps = {
   id: string;
   title: string;
+  accept?: string;
   onFileUpload: (file: File, type: string) => void;
 };
 
@@ -14,7 +15,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, onFileUpload }) => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setFileName(file.name); // File ka naam state mein save karna
+      setFileName(file.name);
       onFileUpload(file, title);
     }
   };
@@ -31,9 +32,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, onFileUpload }) => {
             </span>
           </div>
           <p className="text-white text-[14px] font-light">
-            Drag & Drop or <span className="text-[#E25319]">choose file</span> to upload
+            Drag & Drop or <span className="text-[#E25319]">choose file</span>{" "}
+            to upload
           </p>
-          <p className="text-white text-[11px] font-light">Supported formats: .jpeg, .pdf</p>
+          <p className="text-white text-[11px] font-light">
+            Supported formats: .jpeg, .pdf
+          </p>
           <input
             type="file"
             id={id}

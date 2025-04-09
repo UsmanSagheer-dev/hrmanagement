@@ -1,14 +1,4 @@
-export interface Column<T> {
-  key: keyof T | string;
-  header: string;
-  render?: (item: T) => React.ReactNode;
-}
-
-interface TableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-}
-
+import { TableProps } from "@/app/types/types";
 const Table = <T,>({ data, columns }: TableProps<T>) => {
   return (
     <div className="w-full">
@@ -37,7 +27,9 @@ const Table = <T,>({ data, columns }: TableProps<T>) => {
                     key={col.key as string}
                     className="px-4 py-3 text-[16px] font-light text-white whitespace-nowrap"
                   >
-                    {col.render ? col.render(item) : (item[col.key as keyof T] as React.ReactNode)}
+                    {col.render
+                      ? col.render(item)
+                      : (item[col.key as keyof T] as React.ReactNode)}
                   </td>
                 ))}
               </tr>
@@ -56,7 +48,9 @@ const Table = <T,>({ data, columns }: TableProps<T>) => {
               <div key={col.key as string} className="mb-2">
                 <span className="font-bold text-gray-400">{col.header}: </span>
                 <span className="text-white">
-                  {col.render ? col.render(item) : (item[col.key as keyof T] as React.ReactNode)}
+                  {col.render
+                    ? col.render(item)
+                    : (item[col.key as keyof T] as React.ReactNode)}
                 </span>
               </div>
             ))}
