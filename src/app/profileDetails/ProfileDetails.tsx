@@ -13,6 +13,7 @@ import { HiOutlineMail } from "react-icons/hi";
 import AttendanceContent from "../(content)/attendanceContent/AttendanceContent";
 import LeaveContent from "../(content)/leaveContent/LeaveContent";
 import { useRouter } from "next/navigation";
+import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
 
 type ProfileDetailsProps = {
   onTabChange: (tabName: string) => void;
@@ -133,37 +134,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
   return (
     <div className="h-auto max-h-[81vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 ">
-        <div className="flex items-center mt-[20px] border-b border-[#A2A1A833]  ">
-          <div className="flex flex-wrap border-gray mb-[30px] gap-2 items-center ">
-            <ProfileImage />
-            <div className="">
-              <h2 className="text-white text-xl font-medium">
-                {userData.firstName} {userData.lastName}
-              </h2>
-              <div className="flex items-center gap-1 ">
-                <HiOutlineBriefcase color="white" size={24} />
-                <p className="text-white text-[16px] font-light">
-                  {userData.jobTitle}
-                </p>
-              </div>
-              <div className="flex items-center  gap-1">
-                <HiOutlineMail color="white" size={24} />
-                <p className="text-white text-[16px] font-light">
-                  {userData.email}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="ml-auto">
-            <Button
-              title="Edit Profile"
-              onClick={handleEditProfile}
-              icon={FaEdit}
-              className="bg-[#E25319] text-white px-4 py-2 rounded-lg hover:bg-[#d14917] transition-colors flex items-center"
-            />
-          </div>
-        </div>
+        <UserInfoSection userData={userData} handleEditProfile={handleEditProfile} />
         <div className="flex flex-wrap scroll-auto overflow-auto mt-[30px] mb-[30px] md:flex-nowrap">
           <div className="w-full md:w-[242px] mb-4 md:mb-0">
             <div className="border border-[#A2A1A833] rounded-md">

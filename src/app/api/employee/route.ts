@@ -115,24 +115,25 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-
     if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized. Please sign in." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (id) {
+      const employee = await db.employee.findUnique({
+        where: { employeeId: id },
+      });
+      return NextResponse.json(employee);
     }
 
     const employees = await db.employee.findMany({
       orderBy: { createdAt: "desc" },
     });
-
     return NextResponse.json(employees);
   } catch (error: any) {
-    console.error("Error fetching employees:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch employees" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,12 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ProfileContentProps, UserData } from "../../types/types";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import FileList from "../../components/fileList/FileList";
-
-
 
 const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
   <button
@@ -27,18 +25,82 @@ const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
 );
 
 const InfoSection = ({ label, value }: { label: string; value: any }) => (
-  <div className="mb-  border-b-[1px] border-[#A2A1A81A]">
+  <div className="mb- border-b-[1px] border-[#A2A1A81A]">
     <p className="text-gray-500 text-sm font-light mb-1">{label}</p>
-    <p className="text-white text-[16px] font-light mb-[8px]">{value}</p>
+    <p className="text-white text-[16px] font-light mb-[8px]">
+      {value || "N/A"}
+    </p>
   </div>
 );
 
 export const ProfileContent: React.FC<ProfileContentProps> = ({
-  userData,
   activeProfileTab,
   setActiveProfileTab,
 }) => {
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch("/api/employee", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch employee data");
+        }
+
+        const data = await response.json();
+
+        setUserData(data[0]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployeeData();
+  }, []);
+
+  const getDocumentFiles = () => {
+    if (!userData) return [];
+    return [
+      userData.appointmentLetter && {
+        id: "1",
+        name: "Appointment Letter",
+        path: userData.appointmentLetter,
+      },
+      userData.salarySlips && {
+        id: "2",
+        name: "Salary Slips",
+        path: userData.salarySlips,
+      },
+      userData.relievingLetter && {
+        id: "3",
+        name: "Relieving Letter",
+        path: userData.relievingLetter,
+      },
+      userData.experienceLetter && {
+        id: "4",
+        name: "Experience Letter",
+        path: userData.experienceLetter,
+      },
+    ].filter(Boolean) as { id: string; name: string; path: string }[];
+  };
+
   const renderProfileTabContent = () => {
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!userData) return <div>No data available</div>;
+
     switch (activeProfileTab) {
       case "personal":
         return (
@@ -47,16 +109,21 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
             <InfoSection label="Last Name" value={userData.lastName} />
             <InfoSection label="Mobile Number" value={userData.mobileNumber} />
             <InfoSection label="Email Address" value={userData.email} />
-            <InfoSection label="Date of Birth" value={userData.dateOfBirth} />
+            <InfoSection
+              label="Date of Birth"
+              value={
+                userData.dateOfBirth
+                  ? new Date(userData.dateOfBirth).toLocaleDateString()
+                  : null
+              }
+            />
             <InfoSection
               label="Marital Status"
               value={userData.maritalStatus}
             />
             <InfoSection label="Gender" value={userData.gender} />
             <InfoSection label="Nationality" value={userData.nationality} />
-
             <InfoSection label="Address" value={userData.address} />
-
             <InfoSection label="City" value={userData.city} />
             <InfoSection label="State" value={userData.state} />
             <InfoSection label="Zip Code" value={userData.zipCode} />
@@ -65,15 +132,21 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
       case "professional":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-4">
-            <InfoSection label="Employee ID" value={userData.employeeID} />
+            <InfoSection label="Employee ID" value={userData.employeeId} />
             <InfoSection label="User Name" value={userData.userName} />
             <InfoSection label="Employee Type" value={userData.employeeType} />
-            <InfoSection label="Email Address" value={userData.emailAdress} />
+            <InfoSection label="Work Email" value={userData.workEmail} />
             <InfoSection label="Department" value={userData.department} />
             <InfoSection label="Designation" value={userData.designation} />
             <InfoSection label="Working Days" value={userData.workingDays} />
-            <InfoSection label="Joining Date" value={userData.joinDate} />
-
+            <InfoSection
+              label="Joining Date"
+              value={
+                userData.joiningDate
+                  ? new Date(userData.joiningDate).toLocaleDateString()
+                  : null
+              }
+            />
             <InfoSection
               label="Office Location"
               value={userData.officeLocation}
@@ -82,46 +155,13 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
         );
       case "documents":
         return (
-          <div className="mt-4  w-full">
+          <div className="mt-4 w-full">
             <FileList
-              files={[
-                {
-                  id: "1",
-                  name: "Appointment Letter.pdf",
-                  path: "/documents/appointment-letter.pdf",
-                },
-                {
-                  id: "2",
-                  name: "Salary Slip_June.pdf",
-                  path: "/documents/salary-slip-june.pdf",
-                },
-                {
-                  id: "3",
-                  name: "Salary Slip_May.pdf",
-                  path: "/documents/salary-slip-may.pdf",
-                },
-                {
-                  id: "4",
-                  name: "Salary Slip_April.pdf",
-                  path: "/documents/salary-slip-april.pdf",
-                },
-                {
-                  id: "5",
-                  name: "Reliving Letter.pdf",
-                  path: "/documents/reliving-letter.pdf",
-                },
-                {
-                  id: "6",
-                  name: "Experience Letter.pdf",
-                  path: "/documents/experience-letter.pdf",
-                },
-              ]}
+              files={getDocumentFiles()}
               onView={(file) => {
-                console.log(`Viewing file: ${file.name}`);
                 window.open(file.path, "_blank");
               }}
               onDownload={(file) => {
-                console.log(`Downloading file: ${file.name}`);
                 const link = document.createElement("a");
                 link.href = file.path;
                 link.download = file.name;
@@ -135,10 +175,12 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
       case "account":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-7">
-            <InfoSection label="Email Address" value={userData.emailAdress} />
-            <InfoSection label="Slack ID" value={userData.slackID} />
-            <InfoSection label="Slack ID" value={userData.skypeID} />
-            <InfoSection label="Github ID" value={userData.githubID} />
+            <InfoSection label="Work Email" value={userData.workEmail} />
+           
+
+            <InfoSection label="Slack ID" value={userData.slackId} />
+            <InfoSection label="Skype ID" value={userData.skypeId} />
+            <InfoSection label="Github ID" value={userData.githubId} />
           </div>
         );
       default:
@@ -148,7 +190,7 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
 
   return (
     <div>
-      <div className="flex flex-wrap border-b   border-gray-700   ">
+      <div className="flex flex-wrap border-b border-gray-700">
         <NavigationTab
           Icon={IoIosPerson}
           title="Personal Information"
