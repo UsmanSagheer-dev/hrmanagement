@@ -7,36 +7,32 @@ cloudinary.config({
 });
 
 /**
- * Uploads a file to Cloudinary
- * @param fileData Base64 encoded file data
- * @returns URL of the uploaded file
+ 
+ * @param fileData 
+ * @returns 
  */
 export const uploadToCloudinary = async (fileData: string): Promise<string> => {
-  // If already a Cloudinary URL, return as is
   if (fileData.startsWith("http") && fileData.includes("cloudinary.com")) {
     return fileData;
   }
 
   try {
-    // Check file type
     const isImage = fileData.startsWith("data:image");
     const isPDF = fileData.startsWith("data:application/pdf");
 
     if (!isImage && !isPDF) {
-      throw new Error("Unsupported file format. Only images and PDFs are allowed.");
+      throw new Error(
+        "Unsupported file format. Only images and PDFs are allowed."
+      );
     }
 
-    // Set upload options based on file type
     const uploadOptions = {
       folder: "user_documents",
       resource_type: isPDF ? "raw" : "image",
-      // Add a timestamp to avoid file name collisions
       public_id: `${Date.now()}`,
-      // Set quality compression for images
       ...(isImage && { quality: "auto" }),
     };
 
-    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(fileData, uploadOptions);
 
     return result.secure_url;
@@ -47,8 +43,7 @@ export const uploadToCloudinary = async (fileData: string): Promise<string> => {
 };
 
 /**
- * Deletes a file from Cloudinary
- * @param url Cloudinary URL of the file to delete
+ * @param url
  */
 export const deleteFromCloudinary = async (url: string): Promise<void> => {
   if (!url || !url.includes("cloudinary.com")) {
@@ -57,22 +52,19 @@ export const deleteFromCloudinary = async (url: string): Promise<void> => {
   }
 
   try {
-    // Extract public_id from URL
     const urlParts = url.split("/");
     const folderIndex = urlParts.indexOf("user_documents");
-    
+
     if (folderIndex === -1) {
       console.log("Not a user document URL:", url);
       return;
     }
-    
+
     const publicIdWithExtension = urlParts.slice(folderIndex).join("/");
     const publicId = publicIdWithExtension.split(".")[0];
 
-    // Determine resource type from URL
     const resourceType = url.endsWith(".pdf") ? "raw" : "image";
 
-    // Delete from Cloudinary
     const result = await cloudinary.uploader.destroy(publicId, {
       resource_type: resourceType,
     });

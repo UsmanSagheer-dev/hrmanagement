@@ -79,12 +79,10 @@ export function useEmployeeForm() {
       setIsLoading(true);
       setFormError(null);
 
-      // Convert profile image to Base64 if it exists
       const profileImageBase64 = formData.personal.profileImage
         ? await fileToBase64(formData.personal.profileImage)
         : null;
 
-      // Convert all document files to Base64
       const documentBase64: Record<string, string | null> = {};
       const documentFields = [
         "appointmentLetter",
@@ -93,7 +91,6 @@ export function useEmployeeForm() {
         "experienceLetter"
       ];
 
-      // Process each document asynchronously
       await Promise.all(
         documentFields.map(async (field) => {
           const file = formData.documents[field as keyof typeof formData.documents];
@@ -101,9 +98,7 @@ export function useEmployeeForm() {
         })
       );
 
-      // Prepare employee data
       const employeeData = {
-        // Personal information
         firstName: formData.personal.firstName,
         lastName: formData.personal.lastName,
         mobileNumber: formData.personal.mobileNumber,
@@ -118,7 +113,6 @@ export function useEmployeeForm() {
         zipCode: formData.personal.zipCode,
         profileImage: profileImageBase64,
 
-        // Professional information
         employeeId: formData.professional.employeeId,
         userName: formData.professional.userName,
         employeeType: formData.professional.employeeType,
@@ -129,16 +123,13 @@ export function useEmployeeForm() {
         joiningDate: formData.professional.joiningDate,
         officeLocation: formData.professional.officeLocation,
 
-        // Documents
         documents: documentBase64,
 
-        // Account information
         slackId: formData.account.slackId,
         skypeId: formData.account.skypeId,
         githubId: formData.account.githubId,
       };
 
-      // Send data to API
       const response = await fetch("/api/employee", {
         method: "POST",
         headers: {
@@ -149,11 +140,9 @@ export function useEmployeeForm() {
 
       const result = await response.json();
 
-      // Handle API response
       if (!response.ok) {
         const errorMessage = result.error || "Failed to save employee data";
         
-        // Handle specific errors
         if (response.status === 409 && result.field) {
           let fieldName = "";
           switch (result.field) {
@@ -175,7 +164,6 @@ export function useEmployeeForm() {
         throw new Error(errorMessage);
       }
 
-      // Success handling
       toast.success("Employee data and documents successfully saved!");
       router.push("/viewemployeedetail");
     } catch (error: any) {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
-import cloudinary, {
+import {
   uploadToCloudinary,
   deleteFromCloudinary,
 } from "../../utils/cloudinary";
