@@ -1,4 +1,3 @@
-// app/notifications/page.tsx
 "use client";
 import React, { useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
@@ -11,7 +10,7 @@ function Page() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "Admin";
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  
+
   const {
     notifications,
     isLoading,
@@ -20,13 +19,12 @@ function Page() {
     rejectRequest,
     getFormattedTimeAgo,
     setFilters,
-    fetchNotifications
+    fetchNotifications,
   } = useNotifications();
 
-  // Handle filter changes
   const handleFilterChange = (filter: string) => {
     setActiveFilter(filter);
-    
+
     if (filter === "all") {
       setFilters({});
     } else if (filter === "pending") {
@@ -36,7 +34,6 @@ function Page() {
     }
   };
 
-  // Handle approving a request with confirmation
   const handleApprove = async (notificationId: string) => {
     if (window.confirm("Are you sure you want to approve this request?")) {
       const success = await approveRequest(notificationId);
@@ -46,7 +43,6 @@ function Page() {
     }
   };
 
-  // Handle rejecting a request with confirmation
   const handleReject = async (notificationId: string) => {
     if (window.confirm("Are you sure you want to reject this request?")) {
       const success = await rejectRequest(notificationId);
@@ -70,8 +66,7 @@ function Page() {
               textColor="#A2A1A8"
             />
           </div>
-          
-          {/* Filters */}
+
           <div className="w-full flex gap-4 px-4">
             <button
               onClick={() => handleFilterChange("all")}
@@ -104,7 +99,7 @@ function Page() {
               Employee
             </button>
           </div>
-          
+
           <div className="max-h-[80vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col overflow-y-auto">
             {isLoading ? (
               <div className="flex justify-center items-center h-40">
@@ -113,7 +108,7 @@ function Page() {
             ) : error ? (
               <div className="text-red-500 text-center py-4">{error}</div>
             ) : (
-              <NotificationPanel 
+              <NotificationPanel
                 notifications={notifications}
                 onApprove={handleApprove}
                 onReject={handleReject}
