@@ -5,17 +5,14 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
 import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
-import { useUserProfile } from "@/app/hooks/useUserProfile"; 
-
-interface HeaderProps {
-  title: string;
-  description: string;
-  textColor?: string;
-}
+import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { HeaderProps } from "../types/types";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { userData } = useUserProfile(); 
+  const { userData } = useUserProfile();
+
+  const isAdmin = userData?.role === "Admin";
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
@@ -59,16 +56,20 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
         {renderDescriptionWithIcon()}
       </div>
       <div className="flex items-center space-x-4">
-        <div className="hidden md:block">
-          <SearchBar />
-        </div>
-        <div className="hidden md:block">
-          <Button
-            icon={IoMdNotificationsOutline}
-            onClick={handleNotificationClick}
-            className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
-          />
-        </div>
+        {isAdmin && (
+          <>
+            <div className="hidden md:block">
+              <SearchBar />
+            </div>
+            <div className="hidden md:block">
+              <Button
+                icon={IoMdNotificationsOutline}
+                onClick={handleNotificationClick}
+                className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
+              />
+            </div>
+          </>
+        )}
         <UserProfileDropdown />
       </div>
     </header>

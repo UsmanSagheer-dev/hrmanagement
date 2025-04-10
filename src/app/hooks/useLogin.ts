@@ -60,9 +60,7 @@ export function useLogin() {
 
     try {
       await signIn("google", { redirect: false });
-      // Force session update
       await update();
-      // Redirection handled by useEffect
     } catch (err) {
       setError("Failed to login with Google");
       setLoading(false);

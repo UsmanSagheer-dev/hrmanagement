@@ -142,3 +142,10 @@ export type FileUploadProps = {
   accept?: string;
   onFileUpload: (file: File, id: string) => void;
 };
+
+
+export interface HeaderProps {
+  title: string;
+  description: string;
+  textColor?: string;
+}
