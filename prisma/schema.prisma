@@ -79,6 +79,34 @@ model Authenticator {
   @@unique([userId, credentialID])
 }
 
+enum NotificationType {
+  EMPLOYEE_REQUEST
+  LEAVE_REQUEST
+  GENERAL
+}
+
+enum NotificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  READ
+}
+
+model Notification {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  type        NotificationType  @default(GENERAL)
+  title       String
+  message     String
+  status      NotificationStatus @default(PENDING)
+  sourceId    String?           @db.ObjectId
+  targetId    String?           @db.ObjectId
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  read        Boolean           @default(false)
+  
+  employee    Employee?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+}
+
 model Employee {
   id                 String    @id @map("_id") @db.ObjectId // Remove @default(auto()), use User's id
   firstName          String
@@ -117,6 +145,8 @@ model Employee {
   githubId           String?
   
   user               User      @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  notifications      Notification[]
   
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
