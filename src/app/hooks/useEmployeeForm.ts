@@ -171,7 +171,6 @@ const submitEmployeeData = async () => {
 
     setSubmissionStatus("success");
     
-    // If the response indicates pending approval
     if (result.pendingApproval) {
       toast.info("Your employee registration has been submitted and is pending admin approval");
     } else {

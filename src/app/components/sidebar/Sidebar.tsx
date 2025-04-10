@@ -45,7 +45,7 @@ const Sidebar: React.FC = () => {
       name: "Attendance",
       icon: <LuCalendarCheck size={24} />,
       path: "/viewattendace",
-      roles: ["Admin", "Employee"] 
+      roles: ["Admin"] 
     },
     {
       id: 4,

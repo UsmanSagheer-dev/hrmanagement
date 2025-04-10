@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json();
 
-    // Your existing code for handling image uploads...
     const profileImageUrl = data.profileImage
       ? await uploadToCloudinary(data.profileImage)
       : null;
@@ -120,30 +119,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create employee record
     const employee = await db.employee.create({
       data: formattedData,
     });
 
-    // Find all admin users to create notifications for
     const adminUsers = await db.user.findMany({
       where: { role: "Admin" },
-      select: { id: true }
+      select: { id: true },
     });
 
-    // Create notification for each admin
     if (adminUsers.length > 0) {
-      // Create notifications for each admin
-      const notificationPromises = adminUsers.map(admin => {
+      const notificationPromises = adminUsers.map((admin) => {
         return db.notification.create({
           data: {
             type: "EMPLOYEE_REQUEST",
             title: "New Employee Registration",
             message: `${formattedData.firstName} ${formattedData.lastName} has submitted employee information for approval`,
             status: "PENDING",
-            sourceId: employee.id, // The employee who created this request
-            targetId: admin.id, // The admin who should review it
-          }
+            sourceId: employee.id,
+            targetId: admin.id,
+          },
         });
       });
 
@@ -153,7 +148,7 @@ export async function POST(req: NextRequest) {
     // Set user role to "Pending" until approved
     await db.user.update({
       where: { id: session.user.id },
-      data: { role: "Pending" }
+      data: { role: "Pending" },
     });
 
     return NextResponse.json(
