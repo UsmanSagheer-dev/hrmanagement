@@ -35,12 +35,7 @@ export type UserData = {
   slackId?: string;
   skypeId?: string;
   githubId?: string;
-  
-  
 };
-
-
-
 
 export type EmployeeData = {
   firstName: string;
@@ -55,18 +50,17 @@ export type UserInfoSectionProps = {
   handleEditProfile: () => void;
 };
 
-  export interface User {
+export interface User {
   id: string;
   name: string | null;
   email: string | null;
-  hashedPassword: string | null; 
-  role?: string ;
+  hashedPassword: string | null;
+  role?: string;
   emailVerified?: Date | null;
   image?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 
 export interface AttendanceRecord {
   date: string;
@@ -87,7 +81,6 @@ export interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
 }
-
 
 export type PersonalInfoContentProps = {
   userData: {
@@ -113,7 +106,6 @@ export interface ProfileContentProps {
   setActiveProfileTab: (tab: string) => void;
 }
 
-
 export interface ProjectRecord {
   srNo: number;
   projectName: string;
@@ -132,3 +124,21 @@ export type ProfileDetailsProps = {
   onTabChange: (tabName: string) => void;
 };
 
+export interface FileItem {
+  id: string;
+  name: string;
+  path: string;
+}
+
+export interface FileListProps {
+  files: FileItem[];
+  onView: (file: FileItem) => void;
+  onDownload: (file: FileItem) => void;
+}
+
+export type FileUploadProps = {
+  id: string;
+  title: string;
+  accept?: string;
+  onFileUpload: (file: File, id: string) => void;
+};

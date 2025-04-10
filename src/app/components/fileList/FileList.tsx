@@ -1,18 +1,7 @@
+import { FileListProps } from "@/app/types/types";
 import React from "react";
 import { BiShow } from "react-icons/bi";
 import { GoDownload } from "react-icons/go";
-
-interface FileItem {
-  id: string;
-  name: string;
-  path: string;
-}
-
-interface FileListProps {
-  files: FileItem[];
-  onView: (file: FileItem) => void;
-  onDownload: (file: FileItem) => void;
-}
 
 const FileList: React.FC<FileListProps> = ({ files, onView, onDownload }) => {
   return (

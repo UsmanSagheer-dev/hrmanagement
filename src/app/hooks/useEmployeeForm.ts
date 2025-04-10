@@ -83,30 +83,51 @@ export function useEmployeeForm() {
         ? await fileToBase64(formData.personal.profileImage)
         : null;
 
-      const documentBase64 = {
-        appointmentLetter: formData.documents.appointmentLetter
-          ? await fileToBase64(formData.documents.appointmentLetter)
-          : null,
-        salarySlips: formData.documents.salarySlips
-          ? await fileToBase64(formData.documents.salarySlips)
-          : null,
-        relievingLetter: formData.documents.relievingLetter
-          ? await fileToBase64(formData.documents.relievingLetter)
-          : null,
-        experienceLetter: formData.documents.experienceLetter
-          ? await fileToBase64(formData.documents.experienceLetter)
-          : null,
-      };
+      const documentBase64: Record<string, string | null> = {};
+      const documentFields = [
+        "appointmentLetter",
+        "salarySlips",
+        "relievingLetter",
+        "experienceLetter"
+      ];
+
+      await Promise.all(
+        documentFields.map(async (field) => {
+          const file = formData.documents[field as keyof typeof formData.documents];
+          documentBase64[field] = file ? await fileToBase64(file) : null;
+        })
+      );
 
       const employeeData = {
-        ...formData.personal,
-        ...formData.professional,
-        ...documentBase64,
+        firstName: formData.personal.firstName,
+        lastName: formData.personal.lastName,
+        mobileNumber: formData.personal.mobileNumber,
+        email: formData.personal.email,
+        dateOfBirth: formData.personal.dateOfBirth,
+        maritalStatus: formData.personal.maritalStatus,
+        gender: formData.personal.gender,
+        nationality: formData.personal.nationality,
+        address: formData.personal.address,
+        city: formData.personal.city,
+        state: formData.personal.state,
+        zipCode: formData.personal.zipCode,
+        profileImage: profileImageBase64,
+
+        employeeId: formData.professional.employeeId,
+        userName: formData.professional.userName,
+        employeeType: formData.professional.employeeType,
+        workEmail: formData.professional.workEmail || formData.personal.email,
+        department: formData.professional.department,
+        designation: formData.professional.designation,
+        workingDays: formData.professional.workingDays,
+        joiningDate: formData.professional.joiningDate,
+        officeLocation: formData.professional.officeLocation,
+
+        documents: documentBase64,
+
         slackId: formData.account.slackId,
         skypeId: formData.account.skypeId,
         githubId: formData.account.githubId,
-        workEmail: formData.professional.workEmail || formData.personal.email,
-        profileImage: profileImageBase64,
       };
 
       const response = await fetch("/api/employee", {
@@ -120,29 +141,35 @@ export function useEmployeeForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to save employee data");
+        const errorMessage = result.error || "Failed to save employee data";
+        
+        if (response.status === 409 && result.field) {
+          let fieldName = "";
+          switch (result.field) {
+            case "employeeId":
+              fieldName = "Employee ID";
+              break;
+            case "email":
+              fieldName = "Email address";
+              break;
+            case "workEmail":
+              fieldName = "Work email";
+              break;
+            default:
+              fieldName = result.field;
+          }
+          throw new Error(`${fieldName} already exists in the system.`);
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const uploadedDocs = Object.values(result.employee).filter(
-        (value) =>
-          value && typeof value === "string" && value.includes("cloudinary.com")
-      );
-
-      if (uploadedDocs.length > 0) {
-        toast.success(
-          "Documents and profile image successfully uploaded to Cloudinary!"
-        );
-      } else {
-        toast.warn("No documents or profile image were uploaded to Cloudinary");
-      }
-
+      toast.success("Employee data and documents successfully saved!");
       router.push("/viewemployeedetail");
     } catch (error: any) {
       console.error("Error submitting employee data:", error);
-      setFormError(
-        error.message || "An error occurred while saving the employee data"
-      );
-      toast.error("Failed to upload documents or profile image to Cloudinary");
+      setFormError(error.message || "An error occurred while saving the employee data");
+      toast.error(error.message || "Failed to save employee data");
     } finally {
       setIsLoading(false);
     }
