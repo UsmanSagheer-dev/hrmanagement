@@ -9,24 +9,40 @@ import Button from "../../components/button/Button";
 import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
 import { DocumentsTabProps } from "@/app/types/types";
 
-
 const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   const { formData, updateFormData } = useEmployeeFormContext();
   const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
+  const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    setUploadedFiles(formData.documents);
-  }, [formData.documents]);
+    // Initialize uploaded files from context
+    setUploadedFiles(formData.documents || {});
+  }, []);
 
-  const handleFileUpload = (file: File, type: string) => {
-    setUploadedFiles((prev) => ({
+  const handleFileUpload = (file: File, id: string) => {
+    // Set loading state for this document
+    setIsLoading(prev => ({ ...prev, [id]: true }));
+    
+    // Update local state
+    setUploadedFiles(prev => ({
       ...prev,
-      [type]: file,
+      [id]: file,
     }));
-    updateFormData("documents", { [type]: file });
+    
+    // Update form context with all documents
+    updateFormData("documents", {
+      ...formData.documents,
+      [id]: file,
+    });
+    
+    // Clear loading state
+    setTimeout(() => {
+      setIsLoading(prev => ({ ...prev, [id]: false }));
+    }, 500);
   };
 
   const handleCancel = () => {
+    // Reset all uploaded files
     setUploadedFiles({});
     updateFormData("documents", {
       appointmentLetter: null,
@@ -38,6 +54,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   };
 
   const handleNext = () => {
+    // Update form context with all current files
     updateFormData("documents", uploadedFiles);
     onTabChange("account");
   };
@@ -91,15 +108,38 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
 
         <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-6">
           {documents.map((doc) => (
-            <div key={doc.id}>
+            <div key={doc.id} className="relative">
               <FileUpload
                 id={doc.id}
                 title={doc.title}
-                onFileUpload={handleFileUpload}
-                accept="application/pdf" 
+                onFileUpload={(file) => handleFileUpload(file, doc.id)}
+                accept=".jpeg,.jpg,.pdf"
               />
               {uploadedFiles[doc.id] && (
-                <p className="text-sm text-gray-400 mt-2">{uploadedFiles[doc.id].name}</p>
+                <div className="flex items-center mt-2">
+                  <p className="text-sm text-gray-400 flex-1 truncate">{uploadedFiles[doc.id].name}</p>
+                  <button 
+                    onClick={() => {
+                      setUploadedFiles(prev => {
+                        const updated = {...prev};
+                        delete updated[doc.id];
+                        return updated;
+                      });
+                      updateFormData("documents", {
+                        ...formData.documents,
+                        [doc.id]: null
+                      });
+                    }}
+                    className="ml-2 text-xs text-red-400 hover:text-red-300"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+              {isLoading[doc.id] && (
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-lg">
+                  <div className="w-6 h-6 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                </div>
               )}
             </div>
           ))}
