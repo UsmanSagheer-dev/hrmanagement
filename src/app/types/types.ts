@@ -149,3 +149,16 @@ export interface HeaderProps {
   description: string;
   textColor?: string;
 }
+
+export interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  employeeId: string;
+  department: string;
+  designation: string;
+  employeeType: string;
+  workEmail: string;
+  profileImage: string | null;
+  status?: string;
+}

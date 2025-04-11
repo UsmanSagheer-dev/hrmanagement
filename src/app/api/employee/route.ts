@@ -145,7 +145,6 @@ export async function POST(req: NextRequest) {
       await Promise.all(notificationPromises);
     }
 
-    // Set user role to "Pending" until approved
     await db.user.update({
       where: { id: session.user.id },
       data: { role: "Pending" },
@@ -209,6 +208,64 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching employee data:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch employee data" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+
+    if (!user || user.role !== "Admin") {
+      return NextResponse.json(
+        { error: "Only administrators can delete employee records" },
+        { status: 403 }
+      );
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Employee ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const employee = await db.employee.findUnique({
+      where: { id },
+    });
+
+    if (!employee) {
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 }
+      );
+    }
+
+    await db.notification.deleteMany({
+      where: { OR: [{ sourceId: id }, { targetId: id }] },
+    });
+
+    await db.employee.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Employee deleted successfully" });
+  } catch (error: any) {
+    console.error("Error deleting employee:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete employee" },
       { status: 500 }
     );
   }
