@@ -11,8 +11,6 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Employee } from "@/app/types/types";
 
-
-
 function Page() {
   const router = useRouter();
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -53,7 +51,6 @@ function Page() {
   };
 
   const handleFilter = () => {
-
     toast.info("Filter functionality will be implemented here");
   };
 

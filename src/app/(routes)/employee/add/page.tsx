@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import Header from "@/app/header/Header";
 import PersonalInformationForm from "@/app/(form)/personalInformationForm/PersonalInformationForm";
@@ -15,6 +15,36 @@ import "react-toastify/dist/ReactToastify.css";
 
 function EmployeeFormContent() {
   const { activeTab, handleTabChange } = useEmployeeFormContext();
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("/api/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
+        const data = await response.json();
+        setUserRole(data.role); 
+      } catch (err) {
+        setError("Could not load user profile");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -31,19 +61,36 @@ function EmployeeFormContent() {
     }
   };
 
+  // Show loading state while fetching the profile
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Show error if profile fetch fails
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Only show Header and Sidebar for Employee or Admin roles
+  const showHeaderAndSidebar = userRole === "Employee" || userRole === "Admin";
+
   return (
     <div className="h-screen bg-[#131313] p-[20px]">
       <div className="w-full h-full flex justify-between gap-3">
-        <div>
-          <Sidebar />
-        </div>
-        <div className="w-full flex flex-col gap-4">
-          <div className="w-full">
-            <Header
-              title="All Employees"
-              description="All Employee > Add New Employee"
-            />
+        {showHeaderAndSidebar && (
+          <div>
+            <Sidebar />
           </div>
+        )}
+        <div className="w-full flex flex-col gap-4">
+          {showHeaderAndSidebar && (
+            <div className="w-full">
+              <Header
+                title="All Employees"
+                description="All Employee > Add New Employee"
+              />
+            </div>
+          )}
           <div className="">{renderContent()}</div>
         </div>
       </div>

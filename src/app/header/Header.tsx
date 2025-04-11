@@ -6,11 +6,13 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
 import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { useNotifications } from "@/app/hooks/useNotifications";
 import { HeaderProps } from "../types/types";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { userData } = useUserProfile();
+  const { unreadCount } = useNotifications();
 
   const isAdmin = userData?.role === "Admin";
 
@@ -61,12 +63,17 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
             <div className="hidden md:block">
               <SearchBar />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:block relative">
               <Button
                 icon={IoMdNotificationsOutline}
                 onClick={handleNotificationClick}
                 className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
               />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </div>
           </>
         )}

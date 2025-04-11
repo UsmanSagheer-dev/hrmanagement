@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const type = searchParams.get("type");
+    const read = searchParams.get("read");
     const limit = searchParams.get("limit")
       ? parseInt(searchParams.get("limit")!)
       : undefined;
@@ -30,6 +31,10 @@ export async function GET(req: NextRequest) {
 
     if (status) {
       queryCondition.status = status;
+    }
+
+    if (read !== null) {
+      queryCondition.read = read === "true" ? true : false;
     }
 
     if (user?.role !== "Admin") {
@@ -68,7 +73,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
 export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

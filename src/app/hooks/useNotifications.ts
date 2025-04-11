@@ -29,6 +29,7 @@ export function useNotifications(initialFilter?: {
 }) {
   const { data: session, status: sessionStatus } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState(initialFilter || {});
@@ -89,6 +90,29 @@ export function useNotifications(initialFilter?: {
     }
   }, [sessionStatus, filters]);
 
+  const fetchUnreadCount = useCallback(async () => {
+    if (sessionStatus !== "authenticated") return;
+
+    try {
+      const response = await fetch(`/api/notifications?read=false`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUnreadCount(data.length);
+    } catch (err: any) {
+      console.error("Error fetching unread notification count:", err);
+    }
+  }, [sessionStatus]);
+
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications`, {
@@ -114,6 +138,7 @@ export function useNotifications(initialFilter?: {
             : notification
         )
       );
+      setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
 
       return true;
     } catch (err: any) {
@@ -154,6 +179,7 @@ export function useNotifications(initialFilter?: {
               : notification
           )
         );
+        setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
 
         const actionText = action === "approve" ? "approved" : "rejected";
         toast.success(`Request ${actionText} successfully`);
@@ -184,14 +210,17 @@ export function useNotifications(initialFilter?: {
   useEffect(() => {
     if (sessionStatus === "authenticated") {
       fetchNotifications();
+      fetchUnreadCount();
     }
-  }, [fetchNotifications, sessionStatus]);
+  }, [fetchNotifications, fetchUnreadCount, sessionStatus]);
 
   return {
     notifications,
+    unreadCount,
     isLoading,
     error,
     fetchNotifications,
+    fetchUnreadCount,
     markAsRead,
     approveRequest,
     rejectRequest,
