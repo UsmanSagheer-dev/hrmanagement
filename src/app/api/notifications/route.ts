@@ -1,11 +1,8 @@
-// app/api/notifications/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 
-
-// Get all notifications with filtering options
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,36 +13,33 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const type = searchParams.get("type");
-    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+    const limit = searchParams.get("limit")
+      ? parseInt(searchParams.get("limit")!)
+      : undefined;
 
-    // Determine if admin or regular user
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { role: true }
+      select: { role: true },
     });
 
-    // Build query condition based on role and filters
     const queryCondition: any = {};
 
-    // Filter by type if specified
     if (type) {
       queryCondition.type = type;
     }
 
-    // Filter by status if specified
     if (status) {
       queryCondition.status = status;
     }
 
-    // Admin sees all notifications, regular users only see their own
     if (user?.role !== "Admin") {
       queryCondition.OR = [
         { targetId: session.user.id },
-        { 
+        {
           employee: {
-            id: session.user.id
-          }
-        }
+            id: session.user.id,
+          },
+        },
       ];
     }
 
@@ -59,10 +53,10 @@ export async function GET(req: NextRequest) {
             firstName: true,
             lastName: true,
             email: true,
-            profileImage: true
-          }
-        }
-      }
+            profileImage: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(notifications);
@@ -75,7 +69,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Update notification status (approve/reject employee)
 export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -86,7 +79,7 @@ export async function PUT(req: NextRequest) {
     // Check if admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { role: true }
+      select: { role: true },
     });
 
     if (user?.role !== "Admin") {
@@ -105,12 +98,8 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Find the notification
     const notification = await db.notification.findUnique({
       where: { id: notificationId },
-      include: {
-        employee: true
-      }
     });
 
     if (!notification) {
@@ -120,36 +109,80 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Update notification based on action
     const updateData: any = {};
 
-    // Handle read status if provided
     if (read !== undefined) {
       updateData.read = read;
     }
 
-    // Handle approval actions if provided
     if (action === "approve" || action === "reject") {
       updateData.status = action === "approve" ? "APPROVED" : "REJECTED";
-      
-      // If this is an employee approval, update the User role
-      if (notification.type === "EMPLOYEE_REQUEST" && notification.sourceId && action === "approve") {
-        // Find the User associated with this employee
-        const employee = await db.employee.findUnique({
-          where: { id: notification.sourceId }
+
+      if (notification.type === "EMPLOYEE_REQUEST" && notification.sourceId) {
+        const pendingEmployee = await db.pendingEmployee.findUnique({
+          where: { id: notification.sourceId },
         });
-        
-        if (employee) {
-          // Update the associated User record
-          await db.user.update({
-            where: { id: employee.id },
-            data: { role: "Employee" }
+
+        if (pendingEmployee) {
+          const userId = pendingEmployee.userId;
+
+          if (action === "approve") {
+            await db.employee.create({
+              data: {
+                id: userId,
+                firstName: pendingEmployee.firstName,
+                lastName: pendingEmployee.lastName,
+                mobileNumber: pendingEmployee.mobileNumber,
+                email: pendingEmployee.email,
+                dateOfBirth: pendingEmployee.dateOfBirth,
+                maritalStatus: pendingEmployee.maritalStatus,
+                gender: pendingEmployee.gender,
+                nationality: pendingEmployee.nationality,
+                address: pendingEmployee.address,
+                city: pendingEmployee.city,
+                state: pendingEmployee.state,
+                zipCode: pendingEmployee.zipCode,
+                profileImage: pendingEmployee.profileImage,
+
+                employeeId: pendingEmployee.employeeId,
+                userName: pendingEmployee.userName,
+                employeeType: pendingEmployee.employeeType,
+                workEmail: pendingEmployee.workEmail,
+                department: pendingEmployee.department,
+                designation: pendingEmployee.designation,
+                workingDays: pendingEmployee.workingDays,
+                joiningDate: pendingEmployee.joiningDate,
+                officeLocation: pendingEmployee.officeLocation,
+
+                appointmentLetter: pendingEmployee.appointmentLetter,
+                salarySlips: pendingEmployee.salarySlips,
+                relievingLetter: pendingEmployee.relievingLetter,
+                experienceLetter: pendingEmployee.experienceLetter,
+
+                slackId: pendingEmployee.slackId,
+                skypeId: pendingEmployee.skypeId,
+                githubId: pendingEmployee.githubId,
+              },
+            });
+
+            await db.user.update({
+              where: { id: userId },
+              data: { role: "Employee" },
+            });
+          } else {
+            await db.user.update({
+              where: { id: userId },
+              data: { role: "User" },
+            });
+          }
+
+          await db.pendingEmployee.delete({
+            where: { id: pendingEmployee.id },
           });
         }
       }
     }
 
-    // Update the notification
     const updatedNotification = await db.notification.update({
       where: { id: notificationId },
       data: updateData,
@@ -158,10 +191,10 @@ export async function PUT(req: NextRequest) {
           select: {
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(updatedNotification);

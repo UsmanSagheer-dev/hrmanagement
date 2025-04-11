@@ -151,3 +151,44 @@ model Employee {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 }
+model PendingEmployee {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String    @unique @db.ObjectId // Reference to the User
+  firstName          String
+  lastName           String
+  mobileNumber       String?
+  email              String    
+  dateOfBirth        DateTime?
+  maritalStatus      String?
+  gender             String?
+  nationality        String?
+  address            String?
+  city               String?
+  state              String?
+  zipCode            String?
+  profileImage       String?
+  
+  // Professional Info
+  employeeId         String    
+  userName           String?
+  employeeType       String?
+  workEmail          String?   
+  department         String?
+  designation        String?
+  workingDays        String?
+  joiningDate        DateTime?
+  officeLocation     String?
+  
+  // Documents
+  appointmentLetter  String?
+  salarySlips        String?
+  relievingLetter    String?
+  experienceLetter   String?
+  
+  slackId            String?
+  skypeId            String?
+  githubId           String?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}

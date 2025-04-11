@@ -45,13 +45,66 @@ export async function POST(req: NextRequest) {
       console.error(`Failed to upload documents: ${failedDocs}`);
     }
 
-    const formattedData = {
-      id: session.user.id,
+    // Check if this user already has a pending employee record
+    const existingPendingEmployee = await db.pendingEmployee.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (existingPendingEmployee) {
+      return NextResponse.json(
+        { error: "You already have a pending employee request" },
+        { status: 409 }
+      );
+    }
+
+    // Check if user is already an employee
+    const existingEmployee = await db.employee.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (existingEmployee) {
+      return NextResponse.json(
+        { error: "An employee record already exists for this user" },
+        { status: 409 }
+      );
+    }
+
+    // Check for duplicates in Employee table
+    const duplicateCheck = await db.employee.findFirst({
+      where: {
+        OR: [
+          { employeeId: data.employeeId },
+          { email: data.email },
+          { workEmail: data.workEmail },
+        ],
+      },
+    });
+
+    if (duplicateCheck) {
+      let field = "unknown";
+      if (duplicateCheck.employeeId === data.employeeId)
+        field = "employeeId";
+      else if (duplicateCheck.email === data.email) field = "email";
+      else if (duplicateCheck.workEmail === data.workEmail)
+        field = "workEmail";
+
+      return NextResponse.json(
+        {
+          error: "Employee with this ID or email already exists",
+          field,
+        },
+        { status: 409 }
+      );
+    }
+
+    // Prepare data for PendingEmployee
+    const pendingEmployeeData = {
+      userId: session.user.id,
       firstName: data.firstName,
       lastName: data.lastName,
       mobileNumber: data.mobileNumber,
       email: data.email,
-      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
       maritalStatus: data.maritalStatus,
       gender: data.gender,
       nationality: data.nationality,
@@ -68,7 +121,7 @@ export async function POST(req: NextRequest) {
       department: data.department,
       designation: data.designation,
       workingDays: data.workingDays,
-      joiningDate: data.joiningDate ? new Date(data.joiningDate) : null,
+      joiningDate: data.joiningDate ? new Date(data.joiningDate) : undefined,
       officeLocation: data.officeLocation,
 
       appointmentLetter: documentUrls.appointmentLetter || null,
@@ -81,48 +134,12 @@ export async function POST(req: NextRequest) {
       githubId: data.githubId,
     };
 
-    const existingEmployee = await db.employee.findUnique({
-      where: { id: session.user.id },
+    // Save to PendingEmployee table
+    const pendingEmployee = await db.pendingEmployee.create({
+      data: pendingEmployeeData,
     });
 
-    if (existingEmployee) {
-      return NextResponse.json(
-        { error: "An employee record already exists for this user" },
-        { status: 409 }
-      );
-    }
-
-    const duplicateCheck = await db.employee.findFirst({
-      where: {
-        OR: [
-          { employeeId: formattedData.employeeId },
-          { email: formattedData.email },
-          { workEmail: formattedData.workEmail },
-        ],
-      },
-    });
-
-    if (duplicateCheck) {
-      let field = "unknown";
-      if (duplicateCheck.employeeId === formattedData.employeeId)
-        field = "employeeId";
-      else if (duplicateCheck.email === formattedData.email) field = "email";
-      else if (duplicateCheck.workEmail === formattedData.workEmail)
-        field = "workEmail";
-
-      return NextResponse.json(
-        {
-          error: "Employee with this ID or email already exists",
-          field,
-        },
-        { status: 409 }
-      );
-    }
-
-    const employee = await db.employee.create({
-      data: formattedData,
-    });
-
+    // Find admin users to notify
     const adminUsers = await db.user.findMany({
       where: { role: "Admin" },
       select: { id: true },
@@ -134,9 +151,9 @@ export async function POST(req: NextRequest) {
           data: {
             type: "EMPLOYEE_REQUEST",
             title: "New Employee Registration",
-            message: `${formattedData.firstName} ${formattedData.lastName} has submitted employee information for approval`,
+            message: `${data.firstName} ${data.lastName} has submitted employee information for approval`,
             status: "PENDING",
-            sourceId: employee.id,
+            sourceId: pendingEmployee.id, // Use the pendingEmployee id
             targetId: admin.id,
           },
         });
@@ -145,6 +162,7 @@ export async function POST(req: NextRequest) {
       await Promise.all(notificationPromises);
     }
 
+    // Update user role to Pending
     await db.user.update({
       where: { id: session.user.id },
       data: { role: "Pending" },
@@ -152,8 +170,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Employee data saved successfully and sent for approval",
-        employee,
+        message: "Employee data submitted successfully and sent for approval",
+        pendingEmployee,
         pendingApproval: true,
         uploadStats: {
           total: documentUploads.length + (profileImageUrl ? 1 : 0),
@@ -173,7 +191,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -270,3 +287,5 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+
