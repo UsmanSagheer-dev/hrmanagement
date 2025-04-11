@@ -6,6 +6,7 @@ import Button from "../../../components/button/Button";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { useLogin } from "@/app/hooks/useLogin";
+import Loader from "@/app/components/loader/Loader";
 
 function Login() {
   const {
@@ -73,7 +74,7 @@ function Login() {
 
           <div className="flex items-center justify-center w-full px-4 mt-[30px]">
             <Button
-              title={loading ? "Logging in..." : "Login"}
+              title={loading ? <Loader/> : "Login"}
               disabled={loading}
               type="submit"
             />

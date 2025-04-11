@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { RxDashboard } from "react-icons/rx";
-import { FaUsers, FaCog } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 import { LuCalendarCheck } from "react-icons/lu";
 import { LuCalendarRange } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
