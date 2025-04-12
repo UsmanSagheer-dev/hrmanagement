@@ -4,6 +4,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Header from "../../header/Header";
 import SearchBar from "../../components/searchBar/SearchBar";
 import StatsCard from "../../components/statsCard/StatsCard";
+import DashboardChart from "@/app/components/dashboardChart/DashboardChart";
 
 function Page() {
   const cardData = [
@@ -51,11 +52,9 @@ function Page() {
               textColor="#ffffff"
             />
           </div>
-          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
-            <div className="mb-[30px]">
-              <SearchBar />
-            </div>
-            <div className="w-full grid md:grid-cols-2 grid-cols-1 gap-[20px]">
+          <div className="max-h-[86vh] w-full bg-transparent  p-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
+           
+            <div className="w-full grid md:grid-cols-2 grid-cols-1 gap-[20px] ">
               {cardData.map((card, index) => (
                 <StatsCard
                   key={index}
@@ -66,6 +65,9 @@ function Page() {
                   updateDate={card.updateDate}
                 />
               ))}
+            </div>
+            <div className="w-full border border-[#A2A1A833] rounded-[10px]">
+              <DashboardChart />
             </div>
           </div>
         </div>
