@@ -79,14 +79,12 @@ export default function AttendanceStats() {
     fetchStats();
   }, [timeFrame, fetchAttendanceHistory]);
   
-  // Helper function to calculate business days between two dates
   const getBusinessDays = (startDate: Date, endDate: Date): number => {
     let count = 0;
     const currentDate = new Date(startDate);
     
     while (currentDate <= endDate) {
       const dayOfWeek = currentDate.getDay();
-      // Skip weekends (0 = Sunday, 6 = Saturday)
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
         count++;
       }

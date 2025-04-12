@@ -1,4 +1,3 @@
-// hooks/useAttendance.ts
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
@@ -8,8 +7,8 @@ export type AttendanceStatus = "ON_TIME" | "LATE" | "ABSENT";
 export interface AttendanceRecord {
   id: string;
   date: string;
-  checkInTime: string;
-  checkOutTime?: string;
+  checkInTime: string | null;
+  checkOutTime?: string | null;
   status: AttendanceStatus;
   employee: {
     firstName: string;
@@ -27,13 +26,11 @@ export function useAttendance() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get today's date in YYYY-MM-DD format
   const getToday = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
 
-  // Fetch today's attendance for current user
   const fetchTodayAttendance = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -55,7 +52,6 @@ export function useAttendance() {
     }
   }, []);
 
-  // Fetch attendance history
   const fetchAttendanceHistory = useCallback(async (startDate?: string, endDate?: string) => {
     setIsLoading(true);
     setError(null);
@@ -82,7 +78,6 @@ export function useAttendance() {
     }
   }, []);
 
-  // Check in attendance
   const checkInAttendance = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -113,7 +108,6 @@ export function useAttendance() {
     }
   }, []);
 
-  // Check out (update attendance)
   const checkOutAttendance = useCallback(async () => {
     if (!todayAttendance) {
       toast.error("No active check-in found");
@@ -149,7 +143,6 @@ export function useAttendance() {
     }
   }, [todayAttendance]);
 
-  // Admin function: Get all employees' attendance
   const fetchAllAttendance = useCallback(async (date?: string) => {
     setIsLoading(true);
     setError(null);
@@ -177,22 +170,30 @@ export function useAttendance() {
     }
   }, []);
 
-  // Admin function: Update attendance record
   const updateAttendance = useCallback(
     async (
       id: string,
-      updates: { checkInTime?: string; checkOutTime?: string; status?: AttendanceStatus }
+      updates: { checkInTime?: string | null; checkOutTime?: string | null; status?: AttendanceStatus }
     ) => {
       setIsLoading(true);
       setError(null);
 
       try {
+        // Improved handling for ABSENT status
+        const dataToSend = { ...updates, id };
+        
+        // Explicitly set check-in and check-out times to null when ABSENT
+        if (updates.status === "ABSENT") {
+          dataToSend.checkInTime = null;
+          dataToSend.checkOutTime = null;
+        }
+
         const response = await fetch("/api/attendance", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id, ...updates }),
+          body: JSON.stringify(dataToSend),
         });
 
         const data = await response.json();
@@ -214,14 +215,13 @@ export function useAttendance() {
     []
   );
 
-  // Admin function: Create attendance for an employee
   const createAttendance = useCallback(
     async (
       employeeId: string,
       data: {
         date?: string;
-        checkInTime?: string;
-        checkOutTime?: string;
+        checkInTime?: string | null;
+        checkOutTime?: string | null;
         status?: AttendanceStatus;
       }
     ) => {
@@ -229,18 +229,25 @@ export function useAttendance() {
       setError(null);
 
       try {
+        // Create a copy of data to avoid modifying the original
+        const dataToSend = { 
+          employeeId,
+          date: data.date || getToday(),
+          ...data
+        };
+        
+        // Explicitly set check-in and check-out times to null when ABSENT
+        if (dataToSend.status === "ABSENT") {
+          dataToSend.checkInTime = null;
+          dataToSend.checkOutTime = null;
+        }
+
         const response = await fetch("/api/attendance", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            employeeId,
-            date: data.date || getToday(),
-            checkInTime: data.checkInTime,
-            checkOutTime: data.checkOutTime,
-            status: data.status,
-          }),
+          body: JSON.stringify(dataToSend),
         });
 
         const result = await response.json();
@@ -262,7 +269,6 @@ export function useAttendance() {
     []
   );
 
-  // Admin function: Delete attendance record
   const deleteAttendance = useCallback(async (id: string) => {
     setIsLoading(true);
     setError(null);
@@ -289,7 +295,6 @@ export function useAttendance() {
     }
   }, []);
 
-  // Initial load
   useEffect(() => {
     fetchTodayAttendance();
   }, [fetchTodayAttendance]);

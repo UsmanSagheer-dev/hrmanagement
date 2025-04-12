@@ -3,6 +3,45 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 
+// Function to determine attendance status based on check-in time
+function determineAttendanceStatus(checkInTime: string | null): "ON_TIME" | "LATE" | "ABSENT" {
+  if (!checkInTime) return "ABSENT";
+  
+  // Extract hours and minutes from time string (e.g., "9:45 AM" or "15:30")
+  let hours: number;
+  let minutes: number;
+  
+  if (checkInTime.includes(":")) {
+    if (checkInTime.includes("AM") || checkInTime.includes("PM")) {
+      // Parse 12-hour format (e.g., "9:45 AM")
+      const timeParts = checkInTime.split(/[:\s]/);
+      hours = parseInt(timeParts[0]);
+      minutes = parseInt(timeParts[1]);
+      
+      if (checkInTime.includes("PM") && hours < 12) {
+        hours += 12;
+      } else if (checkInTime.includes("AM") && hours === 12) {
+        hours = 0;
+      }
+    } else {
+      // Parse 24-hour format (e.g., "15:30")
+      const [hoursStr, minutesStr] = checkInTime.split(":");
+      hours = parseInt(hoursStr);
+      minutes = parseInt(minutesStr);
+    }
+  } else {
+    // If no time format is recognized, default to ABSENT
+    return "ABSENT";
+  }
+  
+  // Check if time is before or at 10:00 AM
+  if (hours < 10 || (hours === 10 && minutes === 0)) {
+    return "ON_TIME";
+  } else {
+    return "LATE";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,21 +82,32 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // Calculate status based on check-in time if not provided
+      const calculatedStatus = status || determineAttendanceStatus(checkInTime);
+      
+      // Create the attendance data, ensuring null values for ABSENT
+      const attendanceData = {
+        employeeId,
+        date: dateString,
+        checkInTime: calculatedStatus === "ABSENT" ? null : checkInTime,
+        checkOutTime: calculatedStatus === "ABSENT" ? null : checkOutTime,
+        status: calculatedStatus,
+      };
+
       if (existingAttendance) {
-        return NextResponse.json(
-          { error: "Attendance already recorded for this date", attendance: existingAttendance },
-          { status: 409 }
-        );
+        const updatedAttendance = await db.attendance.update({
+          where: { id: existingAttendance.id },
+          data: attendanceData,
+        });
+        
+        return NextResponse.json({
+          message: "Attendance updated successfully",
+          attendance: updatedAttendance,
+        });
       }
 
       const attendance = await db.attendance.create({
-        data: {
-          employeeId,
-          date: dateString,
-          checkInTime: checkInTime || null,
-          checkOutTime: checkOutTime || null,
-          status: status || "ON_TIME",
-        },
+        data: attendanceData,
       });
 
       return NextResponse.json({
@@ -66,6 +116,7 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
+    // For regular employee check-in/out
     const today = new Date();
     const dateString = today.toISOString().split("T")[0];
     const hours = today.getHours();
@@ -113,12 +164,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cutoffHour = 9;
-    const cutoffMinute = 30;
-    const attendanceStatus =
-      hours > cutoffHour || (hours === cutoffHour && minutes > cutoffMinute)
-        ? "LATE"
-        : "ON_TIME";
+    // Determine status based on check-in time (10:00 AM cutoff)
+    const attendanceStatus = hours < 10 || (hours === 10 && minutes === 0) ? "ON_TIME" : "LATE";
 
     const attendance = await db.attendance.create({
       data: {
@@ -142,7 +189,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// ... (Keep GET, PUT, DELETE handlers as they are)
 // GET: Retrieve attendance records
 export async function GET(req: NextRequest) {
   try {
@@ -251,15 +297,48 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Calculate status based on check-in time if status is not explicitly provided
+    let calculatedStatus = status;
+    if (!calculatedStatus && checkInTime) {
+      calculatedStatus = determineAttendanceStatus(checkInTime);
+    }
+    
+    // Create update data, ensuring null values for ABSENT
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+    
+    // If status is provided or calculated
+    if (calculatedStatus) {
+      updateData.status = calculatedStatus;
+      
+      // If ABSENT, explicitly set times to null
+      if (calculatedStatus === "ABSENT") {
+        updateData.checkInTime = null;
+        updateData.checkOutTime = null;
+      } else {
+        // Otherwise, update with provided values
+        if (checkInTime !== undefined) {
+          updateData.checkInTime = checkInTime;
+        }
+        if (checkOutTime !== undefined) {
+          updateData.checkOutTime = checkOutTime;
+        }
+      }
+    } else {
+      // If no status is provided or calculated
+      if (checkInTime !== undefined) {
+        updateData.checkInTime = checkInTime;
+      }
+      if (checkOutTime !== undefined) {
+        updateData.checkOutTime = checkOutTime;
+      }
+    }
+
     // Update the attendance record
     const updatedAttendance = await db.attendance.update({
       where: { id },
-      data: {
-        checkInTime,
-        checkOutTime,
-        status,
-        updatedAt: new Date(),
-      },
+      data: updateData,
     });
 
     return NextResponse.json({

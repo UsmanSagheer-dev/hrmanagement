@@ -16,7 +16,7 @@ export interface Employee {
   lastName: string;
   designation: string;
   employeeType: string;
-  checkInTime: string;
+  checkInTime: string | null;
   status: AttendanceStatus;
   profileImage?: string;
 }
@@ -37,7 +37,6 @@ function ViewAttendance() {
     setIsLoading(true);
     setError(null);
     try {
-
       const today = new Date().toISOString().split("T")[0];
       const attendanceData = await fetchAllAttendance(today);
 
@@ -57,7 +56,7 @@ function ViewAttendance() {
           lastName: employee.lastName,
           designation: employee.designation,
           employeeType: employee.employeeType,
-          checkInTime: attendance?.checkInTime || "--",
+          checkInTime: attendance?.checkInTime || null,
           status: (attendance?.status || "ABSENT") as AttendanceStatus,
           profileImage: employee.profileImage,
         };
@@ -107,8 +106,8 @@ function ViewAttendance() {
 
   const handleSaveAttendance = async (data: {
     employeeId: string;
-    checkInTime?: string;
-    checkOutTime?: string;
+    checkInTime?: string | null;
+    checkOutTime?: string | null;
     status?: AttendanceStatus;
   }) => {
     try {
@@ -132,7 +131,7 @@ function ViewAttendance() {
           status: data.status,
         });
       }
-      await fetchEmployees(); 
+      await fetchEmployees();
     } catch (error) {
       throw new Error("Failed to save attendance");
     }
@@ -169,7 +168,11 @@ function ViewAttendance() {
     },
     { key: "designation", header: "Designation" },
     { key: "employeeType", header: "Type" },
-    { key: "checkInTime", header: "Check In Time" },
+    {
+      key: "checkInTime",
+      header: "Check In Time",
+      render: (employee: Employee) => employee.checkInTime || "--",
+    },
     {
       key: "status",
       header: "Status",
