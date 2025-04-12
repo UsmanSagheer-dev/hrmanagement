@@ -170,6 +170,8 @@ export interface Employee {
 }
 
 
+
+
 export interface AttendanceModalProps {
   employee: {
     id: string;
@@ -184,5 +186,18 @@ export interface AttendanceModalProps {
     status?: AttendanceStatus;
   }) => Promise<void>;
 }
+
+
+export interface UseAttendanceModalProps {
+  employeeId: string;
+  onSave: (data: {
+    employeeId: string;
+    checkInTime?: string | null;
+    checkOutTime?: string | null;
+    status?: AttendanceStatus;
+  }) => Promise<void>;
+  onClose: () => void;
+}
+
 
 

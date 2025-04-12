@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAttendance } from "../../hooks/useAttendance";
-import { toast } from "react-toastify";
+
 
 export default function AttendanceCheckIn() {
   const { 
@@ -15,12 +15,10 @@ export default function AttendanceCheckIn() {
   const [currentTime, setCurrentTime] = useState<string>("");
   const [currentDate, setCurrentDate] = useState<string>("");
 
-  // Update the current time every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       
-      // Format time
       const hours = now.getHours();
       const minutes = now.getMinutes().toString().padStart(2, '0');
       const seconds = now.getSeconds().toString().padStart(2, '0');
@@ -28,7 +26,6 @@ export default function AttendanceCheckIn() {
       const formattedHours = (hours % 12) || 12;  
       setCurrentTime(`${formattedHours}:${minutes}:${seconds} ${period}`);
       
-      // Format date
       const options: Intl.DateTimeFormatOptions = { 
         weekday: 'long', 
         year: 'numeric', 
@@ -38,13 +35,10 @@ export default function AttendanceCheckIn() {
       setCurrentDate(now.toLocaleDateString(undefined, options));
     };
     
-    // Initialize
     updateTime();
     
-    // Update every second
     const timerId = setInterval(updateTime, 1000);
     
-    // Cleanup
     return () => clearInterval(timerId);
   }, []);
 

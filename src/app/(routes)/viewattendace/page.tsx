@@ -7,8 +7,9 @@ import Pagination from "../../components/pagination/Pagination";
 import Image from "next/image";
 import SearchBar from "../../components/searchBar/SearchBar";
 import { toast } from "react-toastify";
-import { useAttendance, AttendanceStatus } from "../../hooks/useAttendance";
+import { useAttendance } from "../../hooks/useAttendance";
 import AttendanceModal from "@/app/components/attendanceModal/AttendanceModal";
+import { AttendanceStatus } from "@/app/constants/constants";
 
 export interface Employee {
   id: string;

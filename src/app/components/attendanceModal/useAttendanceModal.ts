@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
-import { AttendanceStatus } from "../../hooks/useAttendance";
 
-interface UseAttendanceModalProps {
-  employeeId: string;
-  onSave: (data: {
-    employeeId: string;
-    checkInTime?: string | null;
-    checkOutTime?: string | null;
-    status?: AttendanceStatus;
-  }) => Promise<void>;
-  onClose: () => void;
-}
+import { UseAttendanceModalProps } from "@/app/types/types";
+import { AttendanceStatus } from "@/app/constants/constants";
 
 export const useAttendanceModal = ({
   employeeId,
@@ -51,7 +42,7 @@ export const useAttendanceModal = ({
         status?: AttendanceStatus;
       } = {
         employeeId,
-        status: status as AttendanceStatus || undefined,
+        status: (status as AttendanceStatus) || undefined,
       };
 
       if (status !== "ABSENT") {

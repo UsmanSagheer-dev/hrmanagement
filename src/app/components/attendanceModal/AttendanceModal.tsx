@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { toast } from "react-toastify";
-import { AttendanceStatus } from "../../hooks/useAttendance";
 import { useAttendanceModal } from "./useAttendanceModal";
 import { AttendanceModalProps } from "@/app/types/types";
+import { AttendanceStatus } from "@/app/constants/constants";
 
 
 const AttendanceModal: React.FC<AttendanceModalProps> = ({

@@ -21,8 +21,11 @@ export interface AttendanceRecord {
 }
 
 export function useAttendance() {
-  const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null);
-  const [attendanceHistory, setAttendanceHistory] = useState<AttendanceRecord[]>([]);
+  const [todayAttendance, setTodayAttendance] =
+    useState<AttendanceRecord | null>(null);
+  const [attendanceHistory, setAttendanceHistory] = useState<
+    AttendanceRecord[]
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,31 +55,36 @@ export function useAttendance() {
     }
   }, []);
 
-  const fetchAttendanceHistory = useCallback(async (startDate?: string, endDate?: string) => {
-    setIsLoading(true);
-    setError(null);
+  const fetchAttendanceHistory = useCallback(
+    async (startDate?: string, endDate?: string) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      let url = "/api/attendance";
-      if (startDate && endDate) {
-        url += `?startDate=${startDate}&endDate=${endDate}`;
+      try {
+        let url = "/api/attendance";
+        if (startDate && endDate) {
+          url += `?startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch attendance history");
+        }
+
+        const data = await response.json();
+        setAttendanceHistory(data);
+      } catch (err: any) {
+        setError(
+          err.message || "An error occurred while fetching attendance history"
+        );
+        toast.error("Failed to load attendance history");
+      } finally {
+        setIsLoading(false);
       }
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch attendance history");
-      }
-
-      const data = await response.json();
-      setAttendanceHistory(data);
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching attendance history");
-      toast.error("Failed to load attendance history");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   const checkInAttendance = useCallback(async () => {
     setIsLoading(true);
@@ -162,7 +170,9 @@ export function useAttendance() {
       const data = await response.json();
       return data;
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching attendance records");
+      setError(
+        err.message || "An error occurred while fetching attendance records"
+      );
       toast.error("Failed to load attendance records");
       return [];
     } finally {
@@ -173,14 +183,18 @@ export function useAttendance() {
   const updateAttendance = useCallback(
     async (
       id: string,
-      updates: { checkInTime?: string | null; checkOutTime?: string | null; status?: AttendanceStatus }
+      updates: {
+        checkInTime?: string | null;
+        checkOutTime?: string | null;
+        status?: AttendanceStatus;
+      }
     ) => {
       setIsLoading(true);
       setError(null);
 
       try {
         const dataToSend = { ...updates, id };
-        
+
         if (updates.status === "ABSENT") {
           dataToSend.checkInTime = null;
           dataToSend.checkOutTime = null;
@@ -227,12 +241,12 @@ export function useAttendance() {
       setError(null);
 
       try {
-        const dataToSend = { 
+        const dataToSend = {
           employeeId,
           date: data.date || getToday(),
-          ...data
+          ...data,
         };
-        
+
         if (dataToSend.status === "ABSENT") {
           dataToSend.checkInTime = null;
           dataToSend.checkOutTime = null;
@@ -283,7 +297,9 @@ export function useAttendance() {
       toast.success("Attendance record deleted successfully");
       return true;
     } catch (err: any) {
-      setError(err.message || "An error occurred while deleting attendance record");
+      setError(
+        err.message || "An error occurred while deleting attendance record"
+      );
       toast.error(err.message || "Failed to delete attendance record");
       return false;
     } finally {
