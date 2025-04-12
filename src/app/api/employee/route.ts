@@ -45,7 +45,6 @@ export async function POST(req: NextRequest) {
       console.error(`Failed to upload documents: ${failedDocs}`);
     }
 
-    // Check if this user already has a pending employee record
     const existingPendingEmployee = await db.pendingEmployee.findUnique({
       where: { userId: session.user.id },
     });
@@ -57,7 +56,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user is already an employee
     const existingEmployee = await db.employee.findUnique({
       where: { id: session.user.id },
     });
@@ -69,7 +67,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check for duplicates in Employee table
     const duplicateCheck = await db.employee.findFirst({
       where: {
         OR: [
@@ -82,11 +79,9 @@ export async function POST(req: NextRequest) {
 
     if (duplicateCheck) {
       let field = "unknown";
-      if (duplicateCheck.employeeId === data.employeeId)
-        field = "employeeId";
+      if (duplicateCheck.employeeId === data.employeeId) field = "employeeId";
       else if (duplicateCheck.email === data.email) field = "email";
-      else if (duplicateCheck.workEmail === data.workEmail)
-        field = "workEmail";
+      else if (duplicateCheck.workEmail === data.workEmail) field = "workEmail";
 
       return NextResponse.json(
         {
@@ -97,7 +92,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Prepare data for PendingEmployee
     const pendingEmployeeData = {
       userId: session.user.id,
       firstName: data.firstName,
@@ -134,12 +128,10 @@ export async function POST(req: NextRequest) {
       githubId: data.githubId,
     };
 
-    // Save to PendingEmployee table
     const pendingEmployee = await db.pendingEmployee.create({
       data: pendingEmployeeData,
     });
 
-    // Find admin users to notify
     const adminUsers = await db.user.findMany({
       where: { role: "Admin" },
       select: { id: true },
@@ -153,7 +145,7 @@ export async function POST(req: NextRequest) {
             title: "New Employee Registration",
             message: `${data.firstName} ${data.lastName} has submitted employee information for approval`,
             status: "PENDING",
-            sourceId: pendingEmployee.id, // Use the pendingEmployee id
+            sourceId: pendingEmployee.id,
             targetId: admin.id,
           },
         });
@@ -162,7 +154,6 @@ export async function POST(req: NextRequest) {
       await Promise.all(notificationPromises);
     }
 
-    // Update user role to Pending
     await db.user.update({
       where: { id: session.user.id },
       data: { role: "Pending" },
@@ -287,5 +278,3 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
-
-

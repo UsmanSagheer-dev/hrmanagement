@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-    import { RiArrowDropDownLine } from "react-icons/ri";
+import { RiArrowDropDownLine } from "react-icons/ri";
 import Button from "../button/Button";
 export default function AttendanceOverview() {
   const [selectedDay, setSelectedDay] = useState("All");
@@ -59,12 +59,12 @@ export default function AttendanceOverview() {
               </option>
             ))}
           </select>
-         <Button
-         icon={RiArrowDropDownLine}
-         title="Today"
-         className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md flex flex-row-reverse items-center justify-center "
+          <Button
+            icon={RiArrowDropDownLine}
+            title="Today"
+            className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md flex flex-row-reverse items-center justify-center "
             onClick={() => setSelectedDay("All")}
-            />
+          />
         </div>
       </div>
 
