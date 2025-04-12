@@ -1,4 +1,4 @@
-import { useState } from "react";
+"use client";
 import {
   BarChart,
   Bar,
@@ -10,37 +10,58 @@ import {
 } from "recharts";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import Button from "../button/Button";
+
+import { useEffect, useState } from "react";
+import useDashboardChart from "./useDashboardChart";
+import Loader from "../loader/Loader";
+
 export default function AttendanceOverview() {
-  const [selectedDay, setSelectedDay] = useState("All");
+  const {
+    selectedDay,
+    setSelectedDay,
+    chartData,
+    isLoading,
+    error,
+    weekDates,
+    fetchTooltipData,
+    daysOfWeek,
+  } = useDashboardChart();
 
-  const data = [
-    { name: "Mon", high: 10, medium: 20, low: 70 },
-    { name: "Tue", high: 15, medium: 25, low: 60 },
-    { name: "Wed", high: 20, medium: 30, low: 50 },
-    { name: "Thu", high: 10, medium: 20, low: 70 },
-    { name: "Fri", high: 15, medium: 25, low: 60 },
-    { name: "Sat", high: 20, medium: 30, low: 50 },
-    { name: "Sun", high: 10, medium: 20, low: 70 },
-  ];
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    const [tooltipData, setTooltipData] = useState<{
+      high: number;
+      medium: number;
+      low: number;
+    } | null>(null);
 
-  const displayData =
-    selectedDay === "All"
-      ? data
-      : data.filter((day) => day.name === selectedDay);
+    useEffect(() => {
+      if (active && label) {
+        const date = weekDates[label];
+        if (date) {
+          fetchTooltipData(date).then((data) => {
+            setTooltipData(data);
+          });
+        }
+      }
+    }, [active, label]);
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
+    if (active && tooltipData) {
       return (
         <div className="bg-black border border-gray-700 p-3 rounded-md">
           <p className="font-bold text-white">{`${label}`}</p>
-          <p className="text-pink-500">{`High: ${payload[0].value}%`}</p>
-          <p className="text-yellow-400">{`Medium: ${payload[1].value}%`}</p>
-          <p className="text-orange-500">{`Low: ${payload[2].value}%`}</p>
+          <p className="text-pink-500">{`On Time: ${tooltipData.high}`}</p>
+          <p className="text-yellow-400">{`Late: ${tooltipData.medium}`}</p>
+          <p className="text-orange-500">{`Absent: ${tooltipData.low}`}</p>
         </div>
       );
     }
     return null;
   };
+
+  const displayData =
+    selectedDay === "All"
+      ? chartData
+      : chartData.filter((day) => day.name === selectedDay);
 
   return (
     <div className="bg-transparent text-white p-6 rounded-lg w-full">
@@ -53,58 +74,45 @@ export default function AttendanceOverview() {
             onChange={(e) => setSelectedDay(e.target.value)}
           >
             <option value="All">All Days</option>
-            {data.map((day) => (
-              <option key={day.name} value={day.name}>
-                {day.name}
+            {daysOfWeek.map((day) => (
+              <option key={day} value={day}>
+                {day}
               </option>
             ))}
           </select>
           <Button
             icon={RiArrowDropDownLine}
             title="Today"
-            className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md flex flex-row-reverse items-center justify-center "
+            className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md flex flex-row-reverse items-center justify-center"
             onClick={() => setSelectedDay("All")}
           />
         </div>
       </div>
 
-      <div className="h-96 w-full">
-        <ResponsiveContainer width="100%" height="100%" background="#131313">
-          <BarChart
-            data={displayData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            barSize={12}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="name" tick={{ fill: "#9CA3AF" }} />
-            <YAxis
-              domain={[0, 100]}
-              tickFormatter={(value) => `${value}%`}
-              tick={{ fill: "#9CA3AF" }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-
-            <Bar
-              dataKey="low"
-              stackId="a"
-              fill="#F97316"
-              radius={[30, 30, 30, 30]}
-            />
-
-            <Bar
-              dataKey="medium"
-              stackId="a"
-              fill="#FBBF24"
-              radius={[30, 30, 30, 30]}
-            />
-            <Bar
-              dataKey="high"
-              stackId="a"
-              fill="#F45B69"
-              radius={[30, 30, 30, 30]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="h-96 w-full flex items-center justify-center">
+        {isLoading ? (
+         <Loader/>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : chartData.length === 0 ? (
+          <p className="text-white">No attendance data available</p>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={displayData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              barSize={12}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="name" tick={{ fill: "#9CA3AF" }} />
+              <YAxis tick={{ fill: "#9CA3AF" }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="low" stackId="a" fill="#F97316" radius={[30, 30, 30, 30]} />
+              <Bar dataKey="medium" stackId="a" fill="#FBBF24" radius={[30, 30, 30, 30]} />
+              <Bar dataKey="high" stackId="a" fill="#F45B69" radius={[30, 30, 30, 30]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

@@ -47,13 +47,13 @@ const Sidebar: React.FC = () => {
       path: "/viewattendace",
       roles: ["Admin"] 
     },
-    {
-      id: 4,
-      name: "Leaves",
-      icon: <LuCalendarRange size={24} />,
-      path: "/leaves",
-      roles: ["Admin"]
-    },
+    // {
+    //   id: 4,
+    //   name: "Leaves",
+    //   icon: <LuCalendarRange size={24} />,
+    //   path: "/leaves",
+    //   roles: ["Admin"]
+    // },
     {
       id: 5,
       name: "Settings",

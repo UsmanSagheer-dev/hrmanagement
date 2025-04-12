@@ -201,3 +201,9 @@ export interface UseAttendanceModalProps {
 
 
 
+export interface ChartItem {
+  name: string;
+  high: number;
+  medium: number;
+  low: number;
+}
