@@ -5,6 +5,7 @@ import Header from "../../header/Header";
 import SearchBar from "../../components/searchBar/SearchBar";
 import StatsCard from "../../components/statsCard/StatsCard";
 import DashboardChart from "@/app/components/dashboardChart/DashboardChart";
+import EmployeeDashboardTable from "@/app/components/employeeDashboardTable/EmployeeDashboardTable";
 
 function Page() {
   const cardData = [
@@ -68,6 +69,9 @@ function Page() {
             </div>
             <div className="w-full border border-[#A2A1A833] rounded-[10px]">
               <DashboardChart />
+            </div>
+            <div className="w-full border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
+              <EmployeeDashboardTable/>
             </div>
           </div>
         </div>

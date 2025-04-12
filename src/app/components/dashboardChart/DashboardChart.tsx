@@ -69,7 +69,7 @@ export default function AttendanceOverview() {
       </div>
 
       <div className="h-96 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" background="#131313">
           <BarChart
             data={displayData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
