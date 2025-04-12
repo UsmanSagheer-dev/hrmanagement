@@ -1,3 +1,5 @@
+import { AttendanceStatus } from "@prisma/client";
+
 export type UserData = {
   firstName: string;
   lastName: string;
@@ -152,6 +154,7 @@ export interface HeaderProps {
 
 export interface Employee {
   id: string;
+  name: string;
   firstName: string;
   lastName: string;
   employeeId: string;
@@ -160,5 +163,26 @@ export interface Employee {
   employeeType: string;
   workEmail: string;
   profileImage: string | null;
-  status?: string;
+
+  checkInTime: string | null;
+    status: AttendanceStatus;
+    avatar: string | null;
 }
+
+
+export interface AttendanceModalProps {
+  employee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  onClose: () => void;
+  onSave: (data: {
+    employeeId: string;
+    checkInTime?: string | null;
+    checkOutTime?: string | null;
+    status?: AttendanceStatus;
+  }) => Promise<void>;
+}
+
+

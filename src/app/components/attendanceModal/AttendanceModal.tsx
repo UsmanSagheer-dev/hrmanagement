@@ -3,21 +3,8 @@ import React from "react";
 import { toast } from "react-toastify";
 import { AttendanceStatus } from "../../hooks/useAttendance";
 import { useAttendanceModal } from "./useAttendanceModal";
+import { AttendanceModalProps } from "@/app/types/types";
 
-interface AttendanceModalProps {
-  employee: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  };
-  onClose: () => void;
-  onSave: (data: {
-    employeeId: string;
-    checkInTime?: string | null;
-    checkOutTime?: string | null;
-    status?: AttendanceStatus;
-  }) => Promise<void>;
-}
 
 const AttendanceModal: React.FC<AttendanceModalProps> = ({
   employee,

@@ -179,10 +179,8 @@ export function useAttendance() {
       setError(null);
 
       try {
-        // Improved handling for ABSENT status
         const dataToSend = { ...updates, id };
         
-        // Explicitly set check-in and check-out times to null when ABSENT
         if (updates.status === "ABSENT") {
           dataToSend.checkInTime = null;
           dataToSend.checkOutTime = null;
@@ -229,14 +227,12 @@ export function useAttendance() {
       setError(null);
 
       try {
-        // Create a copy of data to avoid modifying the original
         const dataToSend = { 
           employeeId,
           date: data.date || getToday(),
           ...data
         };
         
-        // Explicitly set check-in and check-out times to null when ABSENT
         if (dataToSend.status === "ABSENT") {
           dataToSend.checkInTime = null;
           dataToSend.checkOutTime = null;

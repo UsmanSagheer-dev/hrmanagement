@@ -4,16 +4,7 @@ import Table from "../table/Table";
 import { useAttendance, AttendanceStatus } from "../../hooks/useAttendance";
 import Image from "next/image";
 import { toast } from "react-toastify";
-
-interface Employee {
-  id: string;
-  name: string;
-  designation: string;
-  type: string;
-  checkInTime: string | null;
-  status: AttendanceStatus;
-  avatar?: string;
-}
+import { Employee } from "@/app/types/types";
 
 const EmployeeDashboardTable: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -124,9 +115,7 @@ const EmployeeDashboardTable: React.FC = () => {
     <div className="bg-transparent">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl text-white font-semibold">Employee Overview</h1>
-        <select
-          className="bg-gray-900 text-white border border-gray-800 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-700"
-        >
+        <select className="bg-gray-900 text-white border border-gray-800 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-700">
           <option>View All</option>
         </select>
       </div>
