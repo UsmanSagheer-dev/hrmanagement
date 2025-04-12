@@ -3,38 +3,34 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 
-// Function to determine attendance status based on check-in time
-function determineAttendanceStatus(checkInTime: string | null): "ON_TIME" | "LATE" | "ABSENT" {
+function determineAttendanceStatus(
+  checkInTime: string | null
+): "ON_TIME" | "LATE" | "ABSENT" {
   if (!checkInTime) return "ABSENT";
-  
-  // Extract hours and minutes from time string (e.g., "9:45 AM" or "15:30")
+
   let hours: number;
   let minutes: number;
-  
+
   if (checkInTime.includes(":")) {
     if (checkInTime.includes("AM") || checkInTime.includes("PM")) {
-      // Parse 12-hour format (e.g., "9:45 AM")
       const timeParts = checkInTime.split(/[:\s]/);
       hours = parseInt(timeParts[0]);
       minutes = parseInt(timeParts[1]);
-      
+
       if (checkInTime.includes("PM") && hours < 12) {
         hours += 12;
       } else if (checkInTime.includes("AM") && hours === 12) {
         hours = 0;
       }
     } else {
-      // Parse 24-hour format (e.g., "15:30")
       const [hoursStr, minutesStr] = checkInTime.split(":");
       hours = parseInt(hoursStr);
       minutes = parseInt(minutesStr);
     }
   } else {
-    // If no time format is recognized, default to ABSENT
     return "ABSENT";
   }
-  
-  // Check if time is before or at 10:00 AM
+
   if (hours < 10 || (hours === 10 && minutes === 0)) {
     return "ON_TIME";
   } else {
@@ -82,10 +78,8 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Calculate status based on check-in time if not provided
       const calculatedStatus = status || determineAttendanceStatus(checkInTime);
-      
-      // Create the attendance data, ensuring null values for ABSENT
+
       const attendanceData = {
         employeeId,
         date: dateString,
@@ -99,7 +93,7 @@ export async function POST(req: NextRequest) {
           where: { id: existingAttendance.id },
           data: attendanceData,
         });
-        
+
         return NextResponse.json({
           message: "Attendance updated successfully",
           attendance: updatedAttendance,
@@ -110,20 +104,24 @@ export async function POST(req: NextRequest) {
         data: attendanceData,
       });
 
-      return NextResponse.json({
-        message: "Attendance recorded successfully",
-        attendance,
-      }, { status: 201 });
+      return NextResponse.json(
+        {
+          message: "Attendance recorded successfully",
+          attendance,
+        },
+        { status: 201 }
+      );
     }
 
-    // For regular employee check-in/out
     const today = new Date();
     const dateString = today.toISOString().split("T")[0];
     const hours = today.getHours();
     const minutes = today.getMinutes();
     const period = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12;
-    const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+    const formattedTime = `${formattedHours}:${minutes
+      .toString()
+      .padStart(2, "0")} ${period}`;
 
     const employee = await db.employee.findUnique({
       where: { id: session.user.id },
@@ -159,13 +157,16 @@ export async function POST(req: NextRequest) {
       }
 
       return NextResponse.json(
-        { error: "Attendance already recorded for today", attendance: existingAttendance },
+        {
+          error: "Attendance already recorded for today",
+          attendance: existingAttendance,
+        },
         { status: 409 }
       );
     }
 
-    // Determine status based on check-in time (10:00 AM cutoff)
-    const attendanceStatus = hours < 10 || (hours === 10 && minutes === 0) ? "ON_TIME" : "LATE";
+    const attendanceStatus =
+      hours < 10 || (hours === 10 && minutes === 0) ? "ON_TIME" : "LATE";
 
     const attendance = await db.attendance.create({
       data: {
@@ -176,10 +177,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      message: "Attendance checked in successfully",
-      attendance,
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        message: "Attendance checked in successfully",
+        attendance,
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error("Error recording attendance:", error);
     return NextResponse.json(
@@ -189,7 +193,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: Retrieve attendance records
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -203,7 +206,6 @@ export async function GET(req: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    // Check if the user is an admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
@@ -211,21 +213,20 @@ export async function GET(req: NextRequest) {
 
     const isAdmin = user?.role === "Admin";
 
-    // If employeeId is specified and user is not admin, check permission
     if (employeeId && employeeId !== session.user.id && !isAdmin) {
       return NextResponse.json(
-        { error: "You don't have permission to view this employee's attendance" },
+        {
+          error: "You don't have permission to view this employee's attendance",
+        },
         { status: 403 }
       );
     }
 
-    // Build the query based on params
     let whereClause: any = {};
 
     if (employeeId) {
       whereClause.employeeId = employeeId;
     } else if (!isAdmin) {
-      // If not admin, only show their own records
       whereClause.employeeId = session.user.id;
     }
 
@@ -238,7 +239,6 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    // Get attendance records with employee details
     const attendanceRecords = await db.attendance.findMany({
       where: whereClause,
       orderBy: { date: "desc" },
@@ -266,7 +266,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PUT: Update attendance record (admin only)
 export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -274,7 +273,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
@@ -297,27 +295,22 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Calculate status based on check-in time if status is not explicitly provided
     let calculatedStatus = status;
     if (!calculatedStatus && checkInTime) {
       calculatedStatus = determineAttendanceStatus(checkInTime);
     }
-    
-    // Create update data, ensuring null values for ABSENT
+
     const updateData: any = {
       updatedAt: new Date(),
     };
-    
-    // If status is provided or calculated
+
     if (calculatedStatus) {
       updateData.status = calculatedStatus;
-      
-      // If ABSENT, explicitly set times to null
+
       if (calculatedStatus === "ABSENT") {
         updateData.checkInTime = null;
         updateData.checkOutTime = null;
       } else {
-        // Otherwise, update with provided values
         if (checkInTime !== undefined) {
           updateData.checkInTime = checkInTime;
         }
@@ -326,7 +319,6 @@ export async function PUT(req: NextRequest) {
         }
       }
     } else {
-      // If no status is provided or calculated
       if (checkInTime !== undefined) {
         updateData.checkInTime = checkInTime;
       }
@@ -335,7 +327,6 @@ export async function PUT(req: NextRequest) {
       }
     }
 
-    // Update the attendance record
     const updatedAttendance = await db.attendance.update({
       where: { id },
       data: updateData,
@@ -389,7 +380,9 @@ export async function DELETE(req: NextRequest) {
       where: { id },
     });
 
-    return NextResponse.json({ message: "Attendance record deleted successfully" });
+    return NextResponse.json({
+      message: "Attendance record deleted successfully",
+    });
   } catch (error: any) {
     console.error("Error deleting attendance:", error);
     return NextResponse.json(

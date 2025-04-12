@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { toast } from "react-toastify";
 import { AttendanceStatus } from "../../hooks/useAttendance";
+import { useAttendanceModal } from "./useAttendanceModal";
 
 interface AttendanceModalProps {
   employee: {
@@ -23,73 +24,28 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
   onClose,
   onSave,
 }) => {
-  const [checkInTime, setCheckInTime] = useState<string>("");
-  const [checkOutTime, setCheckOutTime] = useState<string>("");
-  const [status, setStatus] = useState<AttendanceStatus | "">("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Update status based on check-in time
-  useEffect(() => {
-    if (checkInTime) {
-      // Parse check-in time
-      const [hours, minutes] = checkInTime.split(":").map(Number);
-      
-      // If hours < 10 OR (hours = 10 AND minutes = 0), then ON_TIME
-      if (hours < 10 || (hours === 10 && minutes === 0)) {
-        setStatus("ON_TIME");
-      } else {
-        setStatus("LATE");
+  const {
+    checkInTime,
+    checkOutTime,
+    status,
+    isLoading,
+    setCheckInTime,
+    setCheckOutTime,
+    setStatus,
+    handleSubmit,
+    formatTimeFor12Hour,
+  } = useAttendanceModal({
+    employeeId: employee.id,
+    onSave: async (data) => {
+      try {
+        await onSave(data);
+        toast.success("Attendance updated successfully");
+      } catch {
+        toast.error("Failed to update attendance");
       }
-    }
-  }, [checkInTime]);
-
-  // Clear check-in and check-out times when status is set to ABSENT
-  useEffect(() => {
-    if (status === "ABSENT") {
-      setCheckInTime("");
-      setCheckOutTime("");
-    }
-  }, [status]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // Modified: Create data object with correct handling for ABSENT status
-      const data = {
-        employeeId: employee.id,
-        status: status as AttendanceStatus || undefined
-      };
-      
-      // Only add time fields if NOT ABSENT
-      if (status !== "ABSENT") {
-        data.checkInTime = checkInTime || undefined;
-        data.checkOutTime = checkOutTime || undefined;
-      } else {
-        // Explicitly set to null when ABSENT
-        data.checkInTime = null;
-        data.checkOutTime = null;
-      }
-      
-      await onSave(data);
-      toast.success("Attendance updated successfully");
-      onClose();
-    } catch (error) {
-      toast.error("Failed to update attendance");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Convert 24-hour format time to 12-hour format with AM/PM
-  const formatTimeFor12Hour = (time24: string): string => {
-    if (!time24) return "";
-    const [hours, minutes] = time24.split(":").map(Number);
-    const period = hours >= 12 ? "PM" : "AM";
-    const hours12 = hours % 12 || 12;
-    return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
-  };
+    },
+    onClose,
+  });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -116,7 +72,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
               </p>
             )}
           </div>
-          
+
           {status !== "ABSENT" && (
             <>
               <div className="mb-4">
@@ -129,10 +85,12 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                 />
                 {checkInTime && (
                   <p className="text-xs text-gray-400 mt-1">
-                    {formatTimeFor12Hour(checkInTime)} 
-                    {status === "ON_TIME" ? 
-                      " (On Time)" : 
-                      status === "LATE" ? " (Late)" : ""}
+                    {formatTimeFor12Hour(checkInTime)}
+                    {status === "ON_TIME"
+                      ? " (On Time)"
+                      : status === "LATE"
+                      ? " (Late)"
+                      : ""}
                   </p>
                 )}
               </div>
@@ -152,7 +110,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
               </div>
             </>
           )}
-          
+
           <div className="flex justify-end gap-2">
             <button
               type="button"

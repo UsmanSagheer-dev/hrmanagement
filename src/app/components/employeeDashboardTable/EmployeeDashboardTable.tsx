@@ -1,115 +1,67 @@
-
+"use client";
+import React, { useEffect, useState } from "react";
 import Table from "../table/Table";
+import { useAttendance, AttendanceStatus } from "../../hooks/useAttendance";
+import Image from "next/image";
+import { toast } from "react-toastify";
 
 interface Employee {
+  id: string;
   name: string;
   designation: string;
   type: string;
-  checkInTime: string;
-  status: string;
-  avatar?: string; 
+  checkInTime: string | null;
+  status: AttendanceStatus;
+  avatar?: string;
 }
 
-
 const EmployeeDashboardTable: React.FC = () => {
-  const data: Employee[] = [
-    {
-      name: "Dina",
-      designation: "Team Lead - Design",
-      type: "Office",
-      checkInTime: "09:27 AM",
-      status: "On Time",
-      avatar: "/avatars/dina1.png", 
-    },
-    {
-      name: "Vasilisa",
-      designation: "Web Designer",
-      type: "Office",
-      checkInTime: "10:15 AM",
-      status: "Late",
-      avatar: "/avatars/vasilisa1.png",
-    },
-    {
-      name: "Dina",
-      designation: "Medical Assistant",
-      type: "Remote",
-      checkInTime: "10:24 AM",
-      status: "Late",
-      avatar: "/avatars/dina2.png",
-    },
-    {
-      name: "Vasilisa",
-      designation: "Marketing Coordinator",
-      type: "Office",
-      checkInTime: "09:10 AM",
-      status: "On Time",
-      avatar: "/avatars/vasilisa2.png",
-    },
-    {
-      name: "Jack",
-      designation: "Data Analyst",
-      type: "Office",
-      checkInTime: "09:15 AM",
-      status: "On Time",
-      avatar: "/avatars/jack.png",
-    },
-    {
-      name: "Vasilisa",
-      designation: "Python Developer",
-      type: "Remote",
-      checkInTime: "09:29 AM",
-      status: "On Time",
-      avatar: "/avatars/vasilisa3.png",
-    },
-    {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-      {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-      {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-      {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-      {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-      {
-      name: "Dina",
-      designation: "React JS Developer",
-      type: "Remote",
-      checkInTime: "11:30 AM",
-      status: "Late",
-      avatar: "/avatars/dina3.png",
-    },
-  ];
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { fetchAllAttendance } = useAttendance();
+
+  const fetchEmployees = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const attendanceData = await fetchAllAttendance(today);
+
+      const employeeResponse = await fetch("/api/employee");
+      if (!employeeResponse.ok) {
+        throw new Error("Failed to fetch employees");
+      }
+      const employeeData = await employeeResponse.json();
+
+      const employeesWithAttendance = employeeData.map((employee: any) => {
+        const attendance = attendanceData.find(
+          (record: any) => record.employeeId === employee.id
+        );
+        return {
+          id: employee.id,
+          name: `${employee.firstName} ${employee.lastName}`,
+          designation: employee.designation,
+          type: employee.employeeType,
+          checkInTime: attendance?.checkInTime || "--",
+          status: (attendance?.status || "ABSENT") as AttendanceStatus,
+          avatar: employee.profileImage,
+        };
+      });
+
+      setEmployees(employeesWithAttendance);
+      setIsLoading(false);
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching employees");
+      toast.error("Failed to load employee data");
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const columns = [
     {
@@ -117,11 +69,22 @@ const EmployeeDashboardTable: React.FC = () => {
       header: "Employee Name",
       render: (item: Employee) => (
         <div className="flex items-center space-x-3">
-          <img
-            src={item.avatar || "/default-avatar.png"} 
-            alt={item.name}
-            className="w-8 h-8 rounded-full object-cover"
-          />
+          <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+            {item.avatar ? (
+              <Image
+                src={item.avatar}
+                alt={item.name}
+                width={32}
+                height={32}
+                className="object-cover"
+                onError={() => console.error("Image failed to load")}
+              />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-light">
+                {item.name.charAt(0)}
+              </div>
+            )}
+          </div>
           <span>{item.name}</span>
         </div>
       ),
@@ -144,19 +107,21 @@ const EmployeeDashboardTable: React.FC = () => {
       render: (item: Employee) => (
         <span
           className={`px-3 py-1 rounded-full text-sm font-medium ${
-            item.status === "On Time"
+            item.status === "ON_TIME"
               ? "bg-green-500/20 text-green-400"
-              : "bg-red-500/20 text-red-400"
+              : item.status === "LATE"
+              ? "bg-red-500/20 text-red-400"
+              : "bg-gray-500/20 text-gray-400"
           }`}
         >
-          {item.status}
+          {item.status.replace("_", " ")}
         </span>
       ),
     },
   ];
 
   return (
-    <div className=" bg-transparent ">
+    <div className="bg-transparent">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl text-white font-semibold">Employee Overview</h1>
         <select
@@ -165,7 +130,19 @@ const EmployeeDashboardTable: React.FC = () => {
           <option>View All</option>
         </select>
       </div>
-      <Table data={data} columns={columns} />
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        </div>
+      ) : error ? (
+        <div className="text-center text-red-500 py-10">{error}</div>
+      ) : employees.length === 0 ? (
+        <div className="text-center text-gray-400 py-10">
+          No employee records found
+        </div>
+      ) : (
+        <Table data={employees} columns={columns} />
+      )}
     </div>
   );
 };

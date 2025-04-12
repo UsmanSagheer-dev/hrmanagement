@@ -1,0 +1,1 @@
+export const ATTENDANCE_CUTOFF_TIME = '10:00';
