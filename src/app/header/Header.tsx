@@ -5,17 +5,16 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../components/searchBar/SearchBar";
 import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
-import { useUserProfile } from "@/app/hooks/useUserProfile"; 
-
-interface HeaderProps {
-  title: string;
-  description: string;
-  textColor?: string;
-}
+import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { useNotifications } from "@/app/hooks/useNotifications";
+import { HeaderProps } from "../types/types";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { userData } = useUserProfile(); 
+  const { userData } = useUserProfile();
+  const { unreadCount } = useNotifications();
+
+  const isAdmin = userData?.role === "Admin";
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
@@ -59,16 +58,25 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
         {renderDescriptionWithIcon()}
       </div>
       <div className="flex items-center space-x-4">
-        <div className="hidden md:block">
-          <SearchBar />
-        </div>
-        <div className="hidden md:block">
-          <Button
-            icon={IoMdNotificationsOutline}
-            onClick={handleNotificationClick}
-            className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
-          />
-        </div>
+        {isAdmin && (
+          <>
+            <div className="hidden md:block">
+              <SearchBar />
+            </div>
+            <div className="hidden md:block relative">
+              <Button
+                icon={IoMdNotificationsOutline}
+                onClick={handleNotificationClick}
+                className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"
+              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+          </>
+        )}
         <UserProfileDropdown />
       </div>
     </header>

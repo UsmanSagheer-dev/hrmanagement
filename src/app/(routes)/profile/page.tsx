@@ -1,124 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import IMAGES from "@/app/assets/images";
 import InputField from "@/app/components/inputField/InputField";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { useUserProfile } from "@/app/hooks/useUserProfile";
-
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
+import IMAGES from "@/app/assets/images";
+import { useProfileForm } from "./useProfileForm";
 
 const ProfilePage: React.FC = () => {
-  const { userData, isLoading, error, updateUser, fetchUserData } =
-    useUserProfile();
-  const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    role: "",
-    avatar: "",
-  });
-  const [previewImage, setPreviewImage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (userData) {
-      const updatedData = {
-        name: userData.name || "",
-        role: userData.role || "",
-        avatar: userData.avatar || "",
-      };
-      setFormData(updatedData);
-      setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
-    }
-  }, [userData]);
-
-  const handleInputChange = (field: string) => (value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size should be less than 2MB");
-      return;
-    }
-
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setPreviewImage(base64String);
-      setFormData((prev) => ({ ...prev, avatar: base64String }));
-    };
-    reader.onerror = () => {
-      toast.error("Error reading file");
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSave = async () => {
-    try {
-      setIsSubmitting(true);
-
-      const updates: Record<string, any> = {};
-
-      if (formData.name !== userData?.name) {
-        updates.name = formData.name;
-      }
-
-      if (previewImage !== userData?.avatar && formData.avatar) {
-        updates.avatar = formData.avatar;
-      }
-
-      if (userData?.role === "Admin" && formData.role !== userData.role) {
-        updates.role = formData.role;
-      }
-
-      if (Object.keys(updates).length > 0) {
-        const updatedData = await updateUser(updates);
-
-        setFormData({
-          name: updatedData.name,
-          role: updatedData.role,
-          avatar: updatedData.avatar,
-        });
-
-        setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
-        toast.success("Profile updated successfully");
-      } else {
-        toast.info("No changes detected");
-      }
-
-      setIsEditing(false);
-      router.push("/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update profile");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCancel = () => {
-    if (userData) {
-      setFormData({
-        name: userData.name || "",
-        role: userData.role || "",
-        avatar: userData.avatar || "",
-      });
-      setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
-    }
-    setIsEditing(false);
-  };
+  const {
+    userData,
+    isLoading,
+    error,
+    isEditing,
+    formData,
+    previewImage,
+    isSubmitting,
+    setIsEditing,
+    handleInputChange,
+    handleFileChange,
+    handleSave,
+    handleCancel,
+    fetchUserData,
+  } = useProfileForm();
 
   if (isLoading) {
     return (
@@ -133,7 +35,7 @@ const ProfilePage: React.FC = () => {
       <div className="text-white min-h-screen flex items-center justify-center">
         Error: {error || "No user data available"}
         <button
-          onClick={() => fetchUserData()}
+          onClick={fetchUserData}
           className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
         >
           Retry
@@ -173,7 +75,6 @@ const ProfilePage: React.FC = () => {
                     alt="Profile avatar"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      console.error("Image load error");
                       e.currentTarget.src = IMAGES.Profileimg.src;
                     }}
                   />
@@ -241,7 +142,6 @@ const ProfilePage: React.FC = () => {
                   alt="Profile avatar"
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.error("Image load error");
                     e.currentTarget.src = IMAGES.Profileimg.src;
                   }}
                 />

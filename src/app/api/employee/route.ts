@@ -45,13 +45,60 @@ export async function POST(req: NextRequest) {
       console.error(`Failed to upload documents: ${failedDocs}`);
     }
 
-    const formattedData = {
-      id: session.user.id,
+    const existingPendingEmployee = await db.pendingEmployee.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (existingPendingEmployee) {
+      return NextResponse.json(
+        { error: "You already have a pending employee request" },
+        { status: 409 }
+      );
+    }
+
+    const existingEmployee = await db.employee.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (existingEmployee) {
+      return NextResponse.json(
+        { error: "An employee record already exists for this user" },
+        { status: 409 }
+      );
+    }
+
+    const duplicateCheck = await db.employee.findFirst({
+      where: {
+        OR: [
+          { employeeId: data.employeeId },
+          { email: data.email },
+          { workEmail: data.workEmail },
+        ],
+      },
+    });
+
+    if (duplicateCheck) {
+      let field = "unknown";
+      if (duplicateCheck.employeeId === data.employeeId) field = "employeeId";
+      else if (duplicateCheck.email === data.email) field = "email";
+      else if (duplicateCheck.workEmail === data.workEmail) field = "workEmail";
+
+      return NextResponse.json(
+        {
+          error: "Employee with this ID or email already exists",
+          field,
+        },
+        { status: 409 }
+      );
+    }
+
+    const pendingEmployeeData = {
+      userId: session.user.id,
       firstName: data.firstName,
       lastName: data.lastName,
       mobileNumber: data.mobileNumber,
       email: data.email,
-      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
       maritalStatus: data.maritalStatus,
       gender: data.gender,
       nationality: data.nationality,
@@ -68,7 +115,7 @@ export async function POST(req: NextRequest) {
       department: data.department,
       designation: data.designation,
       workingDays: data.workingDays,
-      joiningDate: data.joiningDate ? new Date(data.joiningDate) : null,
+      joiningDate: data.joiningDate ? new Date(data.joiningDate) : undefined,
       officeLocation: data.officeLocation,
 
       appointmentLetter: documentUrls.appointmentLetter || null,
@@ -81,52 +128,42 @@ export async function POST(req: NextRequest) {
       githubId: data.githubId,
     };
 
-    const existingEmployee = await db.employee.findUnique({
+    const pendingEmployee = await db.pendingEmployee.create({
+      data: pendingEmployeeData,
+    });
+
+    const adminUsers = await db.user.findMany({
+      where: { role: "Admin" },
+      select: { id: true },
+    });
+
+    if (adminUsers.length > 0) {
+      const notificationPromises = adminUsers.map((admin) => {
+        return db.notification.create({
+          data: {
+            type: "EMPLOYEE_REQUEST",
+            title: "New Employee Registration",
+            message: `${data.firstName} ${data.lastName} has submitted employee information for approval`,
+            status: "PENDING",
+            sourceId: pendingEmployee.id,
+            targetId: admin.id,
+          },
+        });
+      });
+
+      await Promise.all(notificationPromises);
+    }
+
+    await db.user.update({
       where: { id: session.user.id },
-    });
-
-    if (existingEmployee) {
-      return NextResponse.json(
-        { error: "An employee record already exists for this user" },
-        { status: 409 }
-      );
-    }
-
-    const duplicateCheck = await db.employee.findFirst({
-      where: {
-        OR: [
-          { employeeId: formattedData.employeeId },
-          { email: formattedData.email },
-          { workEmail: formattedData.workEmail },
-        ],
-      },
-    });
-
-    if (duplicateCheck) {
-      let field = "unknown";
-      if (duplicateCheck.employeeId === formattedData.employeeId)
-        field = "employeeId";
-      else if (duplicateCheck.email === formattedData.email) field = "email";
-      else if (duplicateCheck.workEmail === formattedData.workEmail)
-        field = "workEmail";
-
-      return NextResponse.json(
-        {
-          error: "Employee with this ID or email already exists",
-          field,
-        },
-        { status: 409 }
-      );
-    }
-
-    const employee = await db.employee.create({
-      data: formattedData,
+      data: { role: "Pending" },
     });
 
     return NextResponse.json(
       {
-        message: "Employee data saved successfully",
-        employee,
+        message: "Employee data submitted successfully and sent for approval",
+        pendingEmployee,
+        pendingApproval: true,
         uploadStats: {
           total: documentUploads.length + (profileImageUrl ? 1 : 0),
           succeeded:
@@ -145,7 +182,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -180,6 +216,64 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching employee data:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch employee data" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+
+    if (!user || user.role !== "Admin") {
+      return NextResponse.json(
+        { error: "Only administrators can delete employee records" },
+        { status: 403 }
+      );
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Employee ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const employee = await db.employee.findUnique({
+      where: { id },
+    });
+
+    if (!employee) {
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 }
+      );
+    }
+
+    await db.notification.deleteMany({
+      where: { OR: [{ sourceId: id }, { targetId: id }] },
+    });
+
+    await db.employee.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Employee deleted successfully" });
+  } catch (error: any) {
+    console.error("Error deleting employee:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete employee" },
       { status: 500 }
     );
   }

@@ -1,3 +1,5 @@
+import { AttendanceStatus } from "@prisma/client";
+
 export type UserData = {
   firstName: string;
   lastName: string;
@@ -142,3 +144,75 @@ export type FileUploadProps = {
   accept?: string;
   onFileUpload: (file: File, id: string) => void;
 };
+
+
+export interface HeaderProps {
+  title: string;
+  description: string;
+  textColor?: string;
+}
+
+export interface Employee {
+  id: string;
+  name: string;
+  firstName: string;
+  lastName: string;
+  employeeId: string;
+  department: string;
+  designation: string;
+  employeeType: string;
+  workEmail: string;
+  profileImage: string | null;
+
+  checkInTime: string | null;
+    status: AttendanceStatus;
+    avatar: string | null;
+}
+
+
+
+
+export interface AttendanceModalProps {
+  employee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  onClose: () => void;
+  onSave: (data: {
+    employeeId: string;
+    checkInTime?: string | null;
+    checkOutTime?: string | null;
+    status?: AttendanceStatus;
+  }) => Promise<void>;
+}
+
+
+export interface UseAttendanceModalProps {
+  employeeId: string;
+  onSave: (data: {
+    employeeId: string;
+    checkInTime?: string | null;
+    checkOutTime?: string | null;
+    status?: AttendanceStatus;
+  }) => Promise<void>;
+  onClose: () => void;
+}
+
+
+
+export interface ChartItem {
+  name: string;
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface FormattedAttendanceRecord {
+  date: string;
+  checkIn: string;
+  checkOut: string;
+  breakTime: string;
+  workingHours: string;
+  status: string;
+}

@@ -1,16 +1,8 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { UserData } from "../types/types";
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const cache = new Map<string, UserData>();
 
