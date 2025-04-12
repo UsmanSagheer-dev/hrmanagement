@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
 import { ProfileDetailsProps, UserData } from "../types/types";
 
-
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
   const router = useRouter();
   const [userData] = useState<UserData>({
@@ -94,7 +93,10 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
   return (
     <div className="h-auto max-h-[81vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 ">
-        <UserInfoSection userData={userData} handleEditProfile={handleEditProfile} />
+        <UserInfoSection
+          userData={userData}
+          handleEditProfile={handleEditProfile}
+        />
         <div className="flex flex-wrap scroll-auto overflow-auto mt-[30px] mb-[30px] md:flex-nowrap">
           <div className="w-full md:w-[242px] mb-4 md:mb-0">
             <div className="border border-[#A2A1A833] rounded-md">

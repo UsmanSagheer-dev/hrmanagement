@@ -207,3 +207,12 @@ export interface ChartItem {
   medium: number;
   low: number;
 }
+
+export interface FormattedAttendanceRecord {
+  date: string;
+  checkIn: string;
+  checkOut: string;
+  breakTime: string;
+  workingHours: string;
+  status: string;
+}

@@ -1,92 +1,83 @@
 import React from "react";
 import Table from "../../components/table/Table";
-import { AttendanceRecord, Column } from "@/app/types/types";
+import { Column, FormattedAttendanceRecord } from "@/app/types/types";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useAttendanceData from "./useAttendanceData";
+import { AttendanceRecord } from "@/app/hooks/useAttendance";
 
-const AttendanceContent: React.FC = () => {
-  const attendanceData: AttendanceRecord[] = [
-    {
-      date: "July 01, 2026",
-      checkIn: "09:28 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:30 Min",
-      workingHours: "09:02 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 02, 2026",
-      checkIn: "09:20 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:20 Min",
-      workingHours: "09:20 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 03, 2026",
-      checkIn: "09:25 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:30 Min",
-      workingHours: "09:05 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 04, 2026",
-      checkIn: "09:45 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:40 Min",
-      workingHours: "08:35 Hrs",
-      status: "Late",
-    },
-    {
-      date: "July 05, 2026",
-      checkIn: "10:00 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:30 Min",
-      workingHours: "08:30 Hrs",
-      status: "Late",
-    },
-    {
-      date: "July 06, 2026",
-      checkIn: "09:28 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:30 Min",
-      workingHours: "09:02 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 07, 2026",
-      checkIn: "09:30 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:15 Min",
-      workingHours: "09:15 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 08, 2026",
-      checkIn: "09:52 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:45 Min",
-      workingHours: "08:23 Hrs",
-      status: "Late",
-    },
-    {
-      date: "July 09, 2026",
-      checkIn: "09:10 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:30 Min",
-      workingHours: "09:02 Hrs",
-      status: "On Time",
-    },
-    {
-      date: "July 10, 2026",
-      checkIn: "09:48 AM",
-      checkOut: "07:00 PM",
-      breakTime: "00:42 Min",
-      workingHours: "08:30 Hrs",
-      status: "Late",
-    },
-  ];
+const AttendanceContent: React.FC<{ employeeId?: string }> = ({
+  employeeId,
+}) => {
+  const { attendanceData, loading, error } = useAttendanceData(employeeId);
 
-  const attendanceColumns: Column<AttendanceRecord>[] = [
+  const formatAttendanceData = (
+    data: AttendanceRecord[]
+  ): FormattedAttendanceRecord[] => {
+    return data.map((record) => {
+      let workingHours = "N/A";
+      let breakTime = "N/A";
+
+      if (record.checkInTime && record.checkOutTime) {
+        const checkIn = parseTime(record.checkInTime);
+        const checkOut = parseTime(record.checkOutTime);
+
+        const diffMs = checkOut.getTime() - checkIn.getTime();
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+        workingHours = `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")} Hrs`;
+
+        breakTime = "00:30 Min";
+      }
+
+      return {
+        date: new Date(record.date).toLocaleDateString("en-US", {
+          month: "long",
+          day: "2-digit",
+          year: "numeric",
+        }),
+        checkIn: record.checkInTime || "N/A",
+        checkOut: record.checkOutTime || "N/A",
+        breakTime,
+        workingHours,
+        status: record.status === "ON_TIME" ? "On Time" : record.status,
+      };
+    });
+  };
+
+  const parseTime = (timeStr: string): Date => {
+    const today = new Date();
+    let hours: number, minutes: number;
+
+    if (timeStr.includes("AM") || timeStr.includes("PM")) {
+      const [time, period] = timeStr.split(" ");
+      const [h, m] = time.split(":").map(Number);
+      hours =
+        period === "PM" && h < 12
+          ? h + 12
+          : period === "AM" && h === 12
+          ? 0
+          : h;
+      minutes = m;
+    } else {
+      const [h, m] = timeStr.split(":").map(Number);
+      hours = h;
+      minutes = m;
+    }
+
+    return new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      hours,
+      minutes
+    );
+  };
+
+  const attendanceColumns: Column<FormattedAttendanceRecord>[] = [
     { key: "date", header: "Date" },
     { key: "checkIn", header: "Check In" },
     { key: "checkOut", header: "Check Out" },
@@ -107,9 +98,20 @@ const AttendanceContent: React.FC = () => {
     },
   ];
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const formattedData = formatAttendanceData(attendanceData);
+
   return (
     <div>
-      <Table data={attendanceData} columns={attendanceColumns} />
+      <Table data={formattedData} columns={attendanceColumns} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
