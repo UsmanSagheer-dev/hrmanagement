@@ -6,10 +6,11 @@ import StatsCard from "../../components/statsCard/StatsCard";
 import DashboardChart from "@/app/components/dashboardChart/DashboardChart";
 import EmployeeDashboardTable from "@/app/components/employeeDashboardTable/EmployeeDashboardTable";
 import Loader from "@/app/components/loader/Loader";
-import { useDashboardData } from "./useDashboardData";
+import { getGreeting, useDashboardData } from "./useDashboardData";
 
 function Page() {
   const { cardData, isLoading, error } = useDashboardData();
+  const greeting = getGreeting();
 
   return (
     <div className="h-screen bg-[#131313] p-[20px]">
@@ -20,8 +21,8 @@ function Page() {
         <div className="w-full flex flex-col gap-[30px]">
           <div className="w-full">
             <Header
-              title="Design Department"
-              description="All Departments > Design Department"
+              title="Dashboard"
+              description={greeting}
               textColor="#ffffff"
             />
           </div>

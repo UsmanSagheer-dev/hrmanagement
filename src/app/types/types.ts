@@ -250,3 +250,11 @@ export interface Department {
   totalMembers: number;
 }
 
+export interface StatsCardProps {
+  title: string;
+  value: number;
+  percentage: string;
+  percentageColor: "green" | "red";
+  updateDate: string;
+}
+

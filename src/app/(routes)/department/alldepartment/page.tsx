@@ -16,7 +16,7 @@ function AllDepartment() {
         <div>
           <Sidebar />
         </div>
-        <div className="w-full flex flex-col justify-center gap-[30px]">
+        <div className="w-full flex flex-col  gap-[30px]">
           <div className="w-full">
             <Header
               title="All Departments"
