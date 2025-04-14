@@ -63,7 +63,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
   const updateUser = useCallback(
     async (updates: { name?: string; role?: string; avatar?: string }) => {
       if (!session?.user?.id) {
-        toast.error("Not authenticated");
         throw new Error("Not authenticated");
       }
 
@@ -112,7 +111,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       setIsLoading(false);
       const msg = "Not authenticated";
       setError(msg);
-      toast.error(msg);
     }
   }, [status, fetchUserData, initialUserData, session]);
 

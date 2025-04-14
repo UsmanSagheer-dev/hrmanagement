@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.hashedPassword) {
-      toast.error("Invalid credentials");
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -32,7 +31,6 @@ export async function POST(req: Request) {
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
     if (!isPasswordValid) {
-      toast.error("Invalid credentials");
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -43,7 +41,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 });
   } catch (err: any) {
-    toast.error("Internal server error");
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }

@@ -8,6 +8,7 @@ import FileList from "../../components/fileList/FileList";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserData from "./useUserData";
+import Loader from "@/app/components/loader/Loader";
 
 const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
   <button
@@ -70,7 +71,7 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
   };
 
   const renderProfileTabContent = () => {
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="mt-6 flex justify-center items-center h-auto"><Loader/></div>;
     if (error) return <div>Error: {error}</div>;
     if (!userData) return <div>No data available</div>;
 

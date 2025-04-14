@@ -45,7 +45,6 @@ export function useLogin() {
         }
       }
     } catch {
-      toast.error("Login failed. Please try again.");
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);

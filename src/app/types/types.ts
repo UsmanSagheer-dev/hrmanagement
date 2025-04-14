@@ -38,6 +38,9 @@ export type UserData = {
   slackId?: string;
   skypeId?: string;
   githubId?: string;
+  avatar?: string | null;
+  role?: string;
+  name?: string | null;
 };
 
 export type EmployeeData = {
@@ -68,12 +71,11 @@ export interface User {
 export interface AttendanceRecord {
   date: string;
   checkIn: string;
-  checkOut: string;
+  checkOut?: string;
   breakTime: string;
   workingHours: string;
   status: string;
 }
-
 export interface Column<T> {
   key: keyof T | string;
   header: string;
