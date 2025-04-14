@@ -2,8 +2,6 @@ import React from "react";
 import Table from "../../components/table/Table";
 import { Column, ProjectRecord } from "@/app/types/types";
 
-
-
 export const ProjectsContent: React.FC = () => {
   const projectData: ProjectRecord[] = [
     {

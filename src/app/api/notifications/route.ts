@@ -80,7 +80,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },

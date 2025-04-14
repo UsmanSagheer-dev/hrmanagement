@@ -8,14 +8,6 @@ import { MdLockOpen } from "react-icons/md";
 import InputField from "../../components/inputField/InputField";
 import Button from "../../components/button/Button";
 import { PersonalInformationFormProps } from "../../types/formTypes";
-import {
-  maritalStatusOptions,
-  genderOptions,
-  nationalityOptions,
-  cityOptions,
-  stateOptions,
-  zipCodeOptions,
-} from "../../constants/formConstants";
 import { usePersonalInformationForm } from "./usePersonalInformationForm";
 import { inputFields } from "@/app/constants/inputFields";
 

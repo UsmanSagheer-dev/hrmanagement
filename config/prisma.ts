@@ -1,12 +1,14 @@
 import { PrismaClient } from "@prisma/client";
+import { toast } from "react-hot-toast";
+
 export const prisma = new PrismaClient();
 
 async function checkPrismaConnection() {
   try {
     await prisma.$connect();
-    console.log("Prisma connected successfully!");
+    toast.success("Prisma connected successfully!");
   } catch (error) {
-    console.error("Error connecting to Prisma:", error);
+    toast.error("Error connecting to Prisma!");
   } finally {
     await prisma.$disconnect();
   }

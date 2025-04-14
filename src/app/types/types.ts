@@ -145,7 +145,6 @@ export type FileUploadProps = {
   onFileUpload: (file: File, id: string) => void;
 };
 
-
 export interface HeaderProps {
   title: string;
   description: string;
@@ -163,14 +162,12 @@ export interface Employee {
   employeeType: string;
   workEmail: string;
   profileImage: string | null;
+  image: string | null;
 
   checkInTime: string | null;
-    status: AttendanceStatus;
-    avatar: string | null;
+  status: AttendanceStatus;
+  avatar: string | null;
 }
-
-
-
 
 export interface AttendanceModalProps {
   employee: {
@@ -187,7 +184,6 @@ export interface AttendanceModalProps {
   }) => Promise<void>;
 }
 
-
 export interface UseAttendanceModalProps {
   employeeId: string;
   onSave: (data: {
@@ -198,8 +194,6 @@ export interface UseAttendanceModalProps {
   }) => Promise<void>;
   onClose: () => void;
 }
-
-
 
 export interface ChartItem {
   name: string;
@@ -216,3 +210,43 @@ export interface FormattedAttendanceRecord {
   workingHours: string;
   status: string;
 }
+
+export interface LeaveRecord {
+  date: string;
+  duration: string;
+  days: string;
+  reportingManager: string;
+  status: string;
+}
+
+export interface Member {
+  id: number;
+  name: string;
+  title: string;
+  imageUrl: string;
+}
+
+export interface employee {
+  id: string;
+  name: string;
+  designation: string;
+  type: string;
+  status: string;
+  image?: string;
+}
+
+
+
+export interface DepartmentListProps {
+  departmentName: string;
+  members: Member[];
+  totalMembers: number;
+  onViewAll?: () => void;
+}
+
+export interface Department {
+  name: string;
+  members: Member[];
+  totalMembers: number;
+}
+

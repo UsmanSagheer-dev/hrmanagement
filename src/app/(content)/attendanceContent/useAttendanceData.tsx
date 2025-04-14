@@ -1,4 +1,3 @@
-// useAttendanceData.ts
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";

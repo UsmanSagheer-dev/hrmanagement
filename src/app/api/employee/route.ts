@@ -191,6 +191,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const department = searchParams.get("department");
 
     if (id) {
       const employee = await db.employee.findUnique({
@@ -205,6 +206,14 @@ export async function GET(req: NextRequest) {
       }
 
       return NextResponse.json(employee);
+    }
+
+    if (department) {
+      const employees = await db.employee.findMany({
+        where: { department },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json(employees);
     }
 
     const employees = await db.employee.findMany({

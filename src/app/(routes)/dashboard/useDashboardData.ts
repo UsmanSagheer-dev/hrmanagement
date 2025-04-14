@@ -51,7 +51,7 @@ export const useDashboardData = () => {
         const applicants = applicantResponse.ok ? await applicantResponse.json() : [];
         const totalApplicants = applicants.length || 0;
 
-        const totalProjects = 0; // TODO: replace with actual project API when ready
+        const totalProjects = 0; 
 
         const todayStr = `Update: ${new Date().toLocaleDateString()}`;
         setCardData([

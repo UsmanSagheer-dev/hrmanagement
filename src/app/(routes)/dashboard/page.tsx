@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import Header from "../../header/Header";
+import Header from "../../components/header/Header";
 import StatsCard from "../../components/statsCard/StatsCard";
 import DashboardChart from "@/app/components/dashboardChart/DashboardChart";
 import EmployeeDashboardTable from "@/app/components/employeeDashboardTable/EmployeeDashboardTable";

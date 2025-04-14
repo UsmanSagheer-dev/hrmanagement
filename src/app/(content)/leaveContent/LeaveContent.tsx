@@ -1,14 +1,6 @@
 import React from "react";
 import Table from "../../components/table/Table";
-import { Column } from "@/app/types/types";
-
-interface LeaveRecord {
-  date: string;
-  duration: string;
-  days: string;
-  reportingManager: string;
-  status: string;
-}
+import { Column, LeaveRecord } from "@/app/types/types";
 
 export const LeaveContent: React.FC = () => {
   const leaveData: LeaveRecord[] = [

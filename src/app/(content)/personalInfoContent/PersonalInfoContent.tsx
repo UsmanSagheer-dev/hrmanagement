@@ -2,8 +2,6 @@
 import { PersonalInfoContentProps } from "@/app/types/types";
 import React from "react";
 
-
-
 const InfoSection = ({ label, value }: { label: string; value: string }) => {
   return (
     <div className="mb-4">

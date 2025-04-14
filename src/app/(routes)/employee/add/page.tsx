@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/app/components/sidebar/Sidebar";
-import Header from "@/app/header/Header";
+import Header from "@/app/components/header/Header";
 import PersonalInformationForm from "@/app/(form)/personalInformationForm/PersonalInformationForm";
 import ProfessionalInformationForm from "@/app/(form)/professionalInformationForm/ProfessionalInformationForm";
 import DocumentsForm from "@/app/(form)/documentsForm/DocumentsForm";

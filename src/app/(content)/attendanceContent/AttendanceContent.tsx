@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAttendanceData from "./useAttendanceData";
 import { AttendanceRecord } from "@/app/hooks/useAttendance";
+import Loader from "@/app/components/loader/Loader";
 
 const AttendanceContent: React.FC<{ employeeId?: string }> = ({
   employeeId,
@@ -99,7 +100,11 @@ const AttendanceContent: React.FC<{ employeeId?: string }> = ({
   ];
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center ">
+        <Loader />
+      </div>
+    );
   }
 
   if (error) {

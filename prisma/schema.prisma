@@ -129,6 +129,8 @@ model Attendance {
   employee     Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
+
+
 model Employee {
   id                 String    @id @map("_id") @db.ObjectId // Remove @default(auto()), use User's id
   firstName          String
