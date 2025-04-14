@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAttendance } from "@/app/hooks/useAttendance";
+import { toast } from "react-hot-toast"; // <-- import toast
+
 
 export const useDashboardData = () => {
   const { fetchAllAttendance, isLoading, error } = useAttendance();
@@ -85,7 +87,7 @@ export const useDashboardData = () => {
           },
         ]);
       } catch (err) {
-        console.error("Dashboard data error:", err);
+         toast.error("Failed to load dashboard data"); 
       }
     };
 

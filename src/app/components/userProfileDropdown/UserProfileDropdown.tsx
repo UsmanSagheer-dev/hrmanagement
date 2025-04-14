@@ -5,20 +5,10 @@ import { signOut } from "next-auth/react";
 import IMAGES from "@/app/assets/images";
 import Link from "next/link";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { Props } from "@/app/types/types";
+import toast from "react-hot-toast";
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
-interface Props {
-  initialUserData?: UserData | null;
-}
 
 const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -45,7 +35,7 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
     return url;
   };
 
-  const avatarUrl = getAvatarUrl(userData.avatar);
+  const avatarUrl = getAvatarUrl(userData?.avatar);
 
   return (
     <div className="relative">
@@ -57,17 +47,17 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
           <img
             key={avatarUrl}
             src={avatarUrl}
-            alt={`${userData.name}'s avatar`}
+            alt={`${userData.firstName}'s avatar`}
             className="w-full h-full rounded object-cover"
             onError={(e) => {
-              console.error("Image load error");
+              toast.error("Image load error");
               e.currentTarget.src = IMAGES.Profileimg.src;
             }}
           />
         </div>
         <div>
           <p className="text-[14px] md:text-[16px] font-semibold text-white">
-            {userData.name}
+            {userData.firstName}
           </p>
           <p className="text-xs font-light text-gray-400">{userData.role}</p>
         </div>

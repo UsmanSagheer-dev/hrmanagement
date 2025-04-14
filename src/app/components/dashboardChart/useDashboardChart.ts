@@ -1,5 +1,6 @@
 import { AttendanceRecord, ChartItem } from "@/app/types/types";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -52,7 +53,7 @@ export default function useDashboardChart() {
 
         setChartData(attendanceByDay);
       } catch (err: any) {
-        console.error("Error fetching attendance data:", err);
+        toast.error("Error fetching attendance data");
         setError(err.message || "Failed to load attendance data");
       } finally {
         setIsLoading(false);

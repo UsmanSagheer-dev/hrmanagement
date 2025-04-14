@@ -36,9 +36,7 @@ export const useSignUp = () => {
     try {
       setIsLoading(true);
 
-      console.log("Sending to API:", { name, email, password });
       const body = JSON.stringify({ name, email, password });
-      console.log("Serialized body:", body);
 
       const response = await fetch("/api/register", {
         method: "POST",

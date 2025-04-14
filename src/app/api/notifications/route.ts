@@ -66,7 +66,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(notifications);
   } catch (error: any) {
-    console.error("Error fetching notifications:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch notifications" },
       { status: 500 }
@@ -202,7 +201,6 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(updatedNotification);
   } catch (error: any) {
-    console.error("Error updating notification:", error);
     return NextResponse.json(
       { error: error.message || "Failed to update notification" },
       { status: 500 }

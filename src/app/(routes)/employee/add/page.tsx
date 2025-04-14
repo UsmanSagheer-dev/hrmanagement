@@ -12,6 +12,8 @@ import {
 } from "@/app/contexts/EmployeeFormContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "@/app/components/loader/Loader";
+import toast from "react-hot-toast";
 
 function EmployeeFormContent() {
   const { activeTab, handleTabChange } = useEmployeeFormContext();
@@ -34,10 +36,9 @@ function EmployeeFormContent() {
         }
 
         const data = await response.json();
-        setUserRole(data.role); 
+        setUserRole(data.role);
       } catch (err) {
-        setError("Could not load user profile");
-        console.error(err);
+        toast.error("Could not load user profile");
       } finally {
         setLoading(false);
       }
@@ -61,17 +62,18 @@ function EmployeeFormContent() {
     }
   };
 
-  // Show loading state while fetching the profile
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <Loader />
+      </div>
+    );
   }
 
-  // Show error if profile fetch fails
   if (error) {
     return <div>{error}</div>;
   }
 
-  // Only show Header and Sidebar for Employee or Admin roles
   const showHeaderAndSidebar = userRole === "Employee" || userRole === "Admin";
 
   return (

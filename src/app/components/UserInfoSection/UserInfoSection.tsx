@@ -9,10 +9,10 @@ import { UserInfoSectionProps } from "@/app/types/types";
 import { useUserData } from "./useUserData";
 
 const UserInfoSection: React.FC<UserInfoSectionProps> = ({
-  employeeId,
+employeeId,
   handleEditProfile,
 }) => {
-  const { userData, loading, error } = useUserData(employeeId);
+  const { userData: fetchedUserData, loading, error } = useUserData(employeeId);
 
   if (loading) return <div className="text-white">Loading user data...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -23,25 +23,25 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
         <div className="flex flex-wrap border-gray mb-[30px] gap-2 items-center">
           <div className="relative w-24 h-24 border border-[#A2A1A833] bg-[#A2A1A80D] rounded-lg flex items-center justify-center overflow-hidden">
             <img
-              src={userData.profileImage || "/fallback-profile.png"}
+              src={fetchedUserData.profileImage || "/fallback-profile.png"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
           </div>
           <div>
             <h2 className="text-white text-xl font-medium">
-              {userData.firstName} {userData.lastName}
+              {fetchedUserData.firstName} {fetchedUserData.lastName}
             </h2>
             <div className="flex items-center gap-1">
               <HiOutlineBriefcase color="white" size={24} />
               <p className="text-white text-[16px] font-light">
-                {userData.jobTitle}
+                {fetchedUserData.jobTitle}
               </p>
             </div>
             <div className="flex items-center gap-1">
               <HiOutlineMail color="white" size={24} />
               <p className="text-white text-[16px] font-light">
-                {userData.email}
+                {fetchedUserData.email}
               </p>
             </div>
           </div>

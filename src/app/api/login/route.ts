@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "../../../../lib/prismadb";
+import toast from "react-hot-toast";
 
 export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
-    console.log("Raw request body:", rawBody);
 
     const body = JSON.parse(rawBody);
     const { email, password } = body;
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.hashedPassword) {
+      toast.error("Invalid credentials");
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -31,6 +32,7 @@ export async function POST(req: Request) {
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
     if (!isPasswordValid) {
+      toast.error("Invalid credentials");
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 });
   } catch (err: any) {
-    console.log("LOGIN_ERR: ", err);
+    toast.error("Internal server error");
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }

@@ -20,6 +20,7 @@ export type UserData = {
     absentDays: number;
     lastCheckIn: string;
   };
+  
   appointmentLetter?: string | null;
   salarySlips?: string | null;
   relievingLetter?: string | null;
@@ -258,3 +259,25 @@ export interface StatsCardProps {
   updateDate: string;
 }
 
+ export interface Props {
+  initialUserData?: UserData | null;
+}
+
+export interface Notification {
+  id: string;
+  type: "EMPLOYEE_REQUEST" | "LEAVE_REQUEST" | "GENERAL";
+  title: string;
+  message: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "READ";
+  sourceId?: string;
+  targetId?: string;
+  createdAt: string;
+  updatedAt: string;
+  read: boolean;
+  employee?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImage?: string;
+  };
+}

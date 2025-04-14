@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Employee } from "@/app/types/types";
+import toast from "react-hot-toast";
 
 export function useDepartmentEmployees() {
   const router = useRouter();
@@ -24,18 +25,18 @@ export function useDepartmentEmployees() {
         if (!response.ok) throw new Error("Failed to fetch employees");
         const employees = await response.json();
 
-        const mappedEmployees = employees.map((emp: any) => ({
+        const mappedEmployees = employees?.map((emp: any) => ({
           id: emp.employeeId,
-          name: `${emp.firstName} ${emp.lastName}`,
-          designation: emp.designation || "No Designation",
-          type: emp.employeeType || "Office",
-          status: emp.status || "Permanent",
-          image: emp.profileImage || "/avatars/default.jpg",
+          name: `${emp?.firstName} ${emp?.lastName}`,
+          designation: emp?.designation || "No Designation",
+          type: emp?.employeeType || "Office",
+          status: emp?.status || "Permanent",
+          image: emp?.profileImage || "/avatars/default.jpg",
         }));
 
         setEmployees(mappedEmployees);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+      } catch {
+        toast.error("Error fetching employees");
       } finally {
         setLoading(false);
       }
@@ -44,10 +45,7 @@ export function useDepartmentEmployees() {
     fetchEmployees();
   }, [departmentName]);
 
-  const handleEdit = (employee: Employee) => {
-    console.log("Edit:", employee);
-  };
-
+ 
   const handleDelete = async (employee: Employee) => {
     try {
       const response = await fetch(`/api/employee?id=${employee.id}`, {
@@ -56,8 +54,8 @@ export function useDepartmentEmployees() {
       });
       if (!response.ok) throw new Error("Failed to delete employee");
       setEmployees(employees.filter((emp) => emp.id !== employee.id));
-    } catch (error) {
-      console.error("Error deleting employee:", error);
+    } catch {
+      toast.error("Error deleting employee");
     }
   };
 
@@ -82,7 +80,6 @@ export function useDepartmentEmployees() {
     actualTotalRecords,
     setCurrentPage,
     setRecordsPerPage,
-    handleEdit,
     handleDelete,
     handleView,
   };

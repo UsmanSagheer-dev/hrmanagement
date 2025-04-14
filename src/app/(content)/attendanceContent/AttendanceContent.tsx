@@ -15,7 +15,7 @@ const AttendanceContent: React.FC<{ employeeId?: string }> = ({
   const formatAttendanceData = (
     data: AttendanceRecord[]
   ): FormattedAttendanceRecord[] => {
-    return data.map((record) => {
+    return data?.map((record) => {
       let workingHours = "N/A";
       let breakTime = "N/A";
 

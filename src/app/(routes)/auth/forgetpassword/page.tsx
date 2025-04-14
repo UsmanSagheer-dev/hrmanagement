@@ -10,7 +10,7 @@ function ResetPassword() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams?.get("email") || "";
-  
+
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,7 +30,6 @@ function ResetPassword() {
     setMessage("");
     setError("");
 
-    // Validate inputs
     if (!otp || !newPassword || !confirmPassword) {
       setError("All fields are required");
       setLoading(false);
@@ -51,7 +50,7 @@ function ResetPassword() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         setMessage("Password reset successfully");
         setTimeout(() => {
@@ -108,10 +107,10 @@ function ResetPassword() {
             value={confirmPassword}
             onChange={setConfirmPassword}
           />
-          
+
           {error && <p className="text-red-500 text-center">{error}</p>}
           {message && <p className="text-green-500 text-center">{message}</p>}
-          
+
           <Button title="RESET PASSWORD" disabled={loading} />
         </form>
       </div>

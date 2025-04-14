@@ -9,6 +9,7 @@ import Image from "next/image";
 import EmployeeTableToolbar from "../../../components/employeeTableToolbar/EmployeeTableToolbar";
 import { Employee } from "@/app/types/types";
 import { useEmployees } from "./useEmployees";
+import toast from "react-hot-toast";
 
 function Page() {
   const {
@@ -41,7 +42,7 @@ function Page() {
                 width={32}
                 height={32}
                 className="object-cover"
-                onError={() => console.error("Image failed to load")}
+                onError={() => toast.error("Image failed to load")}
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-light">

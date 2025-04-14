@@ -45,7 +45,6 @@ export async function POST(req) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("CHANGE_ROLE_ERROR:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

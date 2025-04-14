@@ -4,6 +4,7 @@ import Table from "../table/Table";
 import Image from "next/image";
 import { Employee } from "@/app/types/types";
 import { useEmployeeDashboardData } from "./useEmployeeDashboardData";
+import toast from "react-hot-toast";
 
 const EmployeeDashboardTable: React.FC = () => {
   const { employees, isLoading, error } = useEmployeeDashboardData();
@@ -22,7 +23,7 @@ const EmployeeDashboardTable: React.FC = () => {
                 width={32}
                 height={32}
                 className="object-cover"
-                onError={() => console.error("Image failed to load")}
+                onError={() => toast.error("Image failed to load")}
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-light">
@@ -80,7 +81,7 @@ const EmployeeDashboardTable: React.FC = () => {
       ) : error ? (
         <div className="text-center text-red-500 py-10">{error}</div>
       ) : employees.length === 0 ? (
-        <div className="text-center text-gray-400 py-10">
+        <div className="text-center text-gray-400 py-10 flex items-center justify-center">
           No employee records found
         </div>
       ) : (

@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("Error checking employee ID:", error);
     return NextResponse.json(
       { 
         error: "Validation Error",

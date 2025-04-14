@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Department, Member } from "@/app/types/types";
+import toast from "react-hot-toast";
 
 export function useDepartments() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export function useDepartments() {
 
         setDepartments(deptArray);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        toast.error("Error fetching employees");
       } finally {
         setLoading(false);
       }

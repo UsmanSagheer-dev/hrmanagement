@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
+import toast from "react-hot-toast";
 
 function determineAttendanceStatus(
   checkInTime: string | null
@@ -185,7 +186,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Error recording attendance:", error);
+    toast.error("Error recording attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to record attendance" },
       { status: 500 }
@@ -258,7 +259,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(attendanceRecords);
   } catch (error: any) {
-    console.error("Error fetching attendance data:", error);
+    toast.error("Error fetching attendance data");
     return NextResponse.json(
       { error: error.message || "Failed to fetch attendance data" },
       { status: 500 }
@@ -337,7 +338,7 @@ export async function PUT(req: NextRequest) {
       attendance: updatedAttendance,
     });
   } catch (error: any) {
-    console.error("Error updating attendance:", error);
+    toast.error("Error updating attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to update attendance" },
       { status: 500 }
@@ -345,7 +346,6 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE: Delete attendance record (admin only)
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -353,7 +353,6 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
@@ -384,7 +383,7 @@ export async function DELETE(req: NextRequest) {
       message: "Attendance record deleted successfully",
     });
   } catch (error: any) {
-    console.error("Error deleting attendance:", error);
+    toast.error("Error deleting attendance");
     return NextResponse.json(
       { error: error.message || "Failed to delete attendance record" },
       { status: 500 }
