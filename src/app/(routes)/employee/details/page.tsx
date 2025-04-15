@@ -81,7 +81,7 @@ function Page() {
   ];
 
   return (
-    <div className="h-screen bg-[#131313] p-[20px]">
+    <div className="h-screen bg-[#131313] p-[15px]">
       <div className="w-full h-full flex justify-between gap-3">
         <div>
           <Sidebar />
@@ -92,7 +92,7 @@ function Page() {
             description="All Employee Information"
           />
 
-          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
+          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-3 flex flex-col">
             <div className="mb-4 flex-shrink-0">
               <EmployeeTableToolbar
                 onSearch={handleSearch}

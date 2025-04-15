@@ -10,7 +10,6 @@ import {
 } from "recharts";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import Button from "../button/Button";
-
 import { useEffect, useState } from "react";
 import useDashboardChart from "./useDashboardChart";
 import Loader from "../loader/Loader";
@@ -74,7 +73,7 @@ export default function AttendanceOverview() {
             onChange={(e) => setSelectedDay(e.target.value)}
           >
             <option value="All">All Days</option>
-            {daysOfWeek.map((day) => (
+            {daysOfWeek?.map((day) => (
               <option key={day} value={day}>
                 {day}
               </option>
@@ -91,7 +90,7 @@ export default function AttendanceOverview() {
 
       <div className="h-96 w-full flex items-center justify-center">
         {isLoading ? (
-         <Loader/>
+          <Loader />
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : chartData.length === 0 ? (
@@ -107,12 +106,41 @@ export default function AttendanceOverview() {
               <XAxis dataKey="name" tick={{ fill: "#9CA3AF" }} />
               <YAxis tick={{ fill: "#9CA3AF" }} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="low" stackId="a" fill="#F97316" radius={[30, 30, 30, 30]} />
-              <Bar dataKey="medium" stackId="a" fill="#FBBF24" radius={[30, 30, 30, 30]} />
-              <Bar dataKey="high" stackId="a" fill="#F45B69" radius={[30, 30, 30, 30]} />
+              <Bar
+                dataKey="low"
+                stackId="a"
+                fill="#F97316"
+                radius={[30, 30, 30, 30]}
+              />
+              <Bar
+                dataKey="medium"
+                stackId="a"
+                fill="#FBBF24"
+                radius={[30, 30, 30, 30]}
+              />
+              <Bar
+                dataKey="high"
+                stackId="a"
+                fill="#F45B69"
+                radius={[30, 30, 30, 30]}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
+      </div>
+      <div className="flex mt-4 gap-2 text-sm items-center justify-center">
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-[#F45B69] rounded-full mr-1"></div>
+          <span>On Time</span>
+        </div>
+        <div className="flex  items-center ">
+          <div className="w-3 h-3 bg-[#FBBF24] rounded-full mr-1"></div>
+          <span>Late</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-[#F97316] rounded-full mr-1"></div>
+          <span>Absent</span>
+        </div>
       </div>
     </div>
   );

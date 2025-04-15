@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-
 export type AttendanceStatus = "ON_TIME" | "LATE" | "ABSENT";
 
 export interface AttendanceRecord {

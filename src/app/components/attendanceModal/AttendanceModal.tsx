@@ -5,7 +5,6 @@ import { useAttendanceModal } from "./useAttendanceModal";
 import { AttendanceModalProps } from "@/app/types/types";
 import { AttendanceStatus } from "@/app/constants/constants";
 
-
 const AttendanceModal: React.FC<AttendanceModalProps> = ({
   employee,
   onClose,
@@ -55,7 +54,8 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
             </select>
             {status === "ABSENT" && (
               <p className="text-xs text-orange-400 mt-1">
-                Check-in and check-out times will be cleared for absent employees.
+                Check-in and check-out times will be cleared for absent
+                employees.
               </p>
             )}
           </div>

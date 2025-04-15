@@ -39,6 +39,42 @@ function determineAttendanceStatus(
   }
 }
 
+async function markAbsentEmployees() {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    
+    const employees = await db.employee.findMany({
+      select: { id: true }
+    });
+    
+    for (const employee of employees) {
+      const attendanceRecord = await db.attendance.findFirst({
+        where: {
+          employeeId: employee.id,
+          date: today
+        }
+      });
+      
+      if (!attendanceRecord) {
+        await db.attendance.create({
+          data: {
+            employeeId: employee.id,
+            date: today,
+            checkInTime: null,
+            checkOutTime: null,
+            status: "ABSENT"
+          }
+        });
+      }
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error marking absent employees:", error);
+    return { success: false, error };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -56,7 +92,18 @@ export async function POST(req: NextRequest) {
 
     const isAdmin = user?.role === "Admin";
     const data = await req.json();
-    const { employeeId, date, checkInTime, checkOutTime, status } = data;
+    const { employeeId, date, checkInTime, checkOutTime, status, autoMarkAbsent } = data;
+    
+    // If the autoMarkAbsent flag is set, run the absent marking function
+    if (autoMarkAbsent && isAdmin) {
+      const result = await markAbsentEmployees();
+      return NextResponse.json({
+        message: result.success 
+          ? "Absent employees marked successfully" 
+          : "Failed to mark absent employees",
+        success: result.success
+      });
+    }
 
     if (isAdmin && employeeId) {
       const employee = await db.employee.findUnique({

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import { UseAttendanceModalProps } from "@/app/types/types";
 import { AttendanceStatus } from "@/app/constants/constants";
 
