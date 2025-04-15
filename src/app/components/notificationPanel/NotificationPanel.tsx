@@ -1,5 +1,6 @@
-import React from "react";
-import { Notification } from "../../hooks/useNotifications";
+import React, { useState } from "react";
+import { Notification } from "../../types/types";
+import NotificationDetail from "@/app/(routes)/notificationDetail/NotificationDetail";
 
 interface NotificationPanelProps {
   notifications: Notification[];
@@ -16,6 +17,8 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
   isAdmin = false,
   getFormattedTimeAgo,
 }) => {
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "EMPLOYEE_REQUEST":
@@ -52,6 +55,30 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
     }
   };
 
+  const handleNotificationClick = (notification: Notification) => {
+    if (notification.type === "EMPLOYEE_REQUEST") {
+      setSelectedNotification(notification);
+    }
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedNotification(null);
+  };
+
+  const handleApprove = (notificationId: string) => {
+    if (onApprove) {
+      onApprove(notificationId);
+      handleCloseDetail();
+    }
+  };
+
+  const handleReject = (notificationId: string) => {
+    if (onReject) {
+      onReject(notificationId);
+      handleCloseDetail();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {notifications.length === 0 ? (
@@ -64,7 +91,10 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
             key={notification.id}
             className={`p-4 border-b border-[#A2A1A833] hover:bg-[#222222] transition-colors duration-200 ${
               notification.read ? "opacity-70" : ""
+            } ${
+              notification.type === "EMPLOYEE_REQUEST" ? "cursor-pointer" : ""
             }`}
+            onClick={() => handleNotificationClick(notification)}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-3">
@@ -82,16 +112,28 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                     {notification.message}
                   </p>
                   
-                  {isAdmin && notification.status === "PENDING" && (
+                  {notification.type === "EMPLOYEE_REQUEST" && (
+                    <p className="text-blue-400 text-sm">
+                      Click to view employee details
+                    </p>
+                  )}
+                  
+                  {isAdmin && notification.status === "PENDING" && notification.type !== "EMPLOYEE_REQUEST" && (
                     <div className="flex gap-2 mt-2">
                       <button
-                        onClick={() => onApprove && onApprove(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onApprove && onApprove(notification.id);
+                        }}
                         className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => onReject && onReject(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReject && onReject(notification.id);
+                        }}
                         className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
                       >
                         Reject
@@ -106,6 +148,16 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
             </div>
           </div>
         ))
+      )}
+
+      {selectedNotification && (
+        <NotificationDetail 
+          notification={selectedNotification}
+          onClose={handleCloseDetail}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          isAdmin={isAdmin}
+        />
       )}
     </div>
   );
