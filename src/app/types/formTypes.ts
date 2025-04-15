@@ -74,3 +74,10 @@ export type FormDataAccount = {
 
 
 
+export interface UseEmployeeFormReturn {
+  userRole: string | null;
+  loading: boolean;
+  error: string | null;
+  renderContent: () => JSX.Element;
+  showHeaderAndSidebar: boolean;
+}

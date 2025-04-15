@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
+import toast from "react-hot-toast";
 
 function determineAttendanceStatus(
   checkInTime: string | null
@@ -38,6 +39,42 @@ function determineAttendanceStatus(
   }
 }
 
+async function markAbsentEmployees() {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    
+    const employees = await db.employee.findMany({
+      select: { id: true }
+    });
+    
+    for (const employee of employees) {
+      const attendanceRecord = await db.attendance.findFirst({
+        where: {
+          employeeId: employee.id,
+          date: today
+        }
+      });
+      
+      if (!attendanceRecord) {
+        await db.attendance.create({
+          data: {
+            employeeId: employee.id,
+            date: today,
+            checkInTime: null,
+            checkOutTime: null,
+            status: "ABSENT"
+          }
+        });
+      }
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error marking absent employees:", error);
+    return { success: false, error };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -55,7 +92,18 @@ export async function POST(req: NextRequest) {
 
     const isAdmin = user?.role === "Admin";
     const data = await req.json();
-    const { employeeId, date, checkInTime, checkOutTime, status } = data;
+    const { employeeId, date, checkInTime, checkOutTime, status, autoMarkAbsent } = data;
+    
+    // If the autoMarkAbsent flag is set, run the absent marking function
+    if (autoMarkAbsent && isAdmin) {
+      const result = await markAbsentEmployees();
+      return NextResponse.json({
+        message: result.success 
+          ? "Absent employees marked successfully" 
+          : "Failed to mark absent employees",
+        success: result.success
+      });
+    }
 
     if (isAdmin && employeeId) {
       const employee = await db.employee.findUnique({
@@ -185,7 +233,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Error recording attendance:", error);
+    toast.error("Error recording attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to record attendance" },
       { status: 500 }
@@ -258,7 +306,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(attendanceRecords);
   } catch (error: any) {
-    console.error("Error fetching attendance data:", error);
+    toast.error("Error fetching attendance data");
     return NextResponse.json(
       { error: error.message || "Failed to fetch attendance data" },
       { status: 500 }
@@ -337,7 +385,7 @@ export async function PUT(req: NextRequest) {
       attendance: updatedAttendance,
     });
   } catch (error: any) {
-    console.error("Error updating attendance:", error);
+    toast.error("Error updating attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to update attendance" },
       { status: 500 }
@@ -345,7 +393,6 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE: Delete attendance record (admin only)
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -353,7 +400,6 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
@@ -384,7 +430,7 @@ export async function DELETE(req: NextRequest) {
       message: "Attendance record deleted successfully",
     });
   } catch (error: any) {
-    console.error("Error deleting attendance:", error);
+    toast.error("Error deleting attendance");
     return NextResponse.json(
       { error: error.message || "Failed to delete attendance record" },
       { status: 500 }

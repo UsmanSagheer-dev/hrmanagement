@@ -67,14 +67,14 @@ function Login() {
               />
               <p className="text-white text-[16px] font-light">Remember me</p>
             </div>
-            <Link href="/auth/forgetPassword" className="text-orange-500">
+            <Link href="/auth/forgetpassword" className="text-orange-500">
               Forgot Password?
             </Link>
           </div>
 
           <div className="flex items-center justify-center w-full px-4 mt-[30px]">
             <Button
-              title={loading ? <Loader/> : "Login"}
+              title={loading ? <Loader /> : "Login"}
               disabled={loading}
               type="submit"
             />

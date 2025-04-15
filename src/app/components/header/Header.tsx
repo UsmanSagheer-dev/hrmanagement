@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import Button from "../components/button/Button";
+import Button from "../button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import SearchBar from "../components/searchBar/SearchBar";
-import UserProfileDropdown from "../components/userProfileDropdown/UserProfileDropdown";
+import SearchBar from "../searchBar/SearchBar";
+import UserProfileDropdown from "../userProfileDropdown/UserProfileDropdown";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { useNotifications } from "@/app/hooks/useNotifications";
-import { HeaderProps } from "../types/types";
+import { HeaderProps } from "../../types/types";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,10 +18,6 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
   };
 
   const renderDescriptionWithIcon = () => {

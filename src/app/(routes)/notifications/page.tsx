@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import Header from "../../header/Header";
+import Header from "../../components/header/Header";
 import NotificationPanel from "../../components/notificationPanel/NotificationPanel";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useSession } from "next-auth/react";

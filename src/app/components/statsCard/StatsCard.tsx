@@ -1,13 +1,7 @@
+import { StatsCardProps } from "@/app/types/types";
 import React, { JSX } from "react";
-import { FaUsers, FaUser, FaCalendarCheck, FaFolder } from "react-icons/fa"; // Import all four icons
+import { FaUsers, FaUser, FaCalendarCheck, FaFolder } from "react-icons/fa"; 
 
-interface StatsCardProps {
-  title: string;
-  value: number;
-  percentage: string;
-  percentageColor: "green" | "red";
-  updateDate: string;
-}
 
 const StatsCard: React.FC<StatsCardProps> = ({
   title,

@@ -8,14 +8,6 @@ import { MdLockOpen } from "react-icons/md";
 import InputField from "../../components/inputField/InputField";
 import Button from "../../components/button/Button";
 import { PersonalInformationFormProps } from "../../types/formTypes";
-import {
-  maritalStatusOptions,
-  genderOptions,
-  nationalityOptions,
-  cityOptions,
-  stateOptions,
-  zipCodeOptions,
-} from "../../constants/formConstants";
 import { usePersonalInformationForm } from "./usePersonalInformationForm";
 import { inputFields } from "@/app/constants/inputFields";
 
@@ -80,8 +72,6 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       <span>{title}</span>
     </button>
   );
-
- 
 
   return (
     <div className="h-[84vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">

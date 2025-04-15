@@ -37,7 +37,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (err: any) {
-    console.log("REGISTER_ERR: ", err);
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }
@@ -70,7 +69,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json(adminUser, { status: 200 });
   } catch (err: any) {
-    console.log("GET_ADMIN_ERR: ", err);
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }
@@ -114,7 +112,6 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (err: any) {
-    console.log("UPDATE_ADMIN_ERR: ", err);
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }
@@ -144,7 +141,6 @@ export async function DELETE(req: Request) {
       { status: 200 }
     );
   } catch (err: any) {
-    console.log("DELETE_ADMIN_ERR: ", err);
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }

@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); 
 
     await db.user.update({
       where: { id: user.id },
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (err: any) {
-    console.log("FORGOT_PASSWORD_ERR: ", err);
+
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }

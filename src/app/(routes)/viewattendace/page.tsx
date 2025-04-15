@@ -1,142 +1,33 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import Header from "../../header/Header";
+import Header from "../../components/header/Header";
 import Table from "../../components/table/Table";
 import Pagination from "../../components/pagination/Pagination";
 import Image from "next/image";
 import SearchBar from "../../components/searchBar/SearchBar";
-import { toast } from "react-toastify";
-import { useAttendance } from "../../hooks/useAttendance";
 import AttendanceModal from "@/app/components/attendanceModal/AttendanceModal";
-import { AttendanceStatus } from "@/app/constants/constants";
-
-export interface Employee {
-  id: string;
-  firstName: string;
-  lastName: string;
-  designation: string;
-  employeeType: string;
-  checkInTime: string | null;
-  status: AttendanceStatus;
-  profileImage?: string;
-}
+import { Employee } from "@/app/types/types";
+import { useAttendanceManagement } from "./useAttendanceManagement";
+import toast from "react-hot-toast";
 
 function ViewAttendance() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage, setRecordsPerPage] = useState(5);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { fetchAllAttendance, updateAttendance, createAttendance } = useAttendance();
-
-  const fetchEmployees = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const attendanceData = await fetchAllAttendance(today);
-
-      const employeeResponse = await fetch("/api/employee");
-      if (!employeeResponse.ok) {
-        throw new Error("Failed to fetch employees");
-      }
-      const employeeData = await employeeResponse.json();
-
-      const employeesWithAttendance = employeeData.map((employee: any) => {
-        const attendance = attendanceData.find(
-          (record: any) => record.employeeId === employee.id
-        );
-        return {
-          id: employee.id,
-          firstName: employee.firstName,
-          lastName: employee.lastName,
-          designation: employee.designation,
-          employeeType: employee.employeeType,
-          checkInTime: attendance?.checkInTime || null,
-          status: (attendance?.status || "ABSENT") as AttendanceStatus,
-          profileImage: employee.profileImage,
-        };
-      });
-
-      setEmployees(employeesWithAttendance);
-      setIsLoading(false);
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching employees");
-      toast.error("Failed to load employee data");
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
-  const filteredEmployees = employees.filter((employee) => {
-    if (!searchQuery) return true;
-
-    const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
-    const searchLower = searchQuery.toLowerCase();
-
-    return (
-      fullName.includes(searchLower) ||
-      employee.designation.toLowerCase().includes(searchLower) ||
-      employee.employeeType.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const startIndex = (currentPage - 1) * recordsPerPage;
-  const paginatedData = filteredEmployees.slice(
-    startIndex,
-    startIndex + recordsPerPage
-  );
-
-  const handleRowClick = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setIsModalOpen(true);
-  };
-
-  const handleSaveAttendance = async (data: {
-    employeeId: string;
-    checkInTime?: string | null;
-    checkOutTime?: string | null;
-    status?: AttendanceStatus;
-  }) => {
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const existingRecords = await fetchAllAttendance(today);
-      const existingRecord = existingRecords.find(
-        (record: any) => record.employeeId === data.employeeId
-      );
-
-      if (existingRecord) {
-        await updateAttendance(existingRecord.id, {
-          checkInTime: data.checkInTime,
-          checkOutTime: data.checkOutTime,
-          status: data.status,
-        });
-      } else {
-        await createAttendance(data.employeeId, {
-          date: today,
-          checkInTime: data.checkInTime,
-          checkOutTime: data.checkOutTime,
-          status: data.status,
-        });
-      }
-      await fetchEmployees();
-    } catch (error) {
-      throw new Error("Failed to save attendance");
-    }
-  };
+  const {
+    isLoading,
+    error,
+    currentPage,
+    recordsPerPage,
+    paginatedData,
+    filteredEmployees,
+    selectedEmployee,
+    isModalOpen,
+    setCurrentPage,
+    setRecordsPerPage,
+    setIsModalOpen,
+    handleSearch,
+    handleRowClick,
+    handleSaveAttendance,
+  } = useAttendanceManagement();
 
   const columns = [
     {
@@ -155,7 +46,7 @@ function ViewAttendance() {
                 width={32}
                 height={32}
                 className="object-cover"
-                onError={() => console.error("Image failed to load")}
+                onError={() => toast.error("Image failed to load")}
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-light">
@@ -183,8 +74,8 @@ function ViewAttendance() {
             employee.status === "ON_TIME"
               ? "text-green-500 bg-green-500/10"
               : employee.status === "LATE"
-              ? "text-red-500 bg-red-500/10"
-              : "text-gray-500 bg-gray-500/10"
+              ? "text-yellow-500 bg-red-500/10"
+              : "text-red-800 bg-gray-500/10"
           }`}
         >
           {employee.status.replace("_", " ")}

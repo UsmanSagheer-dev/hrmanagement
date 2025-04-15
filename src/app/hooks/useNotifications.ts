@@ -2,25 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
-
-export interface Notification {
-  id: string;
-  type: "EMPLOYEE_REQUEST" | "LEAVE_REQUEST" | "GENERAL";
-  title: string;
-  message: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "READ";
-  sourceId?: string;
-  targetId?: string;
-  createdAt: string;
-  updatedAt: string;
-  read: boolean;
-  employee?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    profileImage?: string;
-  };
-}
+import { Notification } from "../types/types";
 
 export function useNotifications(initialFilter?: {
   status?: string;
@@ -83,7 +65,7 @@ export function useNotifications(initialFilter?: {
       const data = await response.json();
       setNotifications(data);
     } catch (err: any) {
-      console.error("Error fetching notifications:", err);
+      toast.error("Error fetching notifications:", err);
       setError(err.message || "Failed to fetch notifications");
     } finally {
       setIsLoading(false);
@@ -108,8 +90,8 @@ export function useNotifications(initialFilter?: {
 
       const data = await response.json();
       setUnreadCount(data.length);
-    } catch (err: any) {
-      console.error("Error fetching unread notification count:", err);
+    } catch  {
+      toast.error("Error fetching unread notification count:");
     }
   }, [sessionStatus]);
 
@@ -141,8 +123,8 @@ export function useNotifications(initialFilter?: {
       setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
 
       return true;
-    } catch (err: any) {
-      console.error("Error marking notification as read:", err);
+    } catch  {
+    toast.error("Error marking notification as read");
       toast.error("Failed to update notification");
       return false;
     }
@@ -184,8 +166,8 @@ export function useNotifications(initialFilter?: {
         const actionText = action === "approve" ? "approved" : "rejected";
         toast.success(`Request ${actionText} successfully`);
         return true;
-      } catch (err: any) {
-        console.error(`Error ${action}ing notification:`, err);
+      } catch  {
+  
         toast.error(`Failed to ${action} request`);
         return false;
       }

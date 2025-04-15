@@ -20,6 +20,7 @@ export type UserData = {
     absentDays: number;
     lastCheckIn: string;
   };
+  
   appointmentLetter?: string | null;
   salarySlips?: string | null;
   relievingLetter?: string | null;
@@ -37,6 +38,9 @@ export type UserData = {
   slackId?: string;
   skypeId?: string;
   githubId?: string;
+  avatar?: string | null;
+  role?: string;
+  name?: string | null;
 };
 
 export type EmployeeData = {
@@ -67,12 +71,11 @@ export interface User {
 export interface AttendanceRecord {
   date: string;
   checkIn: string;
-  checkOut: string;
+  checkOut?: string;
   breakTime: string;
   workingHours: string;
   status: string;
 }
-
 export interface Column<T> {
   key: keyof T | string;
   header: string;
@@ -145,7 +148,6 @@ export type FileUploadProps = {
   onFileUpload: (file: File, id: string) => void;
 };
 
-
 export interface HeaderProps {
   title: string;
   description: string;
@@ -163,14 +165,12 @@ export interface Employee {
   employeeType: string;
   workEmail: string;
   profileImage: string | null;
+  image: string | null;
 
   checkInTime: string | null;
-    status: AttendanceStatus;
-    avatar: string | null;
+  status: AttendanceStatus;
+  avatar: string | null;
 }
-
-
-
 
 export interface AttendanceModalProps {
   employee: {
@@ -187,7 +187,6 @@ export interface AttendanceModalProps {
   }) => Promise<void>;
 }
 
-
 export interface UseAttendanceModalProps {
   employeeId: string;
   onSave: (data: {
@@ -198,8 +197,6 @@ export interface UseAttendanceModalProps {
   }) => Promise<void>;
   onClose: () => void;
 }
-
-
 
 export interface ChartItem {
   name: string;
@@ -215,4 +212,92 @@ export interface FormattedAttendanceRecord {
   breakTime: string;
   workingHours: string;
   status: string;
+}
+
+export interface LeaveRecord {
+  date: string;
+  duration: string;
+  days: string;
+  reportingManager: string;
+  status: string;
+}
+
+export interface Member {
+  id: number;
+  name: string;
+  title: string;
+  imageUrl: string;
+}
+
+export interface employee {
+  id: string;
+  name: string;
+  designation: string;
+  type: string;
+  status: string;
+  image?: string;
+}
+
+
+
+export interface DepartmentListProps {
+  departmentName: string;
+  members: Member[];
+  totalMembers: number;
+  onViewAll?: () => void;
+}
+
+export interface Department {
+  name: string;
+  members: Member[];
+  totalMembers: number;
+}
+
+export interface StatsCardProps {
+  title: string;
+  value: number;
+  percentage: string;
+  percentageColor: "green" | "red";
+  updateDate: string;
+}
+
+ export interface Props {
+  initialUserData?: UserData | null;
+}
+
+export interface Notification {
+  id: string;
+  type: "EMPLOYEE_REQUEST" | "LEAVE_REQUEST" | "GENERAL";
+  title: string;
+  message: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "READ";
+  sourceId?: string;
+  targetId?: string;
+  createdAt: string;
+  updatedAt: string;
+  read: boolean;
+  employee?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImage?: string;
+  };
+}
+
+
+export interface NotificationDetailProps {
+  notification: Notification;
+  onClose: () => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+  isAdmin: boolean;
+}
+
+
+export interface MenuItem {
+  id: number;
+  name: string;
+  icon: React.ReactNode;
+  path: string;
+  roles: string[];
 }

@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
           const url = await uploadToCloudinary(value as string);
           return { key, url };
         } catch (error) {
-          console.error(`Error uploading ${key}:`, error);
           return { key, url: null, error };
         }
       });
@@ -40,10 +39,6 @@ export async function POST(req: NextRequest) {
     }, {} as Record<string, string>);
 
     const failedUploads = uploadResults.filter((result) => !result.url);
-    if (failedUploads.length > 0) {
-      const failedDocs = failedUploads.map((f) => f.key).join(", ");
-      console.error(`Failed to upload documents: ${failedDocs}`);
-    }
 
     const existingPendingEmployee = await db.pendingEmployee.findUnique({
       where: { userId: session.user.id },
@@ -175,13 +170,13 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Error saving employee data:", error);
     return NextResponse.json(
       { error: error.message || "Failed to save employee data" },
       { status: 500 }
     );
   }
 }
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -191,11 +186,10 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const department = searchParams.get("department");
 
     if (id) {
-      const employee = await db.employee.findUnique({
-        where: { id },
-      });
+      const employee = await db.employee.findUnique({ where: { id } });
 
       if (!employee) {
         return NextResponse.json(
@@ -207,13 +201,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(employee);
     }
 
+    if (department) {
+      const employees = await db.employee.findMany({
+        where: { department },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json(employees);
+    }
+
     const employees = await db.employee.findMany({
       orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(employees);
   } catch (error: any) {
-    console.error("Error fetching employee data:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch employee data" },
       { status: 500 }
@@ -271,7 +272,6 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "Employee deleted successfully" });
   } catch (error: any) {
-    console.error("Error deleting employee:", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete employee" },
       { status: 500 }

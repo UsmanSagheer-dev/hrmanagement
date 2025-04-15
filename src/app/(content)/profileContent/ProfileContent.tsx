@@ -8,6 +8,7 @@ import FileList from "../../components/fileList/FileList";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserData from "./useUserData";
+import Loader from "@/app/components/loader/Loader";
 
 const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
   <button
@@ -17,7 +18,9 @@ const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
     } pb-2 mr-6`}
   >
     <div
-      className={`w-6 h-6 ${isActive ? "text-[#E25319]" : "border-none"} flex items-center justify-center mr-2`}
+      className={`w-6 h-6 ${
+        isActive ? "text-[#E25319]" : "border-none"
+      } flex items-center justify-center mr-2`}
     >
       <Icon className="text-lg" />
     </div>
@@ -28,7 +31,9 @@ const NavigationTab = ({ Icon, title, tabName, isActive, onClick }: any) => (
 const InfoSection = ({ label, value }: { label: string; value: any }) => (
   <div className="mb- border-b-[1px] border-[#A2A1A81A]">
     <p className="text-gray-500 text-sm font-light mb-1">{label}</p>
-    <p className="text-white text-[16px] font-light mb-[8px]">{value || "N/A"}</p>
+    <p className="text-white text-[16px] font-light mb-[8px]">
+      {value || "N/A"}
+    </p>
   </div>
 );
 
@@ -37,7 +42,7 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
   setActiveProfileTab,
   employeeId,
 }) => {
-  const { userData, loading, error } = useUserData(employeeId); 
+  const { userData, loading, error } = useUserData(employeeId);
 
   const getDocumentFiles = () => {
     if (!userData) return [];
@@ -66,7 +71,7 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
   };
 
   const renderProfileTabContent = () => {
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="mt-6 flex justify-center items-center h-auto"><Loader/></div>;
     if (error) return <div>Error: {error}</div>;
     if (!userData) return <div>No data available</div>;
 
@@ -80,9 +85,16 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
             <InfoSection label="Email Address" value={userData.email} />
             <InfoSection
               label="Date of Birth"
-              value={userData.dateOfBirth ? new Date(userData.dateOfBirth).toLocaleDateString() : null}
+              value={
+                userData.dateOfBirth
+                  ? new Date(userData.dateOfBirth).toLocaleDateString()
+                  : null
+              }
             />
-            <InfoSection label="Marital Status" value={userData.maritalStatus} />
+            <InfoSection
+              label="Marital Status"
+              value={userData.maritalStatus}
+            />
             <InfoSection label="Gender" value={userData.gender} />
             <InfoSection label="Nationality" value={userData.nationality} />
             <InfoSection label="Address" value={userData.address} />
@@ -103,9 +115,16 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
             <InfoSection label="Working Days" value={userData.workingDays} />
             <InfoSection
               label="Joining Date"
-              value={userData.joiningDate ? new Date(userData.joiningDate).toLocaleDateString() : null}
+              value={
+                userData.joiningDate
+                  ? new Date(userData.joiningDate).toLocaleDateString()
+                  : null
+              }
             />
-            <InfoSection label="Office Location" value={userData.officeLocation} />
+            <InfoSection
+              label="Office Location"
+              value={userData.officeLocation}
+            />
           </div>
         );
       case "documents":

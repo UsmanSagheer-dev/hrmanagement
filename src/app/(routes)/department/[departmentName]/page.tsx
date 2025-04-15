@@ -8,62 +8,57 @@ import RowActions from "../../../components/rowActions/RowActions";
 import Image from "next/image";
 import EmployeeTableToolbar from "../../../components/employeeTableToolbar/EmployeeTableToolbar";
 import { Employee } from "@/app/types/types";
-import { useEmployees } from "./useEmployees";
-import toast from "react-hot-toast";
+import { useDepartmentEmployees } from "@/app/hooks/useDepartmentEmployees";
 
-function Page() {
+function ViewDepartment() {
   const {
-    isLoading,
-    error,
+    departmentName,
+    loading,
+    paginatedData,
     currentPage,
     recordsPerPage,
-    filteredEmployees,
-    paginatedData,
-    handleSearch,
-    handleFilter,
+    actualTotalRecords,
+    setCurrentPage,
+    setRecordsPerPage,
     handleEdit,
     handleDelete,
     handleView,
-    setCurrentPage,
-    setRecordsPerPage,
-  } = useEmployees();
+  } = useDepartmentEmployees();
 
   const columns = [
+    { key: "id", header: "Employee ID" },
     {
       key: "name",
       header: "Employee Name",
       render: (employee: Employee) => (
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700 mr-2">
-            {employee.profileImage ? (
+            {employee.image ? (
               <Image
-                src={employee.profileImage}
-                alt={`${employee.firstName} ${employee.lastName}`}
+                src={employee.image}
+                alt={employee.name}
                 width={32}
                 height={32}
                 className="object-cover"
-                onError={() => toast.error("Image failed to load")}
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-light">
-                {employee.firstName.charAt(0)}
+                {employee.name.charAt(0)}
               </div>
             )}
           </div>
-          {`${employee.firstName} ${employee.lastName}`}
+          {employee.name}
         </div>
       ),
     },
-    
-    { key: "department", header: "Department" },
     { key: "designation", header: "Designation" },
-    { key: "employeeType", header: "Type" },
+    { key: "type", header: "Type" },
     {
       key: "status",
       header: "Status",
       render: (employee: Employee) => (
-        <span className="text-orange-500 bg-[#E253191A] p-1 rounded-[4px] text-[16px] font-light">
-          {employee.status || "Permanent"}
+        <span className="text-orange-500 bg-[#E253191Acrit p-1 rounded-[4px] text-[16px] font-light">
+          {employee.status}
         </span>
       ),
     },
@@ -81,47 +76,35 @@ function Page() {
   ];
 
   return (
-    <div className="h-screen bg-[#131313] p-[15px]">
+    <div className="h-screen bg-[#131313] p-[20px]">
       <div className="w-full h-full flex justify-between gap-3">
         <div>
           <Sidebar />
         </div>
         <div className="w-full">
-          <Header
-            title="All Employees"
-            description="All Employee Information"
-          />
-
-          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-3 flex flex-col">
+          <div className="w-full">
+            <Header
+              title={`${departmentName} Department`}
+              description={`All Departments > ${departmentName} Department`}
+            />
+          </div>
+          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col">
             <div className="mb-4 flex-shrink-0">
-              <EmployeeTableToolbar
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-              />
+              <EmployeeTableToolbar />
             </div>
-
             <div className="flex-grow overflow-auto hide-vertical-scrollbar">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-                </div>
-              ) : error ? (
-                <div className="text-center text-red-500 py-10">{error}</div>
-              ) : paginatedData.length === 0 ? (
-                <div className="text-center text-gray-400 py-10">
-                  No employees found
-                </div>
+              {loading ? (
+                <p className="text-white">Loading...</p>
               ) : (
                 <Table data={paginatedData} columns={columns} />
               )}
             </div>
-
             <div className="mt-4 flex-shrink-0">
               <Pagination
                 currentPage={currentPage}
                 recordsPerPage={recordsPerPage}
-                totalRecords={filteredEmployees.length}
-                onPageChange={setCurrentPage}
+                totalRecords={actualTotalRecords}
+                onPageChange={(page) => setCurrentPage(page)}
                 onRecordsPerPageChange={(newRecords) => {
                   setRecordsPerPage(newRecords);
                   setCurrentPage(1);
@@ -135,4 +118,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default ViewDepartment;

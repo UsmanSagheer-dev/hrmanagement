@@ -15,12 +15,8 @@ export const GET = async (req: Request) => {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    console.log("GET /api/profile - Session:", {
-      id: session.user.id,
-      email: session.user.email,
-    });
-
     let user = null;
+
     if (session.user.id) {
       user = await db.user.findUnique({
         where: { id: session.user.id },
@@ -52,17 +48,11 @@ export const GET = async (req: Request) => {
     }
 
     if (!user) {
-      console.error("User not found for:", {
-        id: session.user.id,
-        email: session.user.email,
-      });
-
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("PROFILE_FETCH_ERROR:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -78,11 +68,6 @@ export const PUT = async (req: Request) => {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    console.log("PUT /api/profile - Session:", {
-      id: session.user.id,
-      email: session.user.email,
-    });
-
     const { name, role, avatar } = await req.json();
 
     if (role && session.user.role !== "Admin") {
@@ -93,6 +78,7 @@ export const PUT = async (req: Request) => {
     }
 
     let user = null;
+
     if (session.user.id) {
       user = await db.user.findUnique({
         where: { id: session.user.id },
@@ -123,17 +109,13 @@ export const PUT = async (req: Request) => {
 
     if (avatar && avatar !== user.avatar) {
       try {
-        console.log("Uploading new avatar to Cloudinary");
-
         const avatarUrl = await uploadToCloudinary(avatar);
         updateData.avatar = avatarUrl;
 
         if (user.avatar && user.avatar.includes("cloudinary.com")) {
-          console.log("Deleting old avatar from Cloudinary");
           await deleteFromCloudinary(user.avatar);
         }
       } catch (err) {
-        console.error("Avatar upload error:", err);
         return NextResponse.json(
           { error: "Failed to upload avatar" },
           { status: 500 }
@@ -157,7 +139,6 @@ export const PUT = async (req: Request) => {
 
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
-    console.error("PROFILE_UPDATE_ERROR:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import Header from "../../header/Header";
+import Header from "../../components/header/Header";
 import ProfileDetails from "../../profileDetails/ProfileDetails";
 
 function Page() {

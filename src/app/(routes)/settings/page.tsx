@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import Header from "../../header/Header";
+import Header from "../../components/header/Header";
 import ToggleSwitch from "../../components/toggleSwitch/ToggleSwitch";
 import Dropdown from "../../components/dropdown/Dropdown";
 

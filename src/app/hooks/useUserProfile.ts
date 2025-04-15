@@ -1,16 +1,14 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
 import { UserData } from "../types/types";
-
 
 const cache = new Map<string, UserData>();
 
 export const useUserProfile = (initialUserData?: UserData | null) => {
   const { data: session, status } = useSession();
-  const [userData, setUserData] = useState<UserData | null>(
-    initialUserData || null
-  );
+  const [userData, setUserData] = useState<UserData | null>(initialUserData || null);
   const [isLoading, setIsLoading] = useState<boolean>(!initialUserData);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,15 +16,13 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
     if (status !== "authenticated") return;
 
     if (!session?.user?.id) {
-      console.error("No user ID found in session:", session);
       setError("No user ID found in session");
+      toast.error("No user ID found in session");
       setIsLoading(false);
       return;
     }
 
     const userId = session.user.id;
-
-    console.log("Fetching user data for ID:", userId);
 
     const cachedData = cache.get(userId);
     if (cachedData && !initialUserData) {
@@ -52,14 +48,13 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       }
 
       const data = await response.json();
-      console.log("Fetched user data:", data);
-
       setUserData(data);
       cache.set(userId, data);
       setError(null);
     } catch (err: any) {
-      console.error("User fetch error:", err);
-      setError(err.message || "An error occurred while fetching user data");
+      const msg = err.message || "An error occurred while fetching user data";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +67,6 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
       }
 
       try {
-        console.log("Updating user with data:", updates);
-
         const response = await fetch("/api/profile", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -82,11 +75,8 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
 
         const data = await response.json();
         if (!response.ok) {
-          console.error("Update error response:", data);
           throw new Error(data.error || "Update failed");
         }
-
-        console.log("Updated user data:", data);
 
         setUserData((prev) => {
           const updated = prev ? { ...prev, ...data } : data;
@@ -96,10 +86,12 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
         });
 
         setError(null);
+        toast.success("Profile updated successfully");
         return data;
       } catch (err: any) {
-        console.error("Profile update error:", err);
-        setError(err.message || "Failed to update profile");
+        const msg = err.message || "Failed to update profile";
+        setError(msg);
+        toast.error(msg);
         throw err;
       }
     },
@@ -117,7 +109,8 @@ export const useUserProfile = (initialUserData?: UserData | null) => {
     } else if (status === "unauthenticated") {
       setUserData(null);
       setIsLoading(false);
-      setError("Not authenticated");
+      const msg = "Not authenticated";
+      setError(msg);
     }
   }, [status, fetchUserData, initialUserData, session]);
 

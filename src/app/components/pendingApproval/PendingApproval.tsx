@@ -8,7 +8,9 @@ import Loader from "../loader/Loader";
 const PendingApproval = () => {
   const { data: session, update, status } = useSession();
   const router = useRouter();
-  const [localStatus, setLocalStatus] = useState<"pending" | "approved" | "rejected">("pending");
+  const [localStatus, setLocalStatus] = useState<
+    "pending" | "approved" | "rejected"
+  >("pending");
   const { notifications, fetchNotifications } = useNotifications({
     status: "all",
     type: "EMPLOYEE_APPROVAL,EMPLOYEE_REJECTION",
@@ -16,13 +18,13 @@ const PendingApproval = () => {
 
   useEffect(() => {
     const checkApprovalStatus = async () => {
-      const latestDecision = notifications.find(n => 
-        n.type === "EMPLOYEE_APPROVAL" || n.type === "EMPLOYEE_REJECTION"
+      const latestDecision = notifications.find(
+        (n) => n.type === "EMPLOYEE_APPROVAL" || n.type === "EMPLOYEE_REJECTION"
       );
 
       if (latestDecision) {
         if (latestDecision.type === "EMPLOYEE_APPROVAL") {
-          await update(); 
+          await update();
           router.push("/employee/dashboard");
         } else {
           setLocalStatus("rejected");
@@ -32,13 +34,11 @@ const PendingApproval = () => {
       }
     };
 
-    // Check every 30 seconds
     const interval = setInterval(() => {
       fetchNotifications();
       checkApprovalStatus();
     }, 30000);
 
-    // Initial check
     checkApprovalStatus();
 
     return () => clearInterval(interval);
@@ -47,7 +47,7 @@ const PendingApproval = () => {
   if (status === "loading") {
     return (
       <div className="flex justify-center items-center h-screen">
-   <Loader />
+        <Loader />
       </div>
     );
   }
@@ -61,7 +61,8 @@ const PendingApproval = () => {
             Registration Rejected
           </h2>
           <p className="text-red-500 mb-4">
-            Your employee registration has been reviewed and rejected by the HR team.
+            Your employee registration has been reviewed and rejected by the HR
+            team.
           </p>
           <div className="space-y-3">
             <button
@@ -87,14 +88,14 @@ const PendingApproval = () => {
       <div className="max-w-md mx-auto mt-20 p-6 bg-blue-50 rounded-lg">
         <div className="text-center">
           <div className=" mb-4 mx-auto flex justify-center items-center">
-         <Loader/>
+            <Loader />
           </div>
           <h2 className="text-2xl font-bold text-blue-600 mb-2">
             Registration Under Review
           </h2>
           <p className="text-blue-500 mb-4">
-            Your employee registration is currently being reviewed by our HR team.
-            This typically takes 1-2 business days.
+            Your employee registration is currently being reviewed by our HR
+            team. This typically takes 1-2 business days.
           </p>
           <div className="flex items-center justify-center space-x-2 text-gray-500">
             <span>Auto-refreshing in</span>

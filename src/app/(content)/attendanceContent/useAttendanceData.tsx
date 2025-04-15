@@ -1,4 +1,3 @@
-// useAttendanceData.ts
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -6,8 +5,7 @@ import { toast } from "react-toastify";
 export interface AttendanceRecord {
   id: string;
   date: string;
-  checkInTime: string | null;
-  checkOutTime: string | null;
+ 
   status: "ON_TIME" | "LATE" | "ABSENT";
   employee?: {
     firstName: string;
@@ -57,7 +55,6 @@ const useAttendanceData = (employeeId?: string) => {
         const data: AttendanceRecord[] = await response.json();
 
         if (!data || data.length === 0) {
-          toast.info("No attendance data found");
           setAttendanceData([]);
           return;
         }

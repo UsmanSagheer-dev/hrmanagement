@@ -1,53 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
 import InputField from "../../components/inputField/InputField";
 import Button from "../../components/button/Button";
-import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
 import { AccountAccessFormProps } from "@/app/types/formTypes";
+import { useAccountAccessForm } from "./useAccountAccessForm";
 
 const AccountAccessForm: React.FC<AccountAccessFormProps> = ({
   onTabChange,
 }) => {
-  const { formData, updateFormData, submitEmployeeData, isLoading, formError } =
-    useEmployeeFormContext();
-  const [localFormData, setLocalFormData] = useState(formData.account);
-
-  useEffect(() => {
-    setLocalFormData(formData.account);
-  }, [formData.account]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setLocalFormData((prev) => ({ ...prev, [field]: value }));
-    updateFormData("account", { [field]: value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFormData("account", localFormData);
-    await submitEmployeeData();
-  };
-
-  const handleCancel = () => {
-    const resetData = {
-      emailAddress: "",
-      slackId: "",
-      skypeId: "",
-      githubId: "",
-    };
-    setLocalFormData(resetData);
-    updateFormData("account", resetData);
-  };
-
-  const INPUT_FIELDS = [
-    { type: "email", placeholder: "Email Address", field: "emailAddress" },
-    { type: "text", placeholder: "Slack ID", field: "slackId" },
-    { type: "text", placeholder: "Skype ID", field: "skypeId" },
-    { type: "text", placeholder: "Github ID", field: "githubId" },
-  ];
+  const {
+    localFormData,
+    isLoading,
+    formError,
+    INPUT_FIELDS,
+    handleInputChange,
+    handleSubmit,
+    handleCancel,
+  } = useAccountAccessForm();
 
   return (
     <div className="h-[40vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">

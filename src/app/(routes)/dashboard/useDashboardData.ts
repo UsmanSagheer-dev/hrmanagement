@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAttendance } from "@/app/hooks/useAttendance";
+import { toast } from "react-hot-toast"; // <-- import toast
+
 
 export const useDashboardData = () => {
   const { fetchAllAttendance, isLoading, error } = useAttendance();
@@ -51,7 +53,7 @@ export const useDashboardData = () => {
         const applicants = applicantResponse.ok ? await applicantResponse.json() : [];
         const totalApplicants = applicants.length || 0;
 
-        const totalProjects = 0; // TODO: replace with actual project API when ready
+        const totalProjects = 0; 
 
         const todayStr = `Update: ${new Date().toLocaleDateString()}`;
         setCardData([
@@ -85,7 +87,7 @@ export const useDashboardData = () => {
           },
         ]);
       } catch (err) {
-        console.error("Dashboard data error:", err);
+         toast.error("Failed to load dashboard data"); 
       }
     };
 
@@ -94,3 +96,11 @@ export const useDashboardData = () => {
 
   return { cardData, isLoading, error };
 };
+
+export function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "Good Morning";
+  if (hour >= 12 && hour < 17) return "Good Afternoon";
+  if (hour >= 17 && hour < 21) return "Good Evening";
+  return "Good Night";
+}

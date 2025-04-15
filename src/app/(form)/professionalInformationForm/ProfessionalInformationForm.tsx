@@ -1,52 +1,22 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IoIosPerson } from "react-icons/io";
 import { HiOutlineBriefcase } from "react-icons/hi2";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdLockOpen } from "react-icons/md";
-import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
-import { employeeTypeOptions, departmentOptions, workingDaysOptions, officeLocationOptions } from "../../constants/formConstants";
 import { ProfessionalInformationFormProps } from "@/app/types/formTypes";
 import InputField from "@/app/components/inputField/InputField";
 import Button from "@/app/components/button/Button";
+import { useProfessionalInformationForm } from "./useProfessionalInformationForm";
 
 const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = ({ onTabChange }) => {
-  const { formData, updateFormData } = useEmployeeFormContext();
-  const [localFormData, setLocalFormData] = useState(formData.professional);
-
-  useEffect(() => {
-    setLocalFormData(formData.professional);
-  }, [formData.professional]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setLocalFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-    updateFormData("professional", { [field]: value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFormData("professional", localFormData);
-    onTabChange("documents");
-  };
-
-  const handleCancel = () => {
-    const resetData = {
-      employeeId: "",
-      userName: "",
-      employeeType: "",
-      workEmail: "",
-      department: "",
-      designation: "",
-      workingDays: "",
-      joiningDate: "",
-      officeLocation: "",
-    };
-    setLocalFormData(resetData);
-    updateFormData("professional", resetData);
-  };
+  const {
+    localFormData,
+    formOptions,
+    handleInputChange,
+    handleSubmit,
+    handleCancel
+  } = useProfessionalInformationForm(onTabChange);
 
   const NavigationTab = ({
     Icon,
@@ -91,14 +61,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
         <form onSubmit={handleSubmit}>
           <div className="mt-[30px]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <InputField
-                type="text"
-                placeholder="Employee ID"
-                value={localFormData.employeeId}
-                onChange={(value) => handleInputChange("employeeId", value)}
-                required
-                className="border border-[#A2A1A833]"
-              />
+            
               <InputField
                 type="text"
                 placeholder="User Name"
@@ -107,19 +70,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 required
                 className="border border-[#A2A1A833]"
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <InputField
-                type="select"
-                placeholder="Select Employee Type"
-                value={localFormData.employeeType}
-                onChange={(value) => handleInputChange("employeeType", value)}
-                options={employeeTypeOptions}
-                required
-                className="border border-[#A2A1A833]"
-              />
-              <InputField
+                <InputField
                 type="email"
                 placeholder="Work Email Address"
                 value={localFormData.workEmail}
@@ -132,10 +83,32 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
               <InputField
                 type="select"
+                placeholder="Select Employee Type"
+                value={localFormData.employeeType}
+                onChange={(value) => handleInputChange("employeeType", value)}
+                options={formOptions.employeeTypeOptions}
+                required
+                className="border border-[#A2A1A833]"
+              />
+            
+               <InputField
+                type="select"
+                placeholder="Select Office Location"
+                value={localFormData.officeLocation}
+                onChange={(value) => handleInputChange("officeLocation", value)}
+                options={formOptions.officeLocationOptions}
+                required
+                className="border border-[#A2A1A833]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+              <InputField
+                type="select"
                 placeholder="Select Department"
                 value={localFormData.department}
                 onChange={(value) => handleInputChange("department", value)}
-                options={departmentOptions}
+                options={formOptions.departmentOptions}
                 required
                 className="border border-[#A2A1A833]"
               />
@@ -155,7 +128,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 placeholder="Select Working Days"
                 value={localFormData.workingDays}
                 onChange={(value) => handleInputChange("workingDays", value)}
-                options={workingDaysOptions}
+                options={formOptions.workingDaysOptions}
                 required
                 className="border border-[#A2A1A833]"
               />
@@ -170,15 +143,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-              <InputField
-                type="select"
-                placeholder="Select Office Location"
-                value={localFormData.officeLocation}
-                onChange={(value) => handleInputChange("officeLocation", value)}
-                options={officeLocationOptions}
-                required
-                className="border border-[#A2A1A833]"
-              />
+           
             </div>
 
             <div className="flex justify-end gap-4">

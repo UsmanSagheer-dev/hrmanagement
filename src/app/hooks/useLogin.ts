@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export function useLogin() {
   const [email, setEmail] = useState("");
@@ -43,8 +44,7 @@ export function useLogin() {
           router.push("/employee/add");
         }
       }
-    } catch (err) {
-      console.error("Login error:", err);
+    } catch {
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ export function useLogin() {
         router.push("/employee/add");
       }
     } catch (err) {
-      console.error("Google login error:", err);
+      toast.error("Google login failed");
       setError("Failed to login with Google");
     } finally {
       setLoading(false);

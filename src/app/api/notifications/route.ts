@@ -6,7 +6,7 @@ import db from "../../../../lib/prismadb";
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -25,17 +25,9 @@ export async function GET(req: NextRequest) {
 
     const queryCondition: any = {};
 
-    if (type) {
-      queryCondition.type = type;
-    }
-
-    if (status) {
-      queryCondition.status = status;
-    }
-
-    if (read !== null) {
-      queryCondition.read = read === "true" ? true : false;
-    }
+    if (type) queryCondition.type = type;
+    if (status) queryCondition.status = status;
+    if (read !== null) queryCondition.read = read === "true";
 
     if (user?.role !== "Admin") {
       queryCondition.OR = [
@@ -64,23 +56,22 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(notifications);
+    return NextResponse.json(notifications ?? []); 
   } catch (error: any) {
-    console.error("Error fetching notifications:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch notifications" },
+      { error: error?.message ?? "Failed to fetch notifications" },
       { status: 500 }
     );
   }
 }
+
 export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if admin
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
@@ -93,7 +84,10 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const { notificationId, action, read } = await req.json();
+    const body = await req.json();
+    const notificationId = body?.notificationId;
+    const action = body?.action;
+    const read = body?.read;
 
     if (!notificationId) {
       return NextResponse.json(
@@ -119,72 +113,75 @@ export async function PUT(req: NextRequest) {
       updateData.read = read;
     }
 
-    if (action === "approve" || action === "reject") {
-      updateData.status = action === "approve" ? "APPROVED" : "REJECTED";
+    if ((action === "approve" || action === "reject") &&
+      notification.type === "EMPLOYEE_REQUEST" &&
+      notification.sourceId
+    ) {
+      const pendingEmployee = await db.pendingEmployee.findUnique({
+        where: { id: notification.sourceId },
+      });
 
-      if (notification.type === "EMPLOYEE_REQUEST" && notification.sourceId) {
-        const pendingEmployee = await db.pendingEmployee.findUnique({
-          where: { id: notification.sourceId },
-        });
+      if (pendingEmployee) {
+        const userId = pendingEmployee?.userId;
 
-        if (pendingEmployee) {
-          const userId = pendingEmployee.userId;
+        if (action === "approve") {
+          await db.employee.create({
+            data: {
+              id: userId,
+              firstName: pendingEmployee?.firstName,
+              lastName: pendingEmployee?.lastName,
+              mobileNumber: pendingEmployee?.mobileNumber,
+              email: pendingEmployee?.email,
+              dateOfBirth: pendingEmployee?.dateOfBirth,
+              maritalStatus: pendingEmployee?.maritalStatus,
+              gender: pendingEmployee?.gender,
+              nationality: pendingEmployee?.nationality,
+              address: pendingEmployee?.address,
+              city: pendingEmployee?.city,
+              state: pendingEmployee?.state,
+              zipCode: pendingEmployee?.zipCode,
+              profileImage: pendingEmployee?.profileImage,
 
-          if (action === "approve") {
-            await db.employee.create({
-              data: {
-                id: userId,
-                firstName: pendingEmployee.firstName,
-                lastName: pendingEmployee.lastName,
-                mobileNumber: pendingEmployee.mobileNumber,
-                email: pendingEmployee.email,
-                dateOfBirth: pendingEmployee.dateOfBirth,
-                maritalStatus: pendingEmployee.maritalStatus,
-                gender: pendingEmployee.gender,
-                nationality: pendingEmployee.nationality,
-                address: pendingEmployee.address,
-                city: pendingEmployee.city,
-                state: pendingEmployee.state,
-                zipCode: pendingEmployee.zipCode,
-                profileImage: pendingEmployee.profileImage,
+              employeeId: pendingEmployee?.employeeId,
+              userName: pendingEmployee?.userName,
+              employeeType: pendingEmployee?.employeeType,
+              workEmail: pendingEmployee?.workEmail,
+              department: pendingEmployee?.department,
+              designation: pendingEmployee?.designation,
+              workingDays: pendingEmployee?.workingDays,
+              joiningDate: pendingEmployee?.joiningDate,
+              officeLocation: pendingEmployee?.officeLocation,
 
-                employeeId: pendingEmployee.employeeId,
-                userName: pendingEmployee.userName,
-                employeeType: pendingEmployee.employeeType,
-                workEmail: pendingEmployee.workEmail,
-                department: pendingEmployee.department,
-                designation: pendingEmployee.designation,
-                workingDays: pendingEmployee.workingDays,
-                joiningDate: pendingEmployee.joiningDate,
-                officeLocation: pendingEmployee.officeLocation,
+              appointmentLetter: pendingEmployee?.appointmentLetter,
+              salarySlips: pendingEmployee?.salarySlips,
+              relievingLetter: pendingEmployee?.relievingLetter,
+              experienceLetter: pendingEmployee?.experienceLetter,
 
-                appointmentLetter: pendingEmployee.appointmentLetter,
-                salarySlips: pendingEmployee.salarySlips,
-                relievingLetter: pendingEmployee.relievingLetter,
-                experienceLetter: pendingEmployee.experienceLetter,
+              slackId: pendingEmployee?.slackId,
+              skypeId: pendingEmployee?.skypeId,
+              githubId: pendingEmployee?.githubId,
+            },
+          });
 
-                slackId: pendingEmployee.slackId,
-                skypeId: pendingEmployee.skypeId,
-                githubId: pendingEmployee.githubId,
-              },
-            });
-
-            await db.user.update({
-              where: { id: userId },
-              data: { role: "Employee" },
-            });
-          } else {
-            await db.user.update({
-              where: { id: userId },
-              data: { role: "User" },
-            });
-          }
-
-          await db.pendingEmployee.delete({
-            where: { id: pendingEmployee.id },
+          await db.user.update({
+            where: { id: userId },
+            data: { role: "Employee" },
+          });
+        } else {
+          await db.user.update({
+            where: { id: userId },
+            data: { role: "User" },
           });
         }
+
+        await db.pendingEmployee.delete({
+          where: { id: pendingEmployee.id },
+        });
       }
+    }
+
+    if (action === "approve" || action === "reject") {
+      updateData.status = action === "approve" ? "APPROVED" : "REJECTED";
     }
 
     const updatedNotification = await db.notification.update({
@@ -201,11 +198,10 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(updatedNotification);
+    return NextResponse.json(updatedNotification ?? {});
   } catch (error: any) {
-    console.error("Error updating notification:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to update notification" },
+      { error: error?.message ?? "Failed to update notification" },
       { status: 500 }
     );
   }
