@@ -56,8 +56,8 @@ const EmployeeDashboardTable: React.FC = () => {
             item.status === "ON_TIME"
               ? "bg-green-500/20 text-green-400"
               : item.status === "LATE"
-              ? "bg-red-500/20 text-red-400"
-              : "bg-gray-500/20 text-gray-400"
+            ? "text-yellow-500 bg-red-500/10"
+              : "text-red-800 bg-gray-500/10"
           }`}
         >
           {item.status.replace("_", " ")}

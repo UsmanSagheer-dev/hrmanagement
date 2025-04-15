@@ -74,8 +74,8 @@ function ViewAttendance() {
             employee.status === "ON_TIME"
               ? "text-green-500 bg-green-500/10"
               : employee.status === "LATE"
-              ? "text-red-500 bg-red-500/10"
-              : "text-gray-500 bg-gray-500/10"
+              ? "text-yellow-500 bg-red-500/10"
+              : "text-red-800 bg-gray-500/10"
           }`}
         >
           {employee.status.replace("_", " ")}

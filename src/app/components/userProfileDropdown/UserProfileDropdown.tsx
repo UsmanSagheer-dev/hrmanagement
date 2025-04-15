@@ -57,7 +57,7 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
         </div>
         <div>
           <p className="text-[14px] md:text-[16px] font-semibold text-white">
-            {userData.firstName}
+            {userData.name}
           </p>
           <p className="text-xs font-light text-gray-400">{userData.role}</p>
         </div>

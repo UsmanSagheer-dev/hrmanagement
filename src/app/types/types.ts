@@ -292,3 +292,12 @@ export interface NotificationDetailProps {
   onReject: (id: string) => void;
   isAdmin: boolean;
 }
+
+
+export interface MenuItem {
+  id: number;
+  name: string;
+  icon: React.ReactNode;
+  path: string;
+  roles: string[];
+}

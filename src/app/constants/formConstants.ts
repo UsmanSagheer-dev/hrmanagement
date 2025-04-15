@@ -68,10 +68,10 @@ export const zipCodeOptions = [
 ];
 
 export const employeeTypeOptions = [
-  { value: "full-time", label: "Full-Time" },
-  { value: "part-time", label: "Part-Time" },
-  { value: "contract", label: "Contract" },
-  { value: "intern", label: "Intern" },
+  { value: "Full Time", label: "Full-Time" },
+  { value: "Part Time", label: "Part-Time" },
+  { value: "Contract", label: "Contract" },
+  { value: "Intern", label: "Intern" },
 ];
 
 export const departmentOptions = [

@@ -54,7 +54,7 @@ function Page() {
         </div>
       ),
     },
-    { key: "employeeId", header: "Employee ID" },
+    
     { key: "department", header: "Department" },
     { key: "designation", header: "Designation" },
     { key: "employeeType", header: "Type" },

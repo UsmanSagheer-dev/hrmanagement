@@ -3,21 +3,13 @@ import React, { useState, useEffect } from "react";
 import { RxDashboard } from "react-icons/rx";
 import { FaUsers } from "react-icons/fa";
 import { LuCalendarCheck } from "react-icons/lu";
-import { LuCalendarRange } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import IMAGES from "@/app/assets/images";
 import Button from "../button/Button";
 import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-
-interface MenuItem {
-  id: number;
-  name: string;
-  icon: React.ReactNode;
-  path: string;
-  roles: string[];
-}
+import { MenuItem } from "@/app/types/types";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -31,21 +23,21 @@ const Sidebar: React.FC = () => {
       name: "Dashboard",
       icon: <RxDashboard size={24} />,
       path: "/dashboard",
-      roles: ["Admin"]
+      roles: ["Admin"],
     },
     {
       id: 2,
       name: "All Employees",
       icon: <FaUsers size={24} />,
       path: "/employee/details",
-      roles: ["Admin"]
+      roles: ["Admin"],
     },
     {
       id: 3,
       name: "Attendance",
       icon: <LuCalendarCheck size={24} />,
       path: "/viewattendace",
-      roles: ["Admin"] 
+      roles: ["Admin"],
     },
     // {
     //   id: 4,
@@ -59,22 +51,22 @@ const Sidebar: React.FC = () => {
       name: "Settings",
       icon: <IoSettingsOutline size={24} />,
       path: "/settings",
-      roles: ["Admin"]
+      roles: ["Admin"],
     },
- {
-  id: 6,
-  name: "View Details",
-  icon: <IoSettingsOutline size={24} />,
-  path: "/viewemployeedetail",
-  roles: ["Admin", "Employee"] 
-},
+    {
+      id: 6,
+      name: "View Details",
+      icon: <IoSettingsOutline size={24} />,
+      path: "/viewemployeedetail",
+      roles: [ "Employee"],
+    },
 
     {
       id: 7,
       name: "Department",
       icon: <IoSettingsOutline size={24} />,
       path: "/department/alldepartment",
-      roles: ["Admin"]
+      roles: ["Admin"],
     },
   ];
 
@@ -84,7 +76,7 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      const filteredItems = allMenuItems.filter(item => 
+      const filteredItems = allMenuItems.filter((item) =>
         item.roles.includes(userRole)
       );
       setMenuItems(filteredItems);
@@ -93,15 +85,18 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     if (pathname && menuItems.length > 0) {
-      const currentItem = menuItems.find(item => pathname.startsWith(item.path));
-      
+      const currentItem = menuItems.find((item) =>
+        pathname.startsWith(item.path)
+      );
+
       if (currentItem) {
         setActiveItemId(currentItem.id);
       } else {
-        const defaultItem = userRole === "Admin" 
-          ? menuItems.find(item => item.path === "/dashboard") 
-          : menuItems.find(item => item.path === "/viewattendace");
-          
+        const defaultItem =
+          userRole === "Admin"
+            ? menuItems.find((item) => item.path === "/dashboard")
+            : menuItems.find((item) => item.path === "/viewattendace");
+
         if (defaultItem) {
           setActiveItemId(defaultItem.id);
         }
@@ -119,9 +114,11 @@ const Sidebar: React.FC = () => {
   };
 
   if (status === "loading") {
-    return <div className="w-[64px] md:w-64 h-[95vh] bg-[#1a1a1a] flex items-center justify-center">
-      <div className="text-white">Loading...</div>
-    </div>;
+    return (
+      <div className="w-[64px] md:w-64 h-[95vh] bg-[#1a1a1a] flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -131,7 +128,9 @@ const Sidebar: React.FC = () => {
           src={IMAGES.HrLogo.src}
           alt=""
           className="w-[32px] md:w-[83px] h-[32px] cursor-pointer"
-          onClick={() => router.push(userRole === "Admin" ? "/dashboard" : "/viewattendace")}
+          onClick={() =>
+            router.push(userRole === "Admin" ? "/dashboard" : "/viewattendace")
+          }
         />
       </div>
 

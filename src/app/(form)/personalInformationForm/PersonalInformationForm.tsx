@@ -73,8 +73,6 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
     </button>
   );
 
- 
-
   return (
     <div className="h-[84vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">

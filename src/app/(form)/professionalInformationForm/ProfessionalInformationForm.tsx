@@ -61,19 +61,20 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
         <form onSubmit={handleSubmit}>
           <div className="mt-[30px]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <InputField
-                type="text"
-                placeholder="Employee ID"
-                value={localFormData.employeeId}
-                onChange={(value) => handleInputChange("employeeId", value)}
-                required
-                className="border border-[#A2A1A833]"
-              />
+            
               <InputField
                 type="text"
                 placeholder="User Name"
                 value={localFormData.userName}
                 onChange={(value) => handleInputChange("userName", value)}
+                required
+                className="border border-[#A2A1A833]"
+              />
+                <InputField
+                type="email"
+                placeholder="Work Email Address"
+                value={localFormData.workEmail}
+                onChange={(value) => handleInputChange("workEmail", value)}
                 required
                 className="border border-[#A2A1A833]"
               />
@@ -89,11 +90,13 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 required
                 className="border border-[#A2A1A833]"
               />
-              <InputField
-                type="email"
-                placeholder="Work Email Address"
-                value={localFormData.workEmail}
-                onChange={(value) => handleInputChange("workEmail", value)}
+            
+               <InputField
+                type="select"
+                placeholder="Select Office Location"
+                value={localFormData.officeLocation}
+                onChange={(value) => handleInputChange("officeLocation", value)}
+                options={formOptions.officeLocationOptions}
                 required
                 className="border border-[#A2A1A833]"
               />
@@ -140,15 +143,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-              <InputField
-                type="select"
-                placeholder="Select Office Location"
-                value={localFormData.officeLocation}
-                onChange={(value) => handleInputChange("officeLocation", value)}
-                options={formOptions.officeLocationOptions}
-                required
-                className="border border-[#A2A1A833]"
-              />
+           
             </div>
 
             <div className="flex justify-end gap-4">
