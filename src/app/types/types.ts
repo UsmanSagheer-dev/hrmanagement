@@ -283,3 +283,12 @@ export interface Notification {
     profileImage?: string;
   };
 }
+
+
+export interface NotificationDetailProps {
+  notification: Notification;
+  onClose: () => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+  isAdmin: boolean;
+}
