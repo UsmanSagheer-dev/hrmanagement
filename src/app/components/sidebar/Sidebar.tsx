@@ -10,6 +10,7 @@ import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { MenuItem } from "@/app/types/types";
+import Loader from "../loader/Loader";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -116,7 +117,9 @@ const Sidebar: React.FC = () => {
   if (status === "loading") {
     return (
       <div className="w-[64px] md:w-64 h-[95vh] bg-[#1a1a1a] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">
+          <Loader/>
+        </div>
       </div>
     );
   }

@@ -90,7 +90,7 @@ export function useNotifications(initialFilter?: {
 
       const data = await response.json();
       setUnreadCount(data.length);
-    } catch  {
+    } catch {
       toast.error("Error fetching unread notification count:");
     }
   }, [sessionStatus]);
@@ -123,8 +123,8 @@ export function useNotifications(initialFilter?: {
       setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
 
       return true;
-    } catch  {
-    toast.error("Error marking notification as read");
+    } catch {
+      toast.error("Error marking notification as read");
       toast.error("Failed to update notification");
       return false;
     }
@@ -152,22 +152,29 @@ export function useNotifications(initialFilter?: {
           );
         }
 
-        const updatedNotification = await response.json();
-
-        setNotifications((prevNotifications) =>
-          prevNotifications.map((notification) =>
-            notification.id === notificationId
-              ? { ...updatedNotification }
-              : notification
-          )
-        );
-        setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
+        if (action === "reject") {
+          setNotifications((prevNotifications) =>
+            prevNotifications.filter(
+              (notification) => notification.id !== notificationId
+            )
+          );
+          setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
+        } else {
+          const updatedNotification = await response.json();
+          setNotifications((prevNotifications) =>
+            prevNotifications.map((notification) =>
+              notification.id === notificationId
+                ? { ...updatedNotification }
+                : notification
+            )
+          );
+          setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
+        }
 
         const actionText = action === "approve" ? "approved" : "rejected";
         toast.success(`Request ${actionText} successfully`);
         return true;
-      } catch  {
-  
+      } catch (err: any) {
         toast.error(`Failed to ${action} request`);
         return false;
       }

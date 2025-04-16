@@ -120,26 +120,10 @@ const ProfessionalInformationForm: React.FC<
                 className="border border-[#A2A1A833]"
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                <InputField
-                  type="select"
-                  placeholder="Select Department"
-                  value={localFormData.department}
-                  onChange={(value) => handleInputChange("department", value)}
-                  options={formOptions.departmentOptions}
-                  required
-                  className="border border-[#A2A1A833]"
-                />
-                <InputField
-                  type="text"
-                  placeholder="Enter Designation"
-                  value={localFormData.designation}
-                  onChange={(value) => handleInputChange("designation", value)}
-                  required
-                  className="border border-[#A2A1A833]"
-                />
-              </div>
+             
 
+            
+            </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                 <InputField
                   type="select"
@@ -159,7 +143,25 @@ const ProfessionalInformationForm: React.FC<
                   className="border border-[#A2A1A833]"
                 />
               </div>
-            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <InputField
+                  type="select"
+                  placeholder="Select Department"
+                  value={localFormData.department}
+                  onChange={(value) => handleInputChange("department", value)}
+                  options={formOptions.departmentOptions}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+                <InputField
+                  type="text"
+                  placeholder="Enter Designation"
+                  value={localFormData.designation}
+                  onChange={(value) => handleInputChange("designation", value)}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+              </div>
             <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
               <InputField
                 type="select"

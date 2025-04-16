@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(notifications ?? []); 
+    return NextResponse.json(notifications ?? []);
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message ?? "Failed to fetch notifications" },
@@ -107,13 +107,41 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const updateData: any = {};
+    if (action === "reject") {
+      await db.notification.delete({
+        where: { id: notificationId },
+      });
 
+      if (notification.type === "EMPLOYEE_REQUEST" && notification.sourceId) {
+        const pendingEmployee = await db.pendingEmployee.findUnique({
+          where: { id: notification.sourceId },
+        });
+
+        if (pendingEmployee) {
+          const userId = pendingEmployee.userId;
+          await db.user.update({
+            where: { id: userId },
+            data: { role: "User" },
+          });
+
+          await db.pendingEmployee.delete({
+            where: { id: pendingEmployee.id },
+          });
+        }
+      }
+
+      return NextResponse.json({
+        message: "Notification rejected and deleted",
+      });
+    }
+
+    const updateData: any = {};
     if (read !== undefined) {
       updateData.read = read;
     }
 
-    if ((action === "approve" || action === "reject") &&
+    if (
+      action === "approve" &&
       notification.type === "EMPLOYEE_REQUEST" &&
       notification.sourceId
     ) {
@@ -122,57 +150,46 @@ export async function PUT(req: NextRequest) {
       });
 
       if (pendingEmployee) {
-        const userId = pendingEmployee?.userId;
+        const userId = pendingEmployee.userId;
+        await db.employee.create({
+          data: {
+            id: userId,
+            firstName: pendingEmployee.firstName,
+            lastName: pendingEmployee.lastName,
+            mobileNumber: pendingEmployee.mobileNumber,
+            email: pendingEmployee.email,
+            dateOfBirth: pendingEmployee.dateOfBirth,
+            maritalStatus: pendingEmployee.maritalStatus,
+            gender: pendingEmployee.gender,
+            nationality: pendingEmployee.nationality,
+            address: pendingEmployee.address,
+            city: pendingEmployee.city,
+            state: pendingEmployee.state,
+            zipCode: pendingEmployee.zipCode,
+            profileImage: pendingEmployee.profileImage,
+            employeeId: pendingEmployee.employeeId,
+            userName: pendingEmployee.userName,
+            employeeType: pendingEmployee.employeeType,
+            workEmail: pendingEmployee.workEmail,
+            department: pendingEmployee.department,
+            designation: pendingEmployee.designation,
+            workingDays: pendingEmployee.workingDays,
+            joiningDate: pendingEmployee.joiningDate,
+            officeLocation: pendingEmployee.officeLocation,
+            appointmentLetter: pendingEmployee.appointmentLetter,
+            salarySlips: pendingEmployee.salarySlips,
+            relievingLetter: pendingEmployee.relievingLetter,
+            experienceLetter: pendingEmployee.experienceLetter,
+            slackId: pendingEmployee.slackId,
+            skypeId: pendingEmployee.skypeId,
+            githubId: pendingEmployee.githubId,
+          },
+        });
 
-        if (action === "approve") {
-          await db.employee.create({
-            data: {
-              id: userId,
-              firstName: pendingEmployee?.firstName,
-              lastName: pendingEmployee?.lastName,
-              mobileNumber: pendingEmployee?.mobileNumber,
-              email: pendingEmployee?.email,
-              dateOfBirth: pendingEmployee?.dateOfBirth,
-              maritalStatus: pendingEmployee?.maritalStatus,
-              gender: pendingEmployee?.gender,
-              nationality: pendingEmployee?.nationality,
-              address: pendingEmployee?.address,
-              city: pendingEmployee?.city,
-              state: pendingEmployee?.state,
-              zipCode: pendingEmployee?.zipCode,
-              profileImage: pendingEmployee?.profileImage,
-
-              employeeId: pendingEmployee?.employeeId,
-              userName: pendingEmployee?.userName,
-              employeeType: pendingEmployee?.employeeType,
-              workEmail: pendingEmployee?.workEmail,
-              department: pendingEmployee?.department,
-              designation: pendingEmployee?.designation,
-              workingDays: pendingEmployee?.workingDays,
-              joiningDate: pendingEmployee?.joiningDate,
-              officeLocation: pendingEmployee?.officeLocation,
-
-              appointmentLetter: pendingEmployee?.appointmentLetter,
-              salarySlips: pendingEmployee?.salarySlips,
-              relievingLetter: pendingEmployee?.relievingLetter,
-              experienceLetter: pendingEmployee?.experienceLetter,
-
-              slackId: pendingEmployee?.slackId,
-              skypeId: pendingEmployee?.skypeId,
-              githubId: pendingEmployee?.githubId,
-            },
-          });
-
-          await db.user.update({
-            where: { id: userId },
-            data: { role: "Employee" },
-          });
-        } else {
-          await db.user.update({
-            where: { id: userId },
-            data: { role: "User" },
-          });
-        }
+        await db.user.update({
+          where: { id: userId },
+          data: { role: "Employee" },
+        });
 
         await db.pendingEmployee.delete({
           where: { id: pendingEmployee.id },
@@ -180,8 +197,8 @@ export async function PUT(req: NextRequest) {
       }
     }
 
-    if (action === "approve" || action === "reject") {
-      updateData.status = action === "approve" ? "APPROVED" : "REJECTED";
+    if (action === "approve") {
+      updateData.status = "APPROVED";
     }
 
     const updatedNotification = await db.notification.update({
