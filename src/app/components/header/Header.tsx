@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import Button from "../button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
@@ -10,12 +9,9 @@ import { useNotifications } from "@/app/hooks/useNotifications";
 import { HeaderProps } from "../../types/types";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { userData } = useUserProfile();
   const { unreadCount } = useNotifications();
-
   const isAdmin = userData?.role === "Admin";
-
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
   };

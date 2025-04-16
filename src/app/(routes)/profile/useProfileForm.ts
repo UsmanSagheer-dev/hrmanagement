@@ -1,16 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import IMAGES from "@/app/assets/images";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
+import IMAGES from "@/app/assets/images";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
 export const useProfileForm = () => {
   const router = useRouter();
-  const { userData, isLoading, error, updateUser, fetchUserData } = useUserProfile();
-
+  const { userData, isLoading, error, updateUser, fetchUserData } =
+    useUserProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ name: "", role: "", avatar: "" });
   const [previewImage, setPreviewImage] = useState("");
@@ -38,7 +38,7 @@ export const useProfileForm = () => {
     const file = files[0];
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size should be less than 2MB");
+      toast.error("File size should be less than 1MB");
       return;
     }
 
@@ -66,8 +66,10 @@ export const useProfileForm = () => {
 
       const updates: Record<string, any> = {};
       if (formData.name !== userData?.name) updates.name = formData.name;
-      if (previewImage !== userData?.avatar && formData.avatar) updates.avatar = formData.avatar;
-      if (userData?.role === "Admin" && formData.role !== userData.role) updates.role = formData.role;
+      if (previewImage !== userData?.avatar && formData.avatar)
+        updates.avatar = formData.avatar;
+      if (userData?.role === "Admin" && formData.role !== userData.role)
+        updates.role = formData.role;
 
       if (Object.keys(updates).length > 0) {
         const updatedData = await updateUser(updates);
@@ -85,7 +87,7 @@ export const useProfileForm = () => {
           router.push("/dashboard");
         }
       } else {
-        toast.info("No changes detected");
+        toast.error("No changes detected");
       }
 
       setIsEditing(false);
