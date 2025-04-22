@@ -1,54 +1,27 @@
 import React from "react";
 import Button from "../button/Button";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { MdKeyboardArrowRight } from "react-icons/md";
 import SearchBar from "../searchBar/SearchBar";
 import UserProfileDropdown from "../userProfileDropdown/UserProfileDropdown";
-import { useUserProfile } from "@/app/hooks/useUserProfile";
-import { useNotifications } from "@/app/hooks/useNotifications";
 import { HeaderProps } from "../../types/types";
+import { useHeader } from "./useHeader";
 
 const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
-  const { userData } = useUserProfile();
-  const { unreadCount } = useNotifications();
-  const isAdmin = userData?.role === "Admin";
-  const handleNotificationClick = () => {
-    window.location.href = "/notifications";
-  };
-
-  const renderDescriptionWithIcon = () => {
-    const hasBreadcrumb = description.includes(">");
-    if (hasBreadcrumb) {
-      const parts = description.split(">");
-      return (
-        <div className="flex items-center space-x-2">
-          {parts.map((part, index) => (
-            <React.Fragment key={index}>
-              <span
-                className="text-sm md:text-base"
-                style={{ color: textColor }}
-              >
-                {part.trim()}
-              </span>
-              {index < parts.length - 1 && <MdKeyboardArrowRight size={20} />}
-            </React.Fragment>
-          ))}
-        </div>
-      );
-    }
-    return (
-      <p className="text-sm md:text-base" style={{ color: textColor }}>
-        {description}
-      </p>
-    );
-  };
+  const {
+    isAdmin,
+    unreadCount,
+    handleNotificationClick,
+    renderDescriptionWithIcon,
+  } = useHeader(description, textColor);
 
   return (
-    <header className="text-white flex justify-between items-center sticky top-0 z-10 py-2 md:py-[8px]">
-      <div className="flex text-justify flex-col space-x-4">
+    <header className="text-white flex items-center sticky top-0 z-10 py-2 md:py-[8px]">
+      <div className="hidden md:flex text-justify flex-col space-x-4">
         <h1 className="text-lg md:text-xl font-bold">{title}</h1>
         {renderDescriptionWithIcon()}
       </div>
+      
+      <div className="flex-grow"></div>
       <div className="flex items-center space-x-4">
         {isAdmin && (
           <>
