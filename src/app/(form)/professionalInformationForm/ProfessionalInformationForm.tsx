@@ -9,13 +9,15 @@ import InputField from "@/app/components/inputField/InputField";
 import Button from "@/app/components/button/Button";
 import { useProfessionalInformationForm } from "./useProfessionalInformationForm";
 
-const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = ({ onTabChange }) => {
+const ProfessionalInformationForm: React.FC<
+  ProfessionalInformationFormProps
+> = ({ onTabChange }) => {
   const {
     localFormData,
     formOptions,
     handleInputChange,
     handleSubmit,
-    handleCancel
+    handleCancel,
   } = useProfessionalInformationForm(onTabChange);
 
   const NavigationTab = ({
@@ -52,16 +54,35 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
     <div className="h-[67vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 py-5">
         <div className="flex border-b border-gray-700 flex-wrap">
-          <NavigationTab Icon={IoIosPerson} title="Personal Information" tabName="personal" isActive={false} />
-          <NavigationTab Icon={HiOutlineBriefcase} title="Professional Information" tabName="professional" isActive={true} />
-          <NavigationTab Icon={IoDocumentTextOutline} title="Documents" tabName="documents" isActive={false} />
-          <NavigationTab Icon={MdLockOpen} title="Account Access" tabName="account" isActive={false} />
+          <NavigationTab
+            Icon={IoIosPerson}
+            title="Personal Information"
+            tabName="personal"
+            isActive={false}
+          />
+          <NavigationTab
+            Icon={HiOutlineBriefcase}
+            title="Professional Information"
+            tabName="professional"
+            isActive={true}
+          />
+          <NavigationTab
+            Icon={IoDocumentTextOutline}
+            title="Documents"
+            tabName="documents"
+            isActive={false}
+          />
+          <NavigationTab
+            Icon={MdLockOpen}
+            title="Account Access"
+            tabName="account"
+            isActive={false}
+          />
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mt-[30px]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-            
               <InputField
                 type="text"
                 placeholder="User Name"
@@ -70,7 +91,7 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 required
                 className="border border-[#A2A1A833]"
               />
-                <InputField
+              <InputField
                 type="email"
                 placeholder="Work Email Address"
                 value={localFormData.workEmail}
@@ -82,6 +103,14 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
               <InputField
+                type="text"
+                placeholder="Employee ID"
+                value={localFormData.employeeId}
+                onChange={(value) => handleInputChange("employeeId", value)}
+                required
+                className="border border-[#A2A1A833]"
+              />
+              <InputField
                 type="select"
                 placeholder="Select Employee Type"
                 value={localFormData.employeeType}
@@ -90,8 +119,51 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 required
                 className="border border-[#A2A1A833]"
               />
+
+             
+
             
-               <InputField
+            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <InputField
+                  type="select"
+                  placeholder="Select Working Days"
+                  value={localFormData.workingDays}
+                  onChange={(value) => handleInputChange("workingDays", value)}
+                  options={formOptions.workingDaysOptions}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+                <InputField
+                  type="date"
+                  placeholder="Select Joining Date"
+                  value={localFormData.joiningDate}
+                  onChange={(value) => handleInputChange("joiningDate", value)}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+              </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <InputField
+                  type="select"
+                  placeholder="Select Department"
+                  value={localFormData.department}
+                  onChange={(value) => handleInputChange("department", value)}
+                  options={formOptions.departmentOptions}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+                <InputField
+                  type="text"
+                  placeholder="Enter Designation"
+                  value={localFormData.designation}
+                  onChange={(value) => handleInputChange("designation", value)}
+                  required
+                  className="border border-[#A2A1A833]"
+                />
+              </div>
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
+              <InputField
                 type="select"
                 placeholder="Select Office Location"
                 value={localFormData.officeLocation}
@@ -100,50 +172,6 @@ const ProfessionalInformationForm: React.FC<ProfessionalInformationFormProps> = 
                 required
                 className="border border-[#A2A1A833]"
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <InputField
-                type="select"
-                placeholder="Select Department"
-                value={localFormData.department}
-                onChange={(value) => handleInputChange("department", value)}
-                options={formOptions.departmentOptions}
-                required
-                className="border border-[#A2A1A833]"
-              />
-              <InputField
-                type="text"
-                placeholder="Enter Designation"
-                value={localFormData.designation}
-                onChange={(value) => handleInputChange("designation", value)}
-                required
-                className="border border-[#A2A1A833]"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <InputField
-                type="select"
-                placeholder="Select Working Days"
-                value={localFormData.workingDays}
-                onChange={(value) => handleInputChange("workingDays", value)}
-                options={formOptions.workingDaysOptions}
-                required
-                className="border border-[#A2A1A833]"
-              />
-              <InputField
-                type="date"
-                placeholder="Select Joining Date"
-                value={localFormData.joiningDate}
-                onChange={(value) => handleInputChange("joiningDate", value)}
-                required
-                className="border border-[#A2A1A833]"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-           
             </div>
 
             <div className="flex justify-end gap-4">

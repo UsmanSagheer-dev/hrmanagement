@@ -90,7 +90,7 @@ const AttendanceContent: React.FC<{ employeeId?: string }> = ({
       render: (item) => (
         <span
           className={
-            item.status === "On Time" ? "text-green-500" : "text-red-500"
+            item.status === "On Time" ? "text-green-500" : "text-yellow-500"
           }
         >
           {item.status}

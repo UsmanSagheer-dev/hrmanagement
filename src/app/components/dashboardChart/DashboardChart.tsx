@@ -64,7 +64,7 @@ export default function AttendanceOverview() {
 
   return (
     <div className="bg-transparent text-white p-6 rounded-lg w-full">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 flex-wrap">
         <h2 className="text-xl font-bold">Attendance Overview</h2>
         <div className="flex gap-4">
           <select
