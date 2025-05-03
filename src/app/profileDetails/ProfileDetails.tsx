@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import IMAGES from "../assets/images";
-import { ProfileContent } from "../(content)/profileContent/ProfileContent";
-import { ProjectsContent } from "../(content)/projectsContent/ProjectsContent";
+import { ProfileContent } from "../content/profileContent/ProfileContent";
+import { ProjectsContent } from "../content/projectsContent/ProjectsContent";
 import { IoIosPerson } from "react-icons/io";
 import { LuCalendarCheck, LuCalendarRange } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
-import AttendanceContent from "../(content)/attendanceContent/AttendanceContent";
-import LeaveContent from "../(content)/leaveContent/LeaveContent";
+import AttendanceContent from "../content/attendanceContent/AttendanceContent";
+import LeaveContent from "../content/leaveContent/LeaveContent";
 import { useRouter } from "next/navigation";
 import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
 import { ProfileDetailsProps, UserData } from "../types/types";
