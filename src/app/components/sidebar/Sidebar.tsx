@@ -103,7 +103,7 @@ const Sidebar: React.FC = () => {
   const handleItemClick = (id: number, path: string) => {
     setActiveItemId(id);
     router.push(path);
-    setIsSidebarOpen(false); // Close sidebar on item click
+    setIsSidebarOpen(false); 
   };
 
   const handleThemeToggle = (theme: "light" | "dark") => {

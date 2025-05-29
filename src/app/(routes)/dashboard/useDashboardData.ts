@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAttendance } from "@/app/hooks/useAttendance";
-import { toast } from "react-hot-toast"; // <-- import toast
-
+import { toast } from "react-hot-toast";
 
 export const useDashboardData = () => {
   const { fetchAllAttendance, isLoading, error } = useAttendance();
@@ -46,14 +45,18 @@ export const useDashboardData = () => {
         ).length;
 
         const employeeResponse = await fetch("/api/employee");
-        const employees = employeeResponse.ok ? await employeeResponse.json() : [];
+        const employees = employeeResponse.ok
+          ? await employeeResponse.json()
+          : [];
         const totalEmployees = employees.length || 0;
 
         const applicantResponse = await fetch("/api/notifications");
-        const applicants = applicantResponse.ok ? await applicantResponse.json() : [];
+        const applicants = applicantResponse.ok
+          ? await applicantResponse.json()
+          : [];
         const totalApplicants = applicants.length || 0;
 
-        const totalProjects = 0; 
+        const totalProjects = 0;
 
         const todayStr = `Update: ${new Date().toLocaleDateString()}`;
         setCardData([
@@ -87,7 +90,7 @@ export const useDashboardData = () => {
           },
         ]);
       } catch (err) {
-         toast.error("Failed to load dashboard data"); 
+        toast.error("Failed to load dashboard data");
       }
     };
 
