@@ -20,7 +20,7 @@ export type UserData = {
     absentDays: number;
     lastCheckIn: string;
   };
-  
+
   appointmentLetter?: string | null;
   salarySlips?: string | null;
   relievingLetter?: string | null;
@@ -166,7 +166,6 @@ export interface Employee {
   workEmail: string;
   profileImage: string | null;
   image: string | null;
-
   checkInTime: string | null;
   status: AttendanceStatus;
   avatar: string | null;
@@ -238,8 +237,6 @@ export interface employee {
   image?: string;
 }
 
-
-
 export interface DepartmentListProps {
   departmentName: string;
   members: Member[];
@@ -261,7 +258,7 @@ export interface StatsCardProps {
   updateDate: string;
 }
 
- export interface Props {
+export interface Props {
   initialUserData?: UserData | null;
 }
 
@@ -284,7 +281,6 @@ export interface Notification {
   };
 }
 
-
 export interface NotificationDetailProps {
   notification: Notification;
   onClose: () => void;
@@ -292,7 +288,6 @@ export interface NotificationDetailProps {
   onReject: (id: string) => void;
   isAdmin: boolean;
 }
-
 
 export interface MenuItem {
   id: number;
