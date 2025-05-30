@@ -40,17 +40,22 @@ describe("Login Page", () => {
     cy.get('input[type="email"]').type("usman@example.com");
     cy.get('input[type="password"]').type("123456");
     cy.get('button[type="submit"]').click();
-    // You can add custom logic like checking for loader, toast, or redirection.
-  });
-
-  it("should trigger Google login button", () => {
-    cy.contains("Login with Google").click();
-    // Add assertion if you can mock the behavior or see side effects
   });
 
   it("should navigate to Sign Up page", () => {
     cy.contains("Sign Up")
       .should("have.attr", "href")
       .and("include", "/auth/signup");
+  });
+  it("should redirect to /employee/add after successful login", () => {
+    cy.intercept("POST", "/api/auth/callback/credentials").as("loginRequest");
+
+    cy.get('input[type="email"]').type("mufti@gmail.com");
+    cy.get('input[type="password"]').type("12345678");
+    cy.get('button[type="submit"]').click();
+
+    cy.wait(30000);
+
+    cy.url().should("include", "/employee/add");
   });
 });

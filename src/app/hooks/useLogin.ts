@@ -1,8 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import toast from "react-hot-toast";
 
 export function useLogin() {
   const [email, setEmail] = useState("");
@@ -36,44 +35,26 @@ export function useLogin() {
       }
 
       if (result?.ok) {
+        // Force session update
         const updatedSession = await update();
+        
+        // Wait for session to be available
+        const checkSession = async () => {
+          if (status === "authenticated" && updatedSession?.user) {
+            if (updatedSession.user.role === "Admin") {
+              router.push("/dashboard");
+            } else {
+              router.push("/employee/add");
+            }
+          } else {
+            setTimeout(checkSession, 500);
+          }
+        };
 
-        if (updatedSession?.user?.role === "Admin") {
-          router.push("/dashboard");
-        } else {
-          router.push("/employee/add");
-        }
+        await checkSession();
       }
     } catch {
       setError("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const result = await signIn("google", { redirect: false });
-
-      if (result?.error) {
-        setError(result.error);
-        setLoading(false);
-        return;
-      }
-
-      const updatedSession = await update();
-
-      if (updatedSession?.user?.role === "Admin") {
-        router.push("/dashboard");
-      } else {
-        router.push("/employee/add");
-      }
-    } catch (err) {
-      toast.error("Google login failed");
-      setError("Failed to login with Google");
     } finally {
       setLoading(false);
     }
@@ -87,7 +68,6 @@ export function useLogin() {
     error,
     loading,
     handleSubmit,
-    handleGoogleLogin,
     session,
     sessionStatus: status,
   };

@@ -1,6 +1,5 @@
 import { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import db from "./prismadb";
 
@@ -40,27 +39,6 @@ export const authOptions: AuthOptions = {
         };
       },
     }),
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-          scope: "openid email profile",
-        },
-      },
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          role: "user",
-        };
-      },
-    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -71,42 +49,13 @@ export const authOptions: AuthOptions = {
     signIn: "/auth/login",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        const existingUser = await db.user.findUnique({
-          where: { email: user.email },
-        });
-
-        if (!existingUser) {
-          const newUser = await db.user.create({
-            data: {
-              email: user.email,
-              name: user.name,
-              role: "user",
-              avatar: user.image,
-            },
-          });
-          user.id = newUser.id;
-        } else {
-          user.id = existingUser.id;
-          if (user.image && user.image !== existingUser.avatar) {
-            await db.user.update({
-              where: { id: existingUser.id },
-              data: { avatar: user.image },
-            });
-          }
-        }
-        return true;
-      }
-      return true;
-    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.role = user.role;
-        token.avatar = user.avatar || user.image;
+        token.avatar = user.avatar;
       }
       return token;
     },
