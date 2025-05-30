@@ -4,7 +4,6 @@ import IMAGES from "../../../assets/images/index";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc";
 import { useLogin } from "@/app/hooks/useLogin";
 import Loader from "@/app/components/loader/Loader";
 
@@ -17,7 +16,6 @@ function Login() {
     error,
     loading,
     handleSubmit,
-    handleGoogleLogin,
   } = useLogin();
 
   return (
@@ -77,15 +75,6 @@ function Login() {
               title={loading ? <Loader /> : "Login"}
               disabled={loading}
               type="submit"
-            />
-          </div>
-
-          <div className="flex items-center justify-center w-full px-4 mt-[15px]">
-            <Button
-              title={loading ? "Processing..." : "Login with Google"}
-              icon={FcGoogle}
-              onClick={handleGoogleLogin}
-              disabled={loading}
             />
           </div>
 

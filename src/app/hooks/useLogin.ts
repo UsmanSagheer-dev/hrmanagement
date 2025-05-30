@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export function useLogin() {
   const [email, setEmail] = useState("");
@@ -12,72 +12,55 @@ export function useLogin() {
   const router = useRouter();
   const { data: session, status, update } = useSession();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError("Email and password are required");
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (!email || !password) {
+    const errorMsg = "Email and password are required";
+    setError(errorMsg);
+    toast.error(errorMsg); 
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      toast.error("Invalid credentials");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError("");
-
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(result.error || "Invalid credentials");
-        setLoading(false);
-        return;
-      }
-
-      if (result?.ok) {
-        const updatedSession = await update();
-
-        if (updatedSession?.user?.role === "Admin") {
-          router.push("/dashboard");
-        } else {
-          router.push("/employee/add");
-        }
-      }
-    } catch {
-      setError("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const result = await signIn("google", { redirect: false });
-
-      if (result?.error) {
-        setError(result.error);
-        setLoading(false);
-        return;
-      }
-
+    if (result?.ok) {
       const updatedSession = await update();
 
-      if (updatedSession?.user?.role === "Admin") {
-        router.push("/dashboard");
-      } else {
-        router.push("/employee/add");
-      }
-    } catch (err) {
-      toast.error("Google login failed");
-      setError("Failed to login with Google");
-    } finally {
-      setLoading(false);
+      const checkSession = async () => {
+        if (status === "authenticated" && updatedSession?.user) {
+          if (updatedSession.user.role === "Admin") {
+            router.push("/dashboard");
+          } else {
+            router.push("/employee/add");
+          }
+        } else {
+          setTimeout(checkSession, 500);
+        }
+      };
+
+      await checkSession();
     }
-  };
+  } catch {
+    toast.error("Login failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return {
     email,
@@ -87,7 +70,6 @@ export function useLogin() {
     error,
     loading,
     handleSubmit,
-    handleGoogleLogin,
     session,
     sessionStatus: status,
   };
