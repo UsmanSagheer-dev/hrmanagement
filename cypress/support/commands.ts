@@ -1,4 +1,24 @@
 /// <reference types="cypress" />
+
+declare namespace Cypress {
+  interface Chainable {
+    loginViaUI(email: string, password: string): Chainable<Element>
+    fillPersonalInfoForm(data: {
+      firstName: string;
+      lastName: string;
+      phone: string;
+      email: string;
+      gender: string;
+      profileImage?: string;
+    }): Chainable<Element>
+    fillProfessionalInfoForm(data: {
+      username: string;
+      workEmail: string;
+      jobType: string;
+    }): Chainable<Element>
+  }
+}
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -25,83 +45,47 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-declare global {
-  namespace Cypress {
-    interface Chainable<Subject = any> {
-      login(): Chainable<Subject>
-    }
-  }
-}
 
-Cypress.Commands.add('login', (email: string, password: string) => {
-  cy.visit('/auth/login');
-  cy.get('input[type="email"]').type(email);
-  cy.get('input[type="password"]').type(password);
-  cy.get('button[type="submit"]').click();
-});
-
-Cypress.Commands.add('loginAsAdmin', () => {
-  cy.intercept('POST', '/api/auth/callback/credentials', {
-    statusCode: 200,
-    body: { ok: true },
-  }).as('loginRequest');
-
-  cy.intercept('GET', '/api/auth/session', {
+Cypress.Commands.add('loginViaUI', (email, password) => {
+  cy.intercept('POST', '/api/login', {
     statusCode: 200,
     body: {
+      token: 'fake-jwt-token',
       user: {
-        email: 'mufti@gmail.com',
-        role: 'Admin',
-      },
-    },
-  }).as('sessionCheck');
-
-  cy.login('mufti@gmail.com', '12345678');
-  cy.wait('@loginRequest');
-  cy.wait('@sessionCheck');
-  cy.wait(2000);
-});
-
-Cypress.Commands.add('loginAsEmployee', () => {
-  cy.intercept('POST', '/api/auth/callback/credentials').as('loginRequest');
-  cy.intercept('GET', '/api/auth/session').as('sessionCheck');
-
-  cy.login('mufti@gmail.com', '12345678');
-  cy.wait('@loginRequest');
-  cy.wait('@sessionCheck');
-  cy.wait(1000);
-});
-
-Cypress.Commands.add('loginWithInvalidCredentials', () => {
-  cy.intercept('POST', '/api/auth/callback/credentials', {
-    statusCode: 401,
-    body: { error: 'Invalid credentials' },
-  }).as('loginRequest');
-
-  cy.login('wrong@example.com', 'wrongpassword');
-  cy.wait('@loginRequest');
-});
-
-Cypress.Commands.add('loginWithNetworkError', () => {
-  cy.intercept('POST', '/api/auth/callback/credentials', {
-    forceNetworkError: true,
-  }).as('loginRequest');
-
-  cy.login('mufti@gmail.com', '12345678');
-  cy.wait('@loginRequest');
-});
-
-// Type definitions for custom commands
-declare global {
-  namespace Cypress {
-    interface Chainable {
-      login(email: string, password: string): Chainable<void>;
-      loginAsAdmin(): Chainable<void>;
-      loginAsEmployee(): Chainable<void>;
-      loginWithInvalidCredentials(): Chainable<void>;
-      loginWithNetworkError(): Chainable<void>;
+        id: 1,
+        email,
+        name: 'Usman'
+      }
     }
-  }
-}
+  }).as('loginRequest');
 
-export {};
+  cy.visit('/auth/login');
+
+  cy.get('input[type="email"]').type(email);
+  cy.get('input[type="password"]').type(password);
+  cy.get('input[type="checkbox"]').check();
+  cy.get('button[type="submit"]').click();
+
+  cy.wait('@loginRequest');
+});
+
+
+// Personal Information Form fill
+Cypress.Commands.add("fillPersonalInfoForm", (data) => {
+  cy.get("input[placeholder='First Name']").type(data.firstName);
+  cy.get("input[placeholder='Last Name']").type(data.lastName);
+  cy.get("input[placeholder='Phone Number']").type(data.phone);
+  cy.get("input[placeholder='Personal Email']").type(data.email);
+  cy.get("select").select(data.gender);
+
+  if (data.profileImage) {
+    cy.get("input[type='file']").selectFile(`cypress/fixtures/${data.profileImage}`, { force: true });
+  }
+});
+
+// Professional Information Form fill
+Cypress.Commands.add("fillProfessionalInfoForm", (data) => {
+  cy.get("input[placeholder='User Name']").type(data.username);
+  cy.get("input[placeholder='Work Email Address']").type(data.workEmail);
+  cy.get("select").select(data.jobType);
+});
