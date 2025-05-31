@@ -48,6 +48,21 @@ async function markAbsentEmployees() {
     });
     
     for (const employee of employees) {
+      // Check if employee has an approved leave request for today
+      const approvedLeave = await db.leaveRequest.findFirst({
+        where: {
+          employeeId: employee.id,
+          startDate: { lte: today },
+          endDate: { gte: today },
+          status: "APPROVED"
+        }
+      });
+
+      // Skip marking absent if employee has approved leave
+      if (approvedLeave) {
+        continue;
+      }
+
       const attendanceRecord = await db.attendance.findFirst({
         where: {
           employeeId: employee.id,
@@ -105,6 +120,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const dateString = date || new Date().toISOString().split("T")[0];
+
+    // Check for approved leave request
+    const approvedLeave = await db.leaveRequest.findFirst({
+      where: {
+        employeeId: isAdmin ? employeeId : session.user.id,
+        startDate: { lte: dateString },
+        endDate: { gte: dateString },
+        status: "APPROVED"
+      }
+    });
+
+    if (approvedLeave) {
+      return NextResponse.json(
+        { error: "Cannot mark attendance for approved leave days" },
+        { status: 400 }
+      );
+    }
+
     if (isAdmin && employeeId) {
       const employee = await db.employee.findUnique({
         where: { id: employeeId },
@@ -116,8 +150,6 @@ export async function POST(req: NextRequest) {
           { status: 404 }
         );
       }
-
-      const dateString = date || new Date().toISOString().split("T")[0];
 
       const existingAttendance = await db.attendance.findFirst({
         where: {
@@ -162,7 +194,6 @@ export async function POST(req: NextRequest) {
     }
 
     const today = new Date();
-    const dateString = today.toISOString().split("T")[0];
     const hours = today.getHours();
     const minutes = today.getMinutes();
     const period = hours >= 12 ? "PM" : "AM";

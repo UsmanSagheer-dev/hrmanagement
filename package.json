@@ -16,12 +16,14 @@
     "@reduxjs/toolkit": "^2.6.1",
     "@types/bcryptjs": "^2.4.6",
     "@uploadthing/react": "^7.3.0",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.8.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.5.0",
+    "lucide-react": "^0.511.0",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
     "next": "15.2.1",
@@ -38,7 +40,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -46,7 +48,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
     "prisma": "^6.6.0",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.8",
     "typescript": "^5"
   }
 }

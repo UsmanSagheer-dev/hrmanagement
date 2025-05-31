@@ -98,6 +98,11 @@ enum AttendanceStatus {
   ABSENT
 }
 
+enum LeaveRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
 model Notification {
   id          String            @id @default(auto()) @map("_id") @db.ObjectId
@@ -129,52 +134,62 @@ model Attendance {
   employee     Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
-
+model LeaveRequest {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String           @db.ObjectId
+  startDate       String           // Store as YYYY-MM-DD format
+  endDate         String           // Store as YYYY-MM-DD format
+  reason          String
+  status          LeaveRequestStatus @default(PENDING)
+  rejectionReason String?          // Optional field for rejection reason
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  // Relation to Employee
+  employee        Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
 
 model Employee {
-  id                 String    @id @map("_id") @db.ObjectId // Remove @default(auto()), use User's id
-  firstName          String
-  lastName           String
-  mobileNumber       String?
-  email              String    @unique
-  dateOfBirth        DateTime?
-  maritalStatus      String?
-  gender             String?
-  nationality        String?
-  address            String?
-  city               String?
-  state              String?
-  zipCode            String?
-  profileImage       String?
-  
-  // Professional Info
-  employeeId         String    @unique
-  userName           String?
-  employeeType       String?
-  workEmail          String?   @unique
-  department         String?
-  designation        String?
-  workingDays        String?
-  joiningDate        DateTime?
-  officeLocation     String?
-  
-  // Documents
-  appointmentLetter  String?
-  salarySlips        String?
-  relievingLetter    String?
-  experienceLetter   String?
-  
-  slackId            String?
-  skypeId            String?
-  githubId           String?
-  
-  user               User      @relation(fields: [id], references: [id], onDelete: Cascade)
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  firstName         String
+  lastName          String
+  mobileNumber      String
+  email             String
+  dateOfBirth       DateTime
+  maritalStatus     String
+  gender            String
+  nationality       String
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  profileImage      String?
+  employeeId        String           @unique
+  userName          String
+  employeeType      String
+  workEmail         String
+  department        String
+  designation       String
+  workingDays       String
+  joiningDate       DateTime
+  officeLocation    String
+  appointmentLetter String?
+  salarySlips       String?
+  relievingLetter   String?
+  experienceLetter  String?
+  slackId           String?
+  skypeId           String?
+  githubId          String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
-  notifications      Notification[]
-  attendance         Attendance[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  // Relations
+  user              User             @relation(fields: [id], references: [id], onDelete: Cascade)
+  attendance        Attendance[]
+  notifications     Notification[]
+  leaveRequests     LeaveRequest[]
 }
+
 model PendingEmployee {
   id                 String    @id @default(auto()) @map("_id") @db.ObjectId
   userId             String    @unique @db.ObjectId // Reference to the User
