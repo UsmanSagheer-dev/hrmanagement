@@ -1,43 +1,35 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { IoChevronBackOutline } from "react-icons/io5";
 import InputField from "../../../components/inputField/InputField";
 import Button from "../../../components/button/Button";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
-function ResetPassword() {
-  const searchParams = useSearchParams();
+function ForgotPassword() {
   const router = useRouter();
-  const email = searchParams?.get("email") || "";
-
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
-  // useEffect(() => {
-  //   if (!email) {
-  //     router.push("/auth/login");
-  //   }
-  // }, [email, router]);
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
     setError("");
+    setMessage("");
 
-    if (!otp || !newPassword || !confirmPassword) {
-      setError("All fields are required");
+    if (!phoneNumber) {
+      setError("Phone number is required");
       setLoading(false);
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^\+?[1-9]\d{9,14}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      setError("Please enter a valid phone number");
       setLoading(false);
       return;
     }
@@ -46,21 +38,22 @@ function ResetPassword() {
       const response = await fetch("/api/forget-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, newPassword }),
+        body: JSON.stringify({ phoneNumber }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Password reset successfully");
-        setTimeout(() => {
-          router.push("/auth/login");
-        }, 2000);
+        setMessage("If an account exists with this phone number, you will receive an OTP.");
+        toast.success("OTP sent successfully!");
+        router.push(`/auth/forgetpassword/reset?phone=${encodeURIComponent(phoneNumber)}`);
       } else {
-        setError(data.error || "Failed to reset password");
+        setError(data.error || "Failed to send OTP");
+        toast.error(data.error || "Failed to send OTP");
       }
     } catch (error) {
       setError("An error occurred");
+      toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -78,10 +71,10 @@ function ResetPassword() {
 
         <div className="flex flex-col ml-[15px] mb-[30px]">
           <h1 className="text-white text-[30px] font-semibold">
-            Reset Password
+            Forgot Password
           </h1>
           <p className="text-white text-[16px] font-light">
-            Enter the OTP sent to your email and create a new password.
+            Enter your phone number and we'll send you an OTP to reset your password.
           </p>
         </div>
 
@@ -90,32 +83,22 @@ function ResetPassword() {
           className="flex flex-col space-y-4 p-4 rounded-md"
         >
           <InputField
-            label="OTP Code"
+            label="Phone Number"
             type="text"
-            value={otp}
-            onChange={setOtp}
-          />
-          <InputField
-            label="New Password"
-            type="password"
-            value={newPassword}
-            onChange={setNewPassword}
-          />
-          <InputField
-            label="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
+            value={phoneNumber}
+            onChange={setPhoneNumber}
+            disabled={loading}
+            placeholder="+1234567890"
           />
 
           {error && <p className="text-red-500 text-center">{error}</p>}
           {message && <p className="text-green-500 text-center">{message}</p>}
 
-          <Button title="RESET PASSWORD" disabled={loading} />
+          <Button title={loading ? "Sending..." : "Send OTP"} disabled={loading} />
         </form>
       </div>
     </div>
   );
 }
 
-export default ResetPassword;
+export default ForgotPassword;

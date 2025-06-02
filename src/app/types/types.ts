@@ -296,3 +296,21 @@ export interface MenuItem {
   path: string;
   roles: string[];
 }
+
+export interface LeaveRequest {
+  id: string;
+  employeeId: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+  employee?: {
+    firstName: string;
+    lastName: string;
+    employeeId: string;
+    profileImage?: string;
+  };
+}
