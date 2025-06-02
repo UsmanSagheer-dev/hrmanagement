@@ -2,23 +2,21 @@ describe("Full Login Page Test", () => {
   it("should render inputs, submit form, call API, and redirect on success", () => {
     cy.visit("/auth/login");
 
-    // UI assertions
     cy.get('input[type="email"]').should("exist");
     cy.get('input[type="password"]').should("exist");
     cy.get('input[type="checkbox"]').should("exist");
     cy.contains("Forgot Password?").should("exist");
     cy.contains("Sign Up").should("exist");
 
-    // Navigation checks
     cy.contains("Forgot Password?").click();
     cy.url().should("include", "/auth/forgetpassword");
     cy.go("back");
 
     cy.contains("Sign Up").click();
+    cy.wait(1000);
     cy.url().should("include", "/auth/signup");
     cy.go("back");
 
-    // Intercept the login API to simulate success
     cy.intercept("POST", "/api/auth/callback/credentials", {
       statusCode: 200,
       headers: {

@@ -15,6 +15,7 @@
     "@prisma/client": "^6.5.0",
     "@reduxjs/toolkit": "^2.6.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/nodemailer": "^6.4.17",
     "@uploadthing/react": "^7.3.0",
     "autoprefixer": "^10.4.21",
     "axios": "^1.8.2",
@@ -29,6 +30,7 @@
     "next": "15.2.1",
     "next-auth": "^4.24.11",
     "next-cloudinary": "^6.16.0",
+    "nodemailer": "^6.10.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -36,6 +38,7 @@
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.2",
+    "twilio": "^5.7.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

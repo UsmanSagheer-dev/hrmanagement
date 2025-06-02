@@ -17,10 +17,13 @@ model User {
   email         String   @unique
   hashedPassword String?
   name          String?
+  phoneNumber   String?
   emailVerified DateTime?
   avatar        String?
   image         String?
   role          String?  @default("Employee")
+  resetPasswordToken String?
+  resetPasswordExpires DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   accounts      Account[]
