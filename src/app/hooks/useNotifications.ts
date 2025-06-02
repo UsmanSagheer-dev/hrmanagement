@@ -196,6 +196,30 @@ export function useNotifications(initialFilter?: {
     [handleAction]
   );
 
+  const clearAllNotifications = useCallback(async () => {
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
+
+      setNotifications([]);
+      setUnreadCount(0);
+      toast.success('All notifications cleared successfully');
+      return true;
+    } catch (err: any) {
+      toast.error('Failed to clear notifications');
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     if (sessionStatus === "authenticated") {
       fetchNotifications();
@@ -215,5 +239,6 @@ export function useNotifications(initialFilter?: {
     rejectRequest,
     getFormattedTimeAgo,
     setFilters,
+    clearAllNotifications,
   };
 }

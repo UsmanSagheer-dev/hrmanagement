@@ -169,6 +169,8 @@ export interface Employee {
   checkInTime: string | null;
   status: AttendanceStatus;
   avatar: string | null;
+  mobileNumber?: string;
+  address?: string;
 }
 
 export interface AttendanceModalProps {

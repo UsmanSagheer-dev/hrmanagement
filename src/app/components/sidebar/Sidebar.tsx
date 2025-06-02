@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { RxDashboard } from "react-icons/rx";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaBuilding } from "react-icons/fa";
 import { LuCalendarCheck } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi"; // Hamburger icon
@@ -59,7 +59,7 @@ const Sidebar: React.FC = () => {
     {
       id: 7,
       name: "Department",
-      icon: <IoSettingsOutline size={24} />,
+      icon: <FaBuilding size={24} />,
       path: "/department/alldepartment",
       roles: ["Admin"],
     },

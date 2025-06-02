@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Employee } from "@/app/types/types";
 
 export const useEmployees = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const search = searchParams.get("search");
+    if (search) {
+      setSearchQuery(search);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchEmployees();
@@ -36,6 +44,11 @@ export const useEmployees = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
+    if (query.trim()) {
+      router.push(`/employee/details?search=${encodeURIComponent(query)}`);
+    } else {
+      router.push("/employee/details");
+    }
   };
 
   const handleFilter = () => {
@@ -81,7 +94,12 @@ export const useEmployees = () => {
       fullName.includes(searchLower) ||
       employee.employeeId.toLowerCase().includes(searchLower) ||
       employee.workEmail.toLowerCase().includes(searchLower) ||
-      employee.department.toLowerCase().includes(searchLower)
+      employee.department.toLowerCase().includes(searchLower) ||
+      employee.designation?.toLowerCase().includes(searchLower) ||
+      employee.employeeType?.toLowerCase().includes(searchLower) ||
+      employee.status?.toLowerCase().includes(searchLower) ||
+      employee.mobileNumber?.toLowerCase().includes(searchLower) ||
+      employee.address?.toLowerCase().includes(searchLower)
     );
   });
 

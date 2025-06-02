@@ -10,7 +10,9 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
   const {
     isAdmin,
     unreadCount,
+    searchQuery,
     handleNotificationClick,
+    handleSearch,
     renderDescriptionWithIcon,
   } = useHeader(description, textColor);
 
@@ -26,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
         {isAdmin && (
           <>
             <div className="hidden md:block">
-              <SearchBar />
+              <SearchBar value={searchQuery} onChange={handleSearch} />
             </div>
             <div className="hidden md:block relative">
               <Button

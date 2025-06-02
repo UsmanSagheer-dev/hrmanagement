@@ -1,15 +1,26 @@
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { useNotifications } from "@/app/hooks/useNotifications";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export const useHeader = (description: string, textColor?: string) => {
   const { userData } = useUserProfile();
   const { unreadCount } = useNotifications();
   const isAdmin = userData?.role === "Admin";
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleNotificationClick = () => {
     window.location.href = "/notifications";
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (query.trim()) {
+      router.push(`/employee/details?search=${encodeURIComponent(query)}`);
+    }
   };
 
   const renderDescriptionWithIcon = () => {
@@ -43,7 +54,9 @@ export const useHeader = (description: string, textColor?: string) => {
   return {
     isAdmin,
     unreadCount,
+    searchQuery,
     handleNotificationClick,
+    handleSearch,
     renderDescriptionWithIcon,
   };
 };

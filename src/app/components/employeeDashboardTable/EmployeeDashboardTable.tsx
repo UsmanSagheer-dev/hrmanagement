@@ -8,6 +8,9 @@ import toast from "react-hot-toast";
 
 const EmployeeDashboardTable: React.FC = () => {
   const { employees, isLoading, error } = useEmployeeDashboardData();
+  const [showAll, setShowAll] = React.useState(false);
+
+  const displayedEmployees = showAll ? employees : employees.slice(0, 6);
 
   const columns = [
     {
@@ -70,8 +73,13 @@ const EmployeeDashboardTable: React.FC = () => {
     <div className="bg-transparent">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl text-white font-semibold">Employee Overview</h1>
-        <select className="bg-gray-900 text-white border border-gray-800 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-700">
-          <option>View All</option>
+        <select 
+          className="bg-gray-900 text-white border border-gray-800 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-700"
+          value={showAll ? "all" : "limited"}
+          onChange={(e) => setShowAll(e.target.value === "all")}
+        >
+          <option value="limited">View Limited</option>
+          <option value="all">View All</option>
         </select>
       </div>
       {isLoading ? (
@@ -85,7 +93,7 @@ const EmployeeDashboardTable: React.FC = () => {
           No employee records found
         </div>
       ) : (
-        <Table data={employees} columns={columns} />
+        <Table data={displayedEmployees} columns={columns} />
       )}
     </div>
   );
