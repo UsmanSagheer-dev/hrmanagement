@@ -16,6 +16,7 @@ declare namespace Cypress {
       workEmail: string;
       jobType: string;
     }): Chainable<Element>
+    attachFile(fileName: string): Chainable<Element>
   }
 }
 
@@ -88,4 +89,9 @@ Cypress.Commands.add("fillProfessionalInfoForm", (data) => {
   cy.get("input[placeholder='User Name']").type(data.username);
   cy.get("input[placeholder='Work Email Address']").type(data.workEmail);
   cy.get("select").select(data.jobType);
+});
+
+// Add file upload command
+Cypress.Commands.add('attachFile', (fileName: string) => {
+  cy.get('input[type="file"]').selectFile(`cypress/fixtures/${fileName}`, { force: true });
 });

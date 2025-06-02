@@ -20,6 +20,7 @@ function Page() {
     getFormattedTimeAgo,
     setFilters,
     fetchNotifications,
+    clearAllNotifications,
   } = useNotifications();
 
   const handleFilterChange = (filter: string) => {
@@ -31,6 +32,15 @@ function Page() {
       setFilters({ status: "PENDING" });
     } else if (filter === "employee") {
       setFilters({ type: "EMPLOYEE_REQUEST" });
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (window.confirm("Are you sure you want to clear all notifications?")) {
+      const success = await clearAllNotifications();
+      if (success) {
+        fetchNotifications();
+      }
     }
   };
 
@@ -98,6 +108,14 @@ function Page() {
             >
               Employee
             </button>
+            {notifications.length > 0 && (
+              <button
+                onClick={handleClearAll}
+                className="ml-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Clear All
+              </button>
+            )}
           </div>
 
           <div className="max-h-[80vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-4 flex flex-col overflow-y-auto">

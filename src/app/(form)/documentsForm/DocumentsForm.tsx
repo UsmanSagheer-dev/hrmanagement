@@ -27,12 +27,13 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
   ];
 
   const NavigationTab = ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Icon,
     title,
     tabName,
     isActive,
   }: {
-    Icon: any;
+    Icon: React.ComponentType<any>;
     title: string;
     tabName: string;
     isActive: boolean;

@@ -154,35 +154,35 @@ export async function PUT(req: NextRequest) {
         await db.employee.create({
           data: {
             id: userId,
-            firstName: pendingEmployee.firstName,
-            lastName: pendingEmployee.lastName,
-            mobileNumber: pendingEmployee.mobileNumber,
-            email: pendingEmployee.email,
-            dateOfBirth: pendingEmployee.dateOfBirth,
-            maritalStatus: pendingEmployee.maritalStatus,
-            gender: pendingEmployee.gender,
-            nationality: pendingEmployee.nationality,
-            address: pendingEmployee.address,
-            city: pendingEmployee.city,
-            state: pendingEmployee.state,
-            zipCode: pendingEmployee.zipCode,
+            firstName: pendingEmployee.firstName ?? '',
+            lastName: pendingEmployee.lastName ?? '',
+            mobileNumber: pendingEmployee.mobileNumber ?? '',
+            email: pendingEmployee.email ?? '',
+            dateOfBirth: pendingEmployee.dateOfBirth ?? new Date(),
+            maritalStatus: pendingEmployee.maritalStatus ?? '',
+            gender: pendingEmployee.gender ?? '',
+            nationality: pendingEmployee.nationality ?? '',
+            address: pendingEmployee.address ?? '',
+            city: pendingEmployee.city ?? '',
+            state: pendingEmployee.state ?? '',
+            zipCode: pendingEmployee.zipCode ?? '',
             profileImage: pendingEmployee.profileImage,
-            employeeId: pendingEmployee.employeeId,
-            userName: pendingEmployee.userName,
-            employeeType: pendingEmployee.employeeType,
-            workEmail: pendingEmployee.workEmail,
-            department: pendingEmployee.department,
-            designation: pendingEmployee.designation,
-            workingDays: pendingEmployee.workingDays,
-            joiningDate: pendingEmployee.joiningDate,
-            officeLocation: pendingEmployee.officeLocation,
+            employeeId: pendingEmployee.employeeId ?? '',
+            userName: pendingEmployee.userName ?? '',
+            employeeType: pendingEmployee.employeeType ?? '',
+            workEmail: pendingEmployee.workEmail ?? '',
+            department: pendingEmployee.department ?? '',
+            designation: pendingEmployee.designation ?? '',
+            workingDays: pendingEmployee.workingDays ?? '',
+            joiningDate: pendingEmployee.joiningDate ?? new Date(),
+            officeLocation: pendingEmployee.officeLocation ?? '',
             appointmentLetter: pendingEmployee.appointmentLetter,
             salarySlips: pendingEmployee.salarySlips,
             relievingLetter: pendingEmployee.relievingLetter,
             experienceLetter: pendingEmployee.experienceLetter,
-            slackId: pendingEmployee.slackId,
-            skypeId: pendingEmployee.skypeId,
-            githubId: pendingEmployee.githubId,
+            slackId: pendingEmployee.slackId ?? '',
+            skypeId: pendingEmployee.skypeId ?? '',
+            githubId: pendingEmployee.githubId ?? '',
           },
         });
 
@@ -219,6 +219,47 @@ export async function PUT(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message ?? "Failed to update notification" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+
+    const queryCondition: any = {
+      OR: [
+        { targetId: session.user.id },
+        {
+          employee: {
+            id: session.user.id,
+          },
+        },
+      ],
+    };
+
+    // If user is admin, they can clear all notifications
+    if (user?.role === "Admin") {
+      delete queryCondition.OR;
+    }
+
+    await db.notification.deleteMany({
+      where: queryCondition,
+    });
+
+    return NextResponse.json({ message: "All notifications cleared successfully" });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error?.message ?? "Failed to clear notifications" },
       { status: 500 }
     );
   }

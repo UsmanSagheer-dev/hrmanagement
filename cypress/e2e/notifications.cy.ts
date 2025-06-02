@@ -1,6 +1,6 @@
 describe('Notification System', () => {
   beforeEach(() => {
-    cy.login(); // Custom command to handle login
+    cy.loginViaUI('test@example.com', 'password123'); // Using the correct login command
     cy.visit('/notifications');
   });
 
