@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .hide-scrollbar::-webkit-scrollbar,
 .hide-vertical-scrollbar::-webkit-scrollbar {
@@ -9,21 +11,23 @@
 
 .hide-scrollbar,
 .hide-vertical-scrollbar {
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, and Opera */
+  display: none;
+  /* Chrome, Safari, and Opera */
 }
 
 select option {
-  background-color: #000000 !important; /* Black background for options */
-  color: #ffffff !important; /* White text for options */
+  background-color: #331d1d !important;
+  /* Black background for options */
+  color: #d7cccc !important;
+  /* White text for options */
 }
-

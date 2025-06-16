@@ -33,6 +33,7 @@ const InputField: React.FC<InputFieldProps> = ({
   accept,
   multiple,
   onFileChange,
+  disabled,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -52,10 +53,12 @@ const InputField: React.FC<InputFieldProps> = ({
     }
   };
 
+  const getTestId = () => {
+    return label ? `input-${label.toLowerCase().replace(/\s+/g, '-')}` : `input-${type}`;
+  };
+
   const renderInput = () => {
-    const baseClasses = `w-full cursor-pointer text-[#A2A1A8CC] border p-2 rounded-[10px] outline-orange placeholder-[#A2A1A8CC] ${
-      label ? "pt-5" : ""
-    } ${className}`;
+    const baseClasses = `w-full cursor-pointer text-[#A2A1A8CC] border border-[#A2A1A8CC] p-3 rounded-[10px] outline-none focus:border-[#E25319] placeholder-[#A2A1A8CC] bg-transparent ${className}`;
 
     switch (type) {
       case "password":
@@ -71,11 +74,13 @@ const InputField: React.FC<InputFieldProps> = ({
               placeholder={placeholder}
               name={name}
               required={required}
+              disabled={disabled}
               className={baseClasses}
+              data-testid={getTestId()}
             />
             <button
               type="button"
-              className="absolute cursor-pointer right-3 top-4 w-6 h-6 text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A1A8CC] hover:text-[#E25319]"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <BiHide size={24} /> : <BiShow size={24} />}
@@ -93,7 +98,9 @@ const InputField: React.FC<InputFieldProps> = ({
               onBlur={() => setIsFocused(value !== "")}
               name={name}
               required={required}
-              className={`${baseClasses} appearance-none placeholder-[#A2A1A8CC]`}
+              disabled={disabled}
+              className={`${baseClasses} appearance-none`}
+              data-testid={getTestId()}
             >
               <option value="" disabled>
                 {placeholder}
@@ -105,7 +112,7 @@ const InputField: React.FC<InputFieldProps> = ({
               ))}
             </select>
             <MdKeyboardArrowDown
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A1A8CC]"
               size={20}
             />
           </div>
@@ -124,10 +131,12 @@ const InputField: React.FC<InputFieldProps> = ({
               placeholder={placeholder}
               name={name}
               required={required}
+              disabled={disabled}
               className={baseClasses}
+              data-testid={getTestId()}
             />
             <BsCalendar
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A1A8CC]"
               size={18}
             />
           </div>
@@ -143,10 +152,12 @@ const InputField: React.FC<InputFieldProps> = ({
               onChange={(e) => onChange(e.target.checked ? "true" : "false")}
               name={name}
               required={required}
+              disabled={disabled}
               className="w-4 h-4 accent-[#E25319] cursor-pointer"
+              data-testid={getTestId()}
             />
             {placeholder && (
-              <span className="ml-2 text-white">{placeholder}</span>
+              <span className="ml-2 text-[#A2A1A8CC]">{placeholder}</span>
             )}
           </div>
         );
@@ -162,18 +173,20 @@ const InputField: React.FC<InputFieldProps> = ({
               multiple={multiple}
               name={name}
               required={required}
-              className={`${baseClasses} cursor-pointer opacity-0 absolute w-full h-full`}
+              disabled={disabled}
+              className={`${baseClasses} opacity-0 absolute w-full h-full top-0 left-0`}
+              data-testid={getTestId()}
             />
             <input
               type="text"
               value={value || placeholder || ""}
-              onChange={handleChange}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(value !== "")}
               placeholder={placeholder}
               readOnly
               className={`${baseClasses} cursor-pointer`}
               onClick={() => fileInputRef.current?.click()}
+              data-testid={`${getTestId()}-display`}
             />
           </div>
         );
@@ -190,7 +203,9 @@ const InputField: React.FC<InputFieldProps> = ({
             placeholder={placeholder}
             name={name}
             required={required}
+            disabled={disabled}
             className={baseClasses}
+            data-testid={getTestId()}
           />
         );
     }
@@ -202,10 +217,10 @@ const InputField: React.FC<InputFieldProps> = ({
         {renderInput()}
         {label && type !== "checkbox" && (
           <label
-            className={`absolute left-2 text-[#E25319] transition-all duration-200 ease-in-out ${
+            className={`absolute left-2 text-[#E25319] transition-all duration-300 ease-in-out pointer-events-none ${
               isFocused || value
                 ? "top-0 text-xs -translate-y-1/2 bg-black px-1"
-                : "top-[20px] -translate-y-1/2 text-sm"
+                : "top-4 text-sm"
             }`}
           >
             {label}

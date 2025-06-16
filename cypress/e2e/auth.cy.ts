@@ -1,35 +1,64 @@
-describe('Authentication', () => {
+describe("Login Page UI", () => {
   beforeEach(() => {
-    cy.visit('/');
+    cy.visit("/auth/login");
   });
 
-  it('should successfully login with valid credentials', () => {
-    cy.get('[data-testid="email-input"]').type('test@example.com');
-    cy.get('[data-testid="password-input"]').type('password123');
-    cy.get('[data-testid="login-button"]').click();
-    cy.url().should('include', '/dashboard');
+  it("should display the logo", () => {
+    cy.get("img[alt='Logo']").should("be.visible");
   });
 
-  it('should show error message with invalid credentials', () => {
-    cy.get('[data-testid="email-input"]').type('invalid@example.com');
-    cy.get('[data-testid="password-input"]').type('wrongpassword');
-    cy.get('[data-testid="login-button"]').click();
-    cy.get('[data-testid="error-message"]').should('be.visible');
+  it("should display welcome message", () => {
+    cy.contains("h1", "Welcome").should("be.visible");
+    cy.contains("p", "Please login here").should("be.visible");
   });
 
-  it('should successfully register a new user', () => {
-    cy.get('[data-testid="register-link"]').click();
-    cy.get('[data-testid="name-input"]').type('Test User');
-    cy.get('[data-testid="email-input"]').type('newuser@example.com');
-    cy.get('[data-testid="password-input"]').type('password123');
-    cy.get('[data-testid="register-button"]').click();
-    cy.url().should('include', '/login');
+  it("should render email and password input fields", () => {
+    cy.get("input[type='email']").should("be.visible").and("not.be.disabled");
+    cy.get("input[type='password']").should("be.visible").and("not.be.disabled");
   });
 
-  it('should handle password reset flow', () => {
-    cy.get('[data-testid="forgot-password-link"]').click();
-    cy.get('[data-testid="email-input"]').type('test@example.com');
-    cy.get('[data-testid="reset-button"]').click();
-    cy.get('[data-testid="success-message"]').should('be.visible');
+  it("should render remember me checkbox", () => {
+    cy.get("[data-testid='remember-me-checkbox']")
+      .should("exist")
+      .and("have.attr", "type", "checkbox");
   });
-}); 
+
+  it("should render forgot password link", () => {
+    cy.contains("a", "Forgot Password?").should("have.attr", "href").and("include", "/auth/forgetpassword");
+  });
+
+  it("should render login button", () => {
+    cy.get("[data-testid='button']").should("exist").and("contain", "Login");
+  });
+
+  it("should render sign up link", () => {
+    cy.contains("a", "Sign Up").should("have.attr", "href").and("include", "/auth/signup");
+  });
+
+  it("should allow typing in email and password fields", () => {
+    cy.get("input[type='email']").type("test@example.com").should("have.value", "test@example.com");
+    cy.get("input[type='password']").type("123456").should("have.value", "123456");
+  });
+  it("redirects to /dashboard for Admin login", () => {
+    cy.intercept("POST", "/api/auth/callback/credentials").as("loginRequest");
+  
+    cy.get("input[type='email']").type("usmanadmin@gmail.com");
+    cy.get("input[type='password']").type("admin5839");
+    cy.get("[data-testid='button']").click();
+  
+    cy.wait("@loginRequest", { timeout: 35000 });
+  
+    cy.url({ timeout: 30000 }).should("include", "/dashboard");
+  });
+  
+  
+  
+  it("redirects to /employee/add for Employee login", () => {
+    cy.get("input[type='email']").type("mufti@gmail.com");
+    cy.get("input[type='password']").type("12345678");
+    cy.get("[data-testid='button']").click();
+  
+    cy.url({ timeout: 30000 }).should("include", "/employee/add");
+  });
+  
+});

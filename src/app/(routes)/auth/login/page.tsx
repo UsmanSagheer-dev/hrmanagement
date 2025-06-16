@@ -53,7 +53,9 @@ function Login() {
           />
 
           {error && (
-            <p className="text-red-500 text-[14px] text-center">{error}</p>
+            <p data-testid="error-message" className="text-red-500 text-[14px] text-center">
+              {error}
+            </p>
           )}
 
           <div className="flex items-center justify-between w-full px-4 mt-[16px]">
@@ -62,6 +64,7 @@ function Login() {
                 type="checkbox"
                 className="w-6 h-6 bg-orange-500 border-orange-500 checked:bg-orange-500 checked:border-orange-500 accent-orange-500 cursor-pointer"
                 disabled={loading}
+                data-testid="remember-me-checkbox"
               />
               <p className="text-white text-[16px] font-light">Remember me</p>
             </div>
@@ -75,6 +78,7 @@ function Login() {
               title={loading ? <Loader /> : "Login"}
               disabled={loading}
               type="submit"
+              data-testid="button"
             />
           </div>
 
