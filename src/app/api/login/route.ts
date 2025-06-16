@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "../../../../lib/prismadb";
-import toast from "react-hot-toast";
 
 export async function POST(req: Request) {
   try {

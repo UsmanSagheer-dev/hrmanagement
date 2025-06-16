@@ -33,6 +33,7 @@ const InputField: React.FC<InputFieldProps> = ({
   accept,
   multiple,
   onFileChange,
+  disabled,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -52,6 +53,10 @@ const InputField: React.FC<InputFieldProps> = ({
     }
   };
 
+  const getTestId = () => {
+    return label ? `input-${label.toLowerCase().replace(/\s+/g, '-')}` : `input-${type}`;
+  };
+
   const renderInput = () => {
     const baseClasses = `w-full cursor-pointer text-[#A2A1A8CC] border border-[#A2A1A8CC] p-3 rounded-[10px] outline-none focus:border-[#E25319] placeholder-[#A2A1A8CC] bg-transparent ${className}`;
 
@@ -69,7 +74,9 @@ const InputField: React.FC<InputFieldProps> = ({
               placeholder={placeholder}
               name={name}
               required={required}
+              disabled={disabled}
               className={baseClasses}
+              data-testid={getTestId()}
             />
             <button
               type="button"
@@ -91,7 +98,9 @@ const InputField: React.FC<InputFieldProps> = ({
               onBlur={() => setIsFocused(value !== "")}
               name={name}
               required={required}
+              disabled={disabled}
               className={`${baseClasses} appearance-none`}
+              data-testid={getTestId()}
             >
               <option value="" disabled>
                 {placeholder}
@@ -122,7 +131,9 @@ const InputField: React.FC<InputFieldProps> = ({
               placeholder={placeholder}
               name={name}
               required={required}
+              disabled={disabled}
               className={baseClasses}
+              data-testid={getTestId()}
             />
             <BsCalendar
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A1A8CC]"
@@ -141,7 +152,9 @@ const InputField: React.FC<InputFieldProps> = ({
               onChange={(e) => onChange(e.target.checked ? "true" : "false")}
               name={name}
               required={required}
+              disabled={disabled}
               className="w-4 h-4 accent-[#E25319] cursor-pointer"
+              data-testid={getTestId()}
             />
             {placeholder && (
               <span className="ml-2 text-[#A2A1A8CC]">{placeholder}</span>
@@ -160,7 +173,9 @@ const InputField: React.FC<InputFieldProps> = ({
               multiple={multiple}
               name={name}
               required={required}
+              disabled={disabled}
               className={`${baseClasses} opacity-0 absolute w-full h-full top-0 left-0`}
+              data-testid={getTestId()}
             />
             <input
               type="text"
@@ -171,6 +186,7 @@ const InputField: React.FC<InputFieldProps> = ({
               readOnly
               className={`${baseClasses} cursor-pointer`}
               onClick={() => fileInputRef.current?.click()}
+              data-testid={`${getTestId()}-display`}
             />
           </div>
         );
@@ -187,7 +203,9 @@ const InputField: React.FC<InputFieldProps> = ({
             placeholder={placeholder}
             name={name}
             required={required}
+            disabled={disabled}
             className={baseClasses}
+            data-testid={getTestId()}
           />
         );
     }
