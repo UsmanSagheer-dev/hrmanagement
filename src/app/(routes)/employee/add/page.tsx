@@ -9,7 +9,7 @@ import Loader from "@/app/components/loader/Loader";
 import { useEmployeeForm } from "./useEmployeeForm";
 
 function EmployeeFormContent() {
-  const { userRole, loading, error, renderContent, showHeaderAndSidebar } =
+  const {  loading, error, renderContent, showHeaderAndSidebar } =
     useEmployeeForm();
 
   if (loading) {

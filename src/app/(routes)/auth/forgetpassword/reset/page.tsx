@@ -6,6 +6,7 @@ import Button from "../../../../components/button/Button";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
+import Loader from "@/app/components/loader/Loader";
 
 function ResetPassword() {
   const searchParams = useSearchParams();
@@ -43,8 +44,8 @@ function ResetPassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters long");
       setLoading(false);
       return;
     }
@@ -59,7 +60,7 @@ function ResetPassword() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Password reset successfully");
+        setMessage("Password reset successfully! Redirecting to login...");
         toast.success("Password reset successfully!");
         setTimeout(() => {
           router.push("/auth/login");
@@ -69,7 +70,7 @@ function ResetPassword() {
         toast.error(data.error || "Failed to reset password");
       }
     } catch (error) {
-      setError("An error occurred");
+      setError("An error occurred while resetting password");
       toast.error("An error occurred");
     } finally {
       setLoading(false);
@@ -91,7 +92,7 @@ function ResetPassword() {
             Reset Password
           </h1>
           <p className="text-white text-[16px] font-light">
-            Enter the OTP sent to your phone and create a new password.
+            Enter the 6-digit OTP sent to your phone and set a new password (min 8 characters).
           </p>
         </div>
 
@@ -105,6 +106,7 @@ function ResetPassword() {
             value={otp}
             onChange={setOtp}
             disabled={loading}
+       
           />
           <InputField
             label="New Password"
@@ -112,6 +114,7 @@ function ResetPassword() {
             value={newPassword}
             onChange={setNewPassword}
             disabled={loading}
+          
           />
           <InputField
             label="Confirm Password"
@@ -119,16 +122,17 @@ function ResetPassword() {
             value={confirmPassword}
             onChange={setConfirmPassword}
             disabled={loading}
+          
           />
 
           {error && <p className="text-red-500 text-center">{error}</p>}
           {message && <p className="text-green-500 text-center">{message}</p>}
 
-          <Button title={loading ? "Resetting..." : "Reset Password"} disabled={loading} />
+          <Button title={loading ? <Loader/> : "Reset Password"} disabled={loading} />
         </form>
       </div>
     </div>
   );
 }
 
-export default ResetPassword; 
+export default ResetPassword;

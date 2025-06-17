@@ -33,7 +33,11 @@ export function useAccountAccessForm() {
     updateFormData("account", resetData);
   };
 
-  const INPUT_FIELDS = [
+  const INPUT_FIELDS: {
+    type: "text" | "email" | "password" | "checkbox" | "select" | "date" | "file";
+    placeholder: string;
+    field: string;
+  }[] = [
     { type: "email", placeholder: "Email Address", field: "emailAddress" },
     { type: "text", placeholder: "Slack ID", field: "slackId" },
     { type: "text", placeholder: "Skype ID", field: "skypeId" },
