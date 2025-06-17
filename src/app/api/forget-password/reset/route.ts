@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "../../../../../lib/prismadb";
 
+const formatPhoneNumber = (phoneNumber: string) => {
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  return phoneNumber.startsWith('+') ? phoneNumber : `+${cleaned}`;
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -14,12 +19,24 @@ export async function POST(req: Request) {
       );
     }
 
+    const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+    const phoneRegex = /^\+?[1-9]\d{9,14}$/;
+    if (!phoneRegex.test(formattedPhoneNumber)) {
+      return NextResponse.json(
+        { error: "Invalid phone number format" },
+        { status: 400 }
+      );
+    }
+
+    if (newPassword.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters long" },
+        { status: 400 }
+      );
+    }
+
     const user = await db.user.findFirst({
-      where: {
-        phoneNumber: {
-          equals: phoneNumber
-        }
-      },
+      where: { phoneNumber: { equals: formattedPhoneNumber } },
     });
 
     if (!user) {
@@ -31,7 +48,7 @@ export async function POST(req: Request) {
 
     if (!user.resetPasswordToken || !user.resetPasswordExpires) {
       return NextResponse.json(
-        { error: "No password reset request found" },
+        { error: "No active password reset request found" },
         { status: 400 }
       );
     }
@@ -72,4 +89,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-} 
+}

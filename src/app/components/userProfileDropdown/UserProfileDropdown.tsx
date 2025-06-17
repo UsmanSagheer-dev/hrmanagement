@@ -7,9 +7,6 @@ import Link from "next/link";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { Props } from "@/app/types/types";
 import toast from "react-hot-toast";
-
-
-
 const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { userData, isLoading } = useUserProfile(initialUserData);
