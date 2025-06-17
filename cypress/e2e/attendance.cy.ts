@@ -1,6 +1,6 @@
 describe('Attendance Management', () => {
   beforeEach(() => {
-    cy.loginViaUI('test@example.com', 'password123'); // Using the correct login command
+    cy.loginViaUI('test@example.com', 'password123'); 
     cy.visit('/attendance');
   });
 

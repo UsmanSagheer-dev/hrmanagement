@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 
 export function useLogin() {
@@ -10,57 +10,55 @@ export function useLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { data: session, status, update } = useSession();
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  if (!email || !password) {
-    const errorMsg = "Email and password are required";
-    setError(errorMsg);
-    toast.error(errorMsg); 
-    return;
-  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  setLoading(true);
-  setError("");
+    if (loading) return;
 
-  try {
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      toast.error("Invalid credentials");
-      setLoading(false);
+    if (!email || !password) {
+      const errorMsg = "Email and password are required";
+      setError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
-    if (result?.ok) {
-      const updatedSession = await update();
+    setLoading(true);
+    setError("");
 
-      const checkSession = async () => {
-        if (status === "authenticated" && updatedSession?.user) {
-          if (updatedSession.user.role === "Admin") {
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Invalid credentials");
+        setLoading(false);
+        return;
+      }
+
+      if (result?.ok) {
+        const session = await getSession();
+
+        if (session?.user) {
+          const role = session.user.role;
+          if (role === "Admin") {
             router.push("/dashboard");
           } else {
             router.push("/employee/add");
           }
         } else {
-          setTimeout(checkSession, 500);
+          toast.error("Session not found. Please try again.");
         }
-      };
-
-      await checkSession();
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch {
-    toast.error("Login failed. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return {
     email,
@@ -70,7 +68,5 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     error,
     loading,
     handleSubmit,
-    session,
-    sessionStatus: status,
   };
 }

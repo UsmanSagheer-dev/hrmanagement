@@ -6,6 +6,7 @@ import Button from "../../../components/button/Button";
 import Link from "next/link";
 import { useLogin } from "@/app/hooks/useLogin";
 import Loader from "@/app/components/loader/Loader";
+import { COLORS } from "@/app/constants/color";
 
 function Login() {
   const {
@@ -19,7 +20,7 @@ function Login() {
   } = useLogin();
 
   return (
-    <div className="h-screen bg-[#131313] flex items-center justify-center">
+<div className="h-screen flex items-center justify-center" style={{ backgroundColor:COLORS.darkBackground }}>
       <div className="w-[455px] max-w-full flex flex-col justify-center">
         <div>
           <img

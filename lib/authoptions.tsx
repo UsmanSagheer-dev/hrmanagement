@@ -16,8 +16,17 @@ export const authOptions: AuthOptions = {
           throw new Error("Email and password are required");
         }
 
+        // Optimized query with minimal fields
         const user = await db.user.findUnique({
           where: { email: credentials.email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            avatar: true,
+            hashedPassword: true,
+          },
         });
 
         if (!user || !user.hashedPassword) {
@@ -28,7 +37,9 @@ export const authOptions: AuthOptions = {
           credentials.password,
           user.hashedPassword
         );
-        if (!isValid) throw new Error("Invalid password");
+        if (!isValid) {
+          throw new Error("Invalid password");
+        }
 
         return {
           id: user.id,
@@ -43,13 +54,15 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   pages: {
     signIn: "/auth/login",
   },
   callbacks: {
     async jwt({ token, user }) {
+      // Only update token with user data when user is present (initial sign-in)
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -60,6 +73,7 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      // Efficient session assignment
       if (token?.id) {
         session.user = {
           id: token.id as string,
