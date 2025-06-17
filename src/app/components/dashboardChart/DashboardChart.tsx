@@ -13,6 +13,7 @@ import Button from "../button/Button";
 import { useEffect, useState } from "react";
 import useDashboardChart from "./useDashboardChart";
 import Loader from "../loader/Loader";
+import { COLORS } from "@/app/constants/color";
 
 export default function AttendanceOverview() {
   const {
@@ -46,11 +47,17 @@ export default function AttendanceOverview() {
 
     if (active && tooltipData) {
       return (
-        <div className="bg-black border border-gray-700 p-3 rounded-md">
-          <p className="font-bold text-white">{`${label}`}</p>
-          <p className="text-pink-500">{`On Time: ${tooltipData.high}`}</p>
-          <p className="text-yellow-400">{`Late: ${tooltipData.medium}`}</p>
-          <p className="text-orange-500">{`Absent: ${tooltipData.low}`}</p>
+        <div
+          style={{
+            backgroundColor: COLORS.tooltipBg,
+            border: `1px solid ${COLORS.tooltipBorder}`,
+          }}
+          className="p-3 rounded-md"
+        >
+          <p className="font-bold text-white">{label}</p>
+          <p style={{ color: COLORS.onTime }}>{`On Time: ${tooltipData.high}`}</p>
+          <p style={{ color: COLORS.late }}>{`Late: ${tooltipData.medium}`}</p>
+          <p style={{ color: COLORS.absent }}>{`Absent: ${tooltipData.low}`}</p>
         </div>
       );
     }
@@ -63,14 +70,22 @@ export default function AttendanceOverview() {
       : chartData.filter((day) => day.name === selectedDay);
 
   return (
-    <div className="bg-transparent text-white p-6 rounded-lg w-full">
+    <div
+      className="text-white p-6 rounded-lg w-full"
+      style={{ backgroundColor: "transparent" }}
+    >
       <div className="flex justify-between items-center mb-6 flex-wrap">
         <h2 className="text-xl font-bold">Attendance Overview</h2>
         <div className="flex gap-4">
           <select
-            className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md"
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
+            className="px-4 py-2 rounded-md"
+            style={{
+              backgroundColor: "transparent",
+              border: `1px solid ${COLORS.borderGray}`,
+              color: COLORS.textWhite,
+            }}
           >
             <option value="All">All Days</option>
             {daysOfWeek?.map((day) => (
@@ -82,7 +97,12 @@ export default function AttendanceOverview() {
           <Button
             icon={RiArrowDropDownLine}
             title="Today"
-            className="bg-transparent border border-gray-700 text-white px-4 py-2 rounded-md flex flex-row-reverse items-center justify-center"
+            className="flex flex-row-reverse items-center justify-center px-4 py-2 rounded-md"
+            style={{
+              backgroundColor: "transparent",
+              border: `1px solid ${COLORS.borderGray}`,
+              color: COLORS.textWhite,
+            }}
             onClick={() => setSelectedDay("All")}
           />
         </div>
@@ -102,43 +122,53 @@ export default function AttendanceOverview() {
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               barSize={12}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="name" tick={{ fill: "#9CA3AF" }} />
-              <YAxis tick={{ fill: "#9CA3AF" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridStroke} />
+              <XAxis dataKey="name" tick={{ fill: COLORS.axisLabel }} />
+              <YAxis tick={{ fill: COLORS.axisLabel }} />
               <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="low"
                 stackId="a"
-                fill="#F97316"
+                fill={COLORS.absent}
                 radius={[30, 30, 30, 30]}
               />
               <Bar
                 dataKey="medium"
                 stackId="a"
-                fill="#FBBF24"
+                fill={COLORS.late}
                 radius={[30, 30, 30, 30]}
               />
               <Bar
                 dataKey="high"
                 stackId="a"
-                fill="#F45B69"
+                fill={COLORS.onTime}
                 radius={[30, 30, 30, 30]}
               />
             </BarChart>
           </ResponsiveContainer>
         )}
       </div>
-      <div className="flex mt-4 gap-2 text-sm items-center justify-center">
+
+      <div className="flex mt-4 gap-4 text-sm items-center justify-center">
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-[#F45B69] rounded-full mr-1"></div>
+          <div
+            className="w-3 h-3 rounded-full mr-1"
+            style={{ backgroundColor: COLORS.onTime }}
+          ></div>
           <span>On Time</span>
         </div>
-        <div className="flex  items-center ">
-          <div className="w-3 h-3 bg-[#FBBF24] rounded-full mr-1"></div>
+        <div className="flex items-center">
+          <div
+            className="w-3 h-3 rounded-full mr-1"
+            style={{ backgroundColor: COLORS.late }}
+          ></div>
           <span>Late</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-[#F97316] rounded-full mr-1"></div>
+          <div
+            className="w-3 h-3 rounded-full mr-1"
+            style={{ backgroundColor: COLORS.absent }}
+          ></div>
           <span>Absent</span>
         </div>
       </div>

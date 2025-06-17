@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useAttendanceModal } from "./useAttendanceModal";
 import { AttendanceModalProps } from "@/app/types/types";
 import { AttendanceStatus } from "@/app/constants/constants";
+import { COLORS } from "@/app/constants/color";
 
 const AttendanceModal: React.FC<AttendanceModalProps> = ({
   employee,
@@ -34,8 +35,14 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-[#1C2526] p-6 rounded-lg w-[400px] text-white">
+    <div
+      className="fixed inset-0 flex justify-center items-center z-50"
+      style={{ backgroundColor: COLORS.overlayBackground }}
+    >
+      <div
+        className="p-6 rounded-lg w-[400px]"
+        style={{ backgroundColor: COLORS.modalBackground, color: COLORS.textWhite }}
+      >
         <h2 className="text-xl font-semibold mb-4">
           Update Attendance for {employee.firstName} {employee.lastName}
         </h2>
@@ -45,7 +52,11 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as AttendanceStatus)}
-              className="w-full p-2 bg-[#2A3435] rounded text-white"
+              className="w-full p-2 rounded"
+              style={{
+                backgroundColor: COLORS.inputBackground,
+                color: COLORS.textWhite,
+              }}
             >
               <option value="">Select Status</option>
               <option value="ON_TIME">On Time</option>
@@ -53,9 +64,8 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
               <option value="ABSENT">Absent</option>
             </select>
             {status === "ABSENT" && (
-              <p className="text-xs text-orange-400 mt-1">
-                Check-in and check-out times will be cleared for absent
-                employees.
+              <p className="text-xs mt-1" style={{ color: COLORS.textOrange }}>
+                Check-in and check-out times will be cleared for absent employees.
               </p>
             )}
           </div>
@@ -68,10 +78,14 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                   type="time"
                   value={checkInTime}
                   onChange={(e) => setCheckInTime(e.target.value)}
-                  className="w-full p-2 bg-[#2A3435] rounded text-white"
+                  className="w-full p-2 rounded"
+                  style={{
+                    backgroundColor: COLORS.inputBackground,
+                    color: COLORS.textWhite,
+                  }}
                 />
                 {checkInTime && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: COLORS.textGray }}>
                     {formatTimeFor12Hour(checkInTime)}
                     {status === "ON_TIME"
                       ? " (On Time)"
@@ -87,10 +101,14 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                   type="time"
                   value={checkOutTime}
                   onChange={(e) => setCheckOutTime(e.target.value)}
-                  className="w-full p-2 bg-[#2A3435] rounded text-white"
+                  className="w-full p-2 rounded"
+                  style={{
+                    backgroundColor: COLORS.inputBackground,
+                    color: COLORS.textWhite,
+                  }}
                 />
                 {checkOutTime && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: COLORS.textGray }}>
                     {formatTimeFor12Hour(checkOutTime)}
                   </p>
                 )}
@@ -98,18 +116,26 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
             </>
           )}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 rounded hover:bg-gray-600"
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: COLORS.buttonGray,
+                color: COLORS.textWhite,
+              }}
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-orange-500 rounded hover:bg-orange-600"
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: COLORS.buttonOrange,
+                color: COLORS.textWhite,
+              }}
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save"}
