@@ -127,3 +127,15 @@ export const useEmployees = () => {
     setRecordsPerPage,
   };
 };
+
+export const fetchEmployees = async () => {
+  try {
+    const response = await fetch("/api/employee");
+    if (!response.ok) throw new Error("Failed to fetch employees");
+
+    const data = await response.json();
+    return data;
+  } catch (err: any) {
+    throw new Error(err.message || "An error occurred while fetching employees");
+  }
+};

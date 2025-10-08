@@ -21,7 +21,7 @@ const UserProfileDropdown: React.FC<Props> = ({ initialUserData }) => {
     );
   }
 
-  const getAvatarUrl = (url?: string) => {
+  const getAvatarUrl = (url?: string | null) => {
     if (!url) return IMAGES.Profileimg.src;
 
     if (url.includes("cloudinary.com")) {

@@ -32,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({ title, description, textColor }) => {
             </div>
             <div className="hidden md:block relative">
               <Button
+              title=""  
                 icon={IoMdNotificationsOutline}
                 onClick={handleNotificationClick}
                 className="bg-[#A2A1A81A] w-[50px] h-[50px] rounded-[10px] flex items-center justify-center cursor-pointer"

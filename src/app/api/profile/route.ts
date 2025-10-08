@@ -7,7 +7,7 @@ import {
   deleteFromCloudinary,
 } from "../../utils/cloudinary";
 
-export const GET = async (req: Request) => {
+export const GET = async () => {
   try {
     const session = await getServerSession(authOptions);
 

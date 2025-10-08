@@ -124,7 +124,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
                     ] as string
                   }
                   onChange={(value) => handleInputChange(input.field, value)}
-                  options={input.options}
+                  {...(input.type === "select" ? { options: input.options } : {})}
                   required
                   className="border border-[#A2A1A833]"
                 />

@@ -126,7 +126,7 @@ model Attendance {
   id           String           @id @default(auto()) @map("_id") @db.ObjectId
   employeeId   String           @db.ObjectId
   date         String           // Store as YYYY-MM-DD format
-  checkInTime  String           // Store as formatted time (e.g., "9:15 AM")
+  checkInTime  String?          // Store as formatted time (e.g., "9:15 AM")
   checkOutTime String?          // Optional check-out time
   status       AttendanceStatus @default(ON_TIME)
   comments     String?

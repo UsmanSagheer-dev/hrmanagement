@@ -109,6 +109,7 @@ export interface ProfileContentProps {
   userData: UserData;
   activeProfileTab: string;
   setActiveProfileTab: (tab: string) => void;
+  employeeId: string; // Added to resolve the TypeScript error
 }
 
 export interface ProjectRecord {
@@ -266,7 +267,7 @@ export interface Props {
 
 export interface Notification {
   id: string;
-  type: "EMPLOYEE_REQUEST" | "LEAVE_REQUEST" | "GENERAL";
+  type: "EMPLOYEE_REQUEST" | "LEAVE_REQUEST" | "GENERAL" | "EMPLOYEE_APPROVAL" | "EMPLOYEE_REJECTION";
   title: string;
   message: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "READ";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useEmployeeFormContext } from "../../contexts/EmployeeFormContext";
-import { PersonalInformationFormProps } from "../../types/formTypes";
+import { PersonalInformationFormProps, FormData } from "../../types/formTypes";
 
 export const usePersonalInformationForm = ({
   onTabChange,
@@ -9,7 +9,9 @@ export const usePersonalInformationForm = ({
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null
   );
-  const [localFormData, setLocalFormData] = useState(formData.personal);
+  const [localFormData, setLocalFormData] = useState<FormData["personal"]>(
+    formData.personal
+  );
 
   useEffect(() => {
     setLocalFormData(formData.personal);

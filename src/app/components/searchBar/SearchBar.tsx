@@ -3,6 +3,7 @@ import { CiSearch } from "react-icons/ci";
 
 interface SearchBarProps {
   value?: string;
+  onSearch?: (query: string) => void;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

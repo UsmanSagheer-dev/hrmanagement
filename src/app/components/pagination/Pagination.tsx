@@ -40,6 +40,7 @@ const Pagination: React.FC<PaginationProps> = ({
       </h1>
       <div className="flex space-x-1">
         <Button
+        title=""
           icon={IoChevronBackOutline}
           className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -73,6 +74,7 @@ const Pagination: React.FC<PaginationProps> = ({
           return null;
         })}
         <Button
+          title="Next Page"
           icon={IoChevronForwardOutline}
           className={`px-3 py-1 rounded text-white hover:bg-gray-800 ${
             currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""

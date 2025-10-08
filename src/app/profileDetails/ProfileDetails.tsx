@@ -10,9 +10,9 @@ import AttendanceContent from "../content/attendanceContent/AttendanceContent";
 import LeaveContent from "../content/leaveContent/LeaveContent";
 import { useRouter } from "next/navigation";
 import UserInfoSection from "../components/UserInfoSection/UserInfoSection";
-import { ProfileDetailsProps, UserData } from "../types/types";
+import { UserData } from "../types/types";
 
-const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
+const ProfileDetails: React.FC = () => {
   const router = useRouter();
   const [userData] = useState<UserData>({
     firstName: "Dina",
@@ -53,28 +53,19 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
   const [activeSection, setActiveSection] = useState("profile");
   const [activeProfileTab, setActiveProfileTab] = useState("personal");
 
-  const ProfileImage = () => (
-    <div className="relative w-24 h-24 border border-[#A2A1A833] bg-[#A2A1A80D] rounded-lg flex items-center justify-center overflow-hidden">
-      <img
-        src={userData.profileImage || IMAGES.Profileimg.src}
-        alt="Profile"
-        className="w-full h-full object-cover"
-      />
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeSection) {
       case "profile":
         return (
           <ProfileContent
-            userData={userData}
+            userData={userData} // Pass userData explicitly
             activeProfileTab={activeProfileTab}
             setActiveProfileTab={setActiveProfileTab}
+            employeeId={userData.employeeId || ""} // Ensure employeeId is always a string
           />
         );
       case "attendance":
-        return <AttendanceContent userData={userData} />;
+        return <AttendanceContent employeeId={userData.employeeId} />;
       case "projects":
         return <ProjectsContent />;
       case "leave":
@@ -82,9 +73,10 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
       default:
         return (
           <ProfileContent
-            userData={userData}
+            userData={userData} // Pass userData explicitly
             activeProfileTab={activeProfileTab}
             setActiveProfileTab={setActiveProfileTab}
+            employeeId={userData.employeeId || ""} // Ensure employeeId is always a string
           />
         );
     }
@@ -94,7 +86,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ onTabChange }) => {
     <div className="h-auto max-h-[81vh] bg-transparent border border-[#A2A1A833] rounded-[10px] overflow-y-scroll scrollbar-hide">
       <div className="container mx-auto px-4 ">
         <UserInfoSection
-          userData={userData}
+          employeeId={userData.employeeId} // Pass employeeId instead of userData
           handleEditProfile={handleEditProfile}
         />
         <div className="flex flex-wrap scroll-auto overflow-auto mt-[30px] mb-[30px] md:flex-nowrap">

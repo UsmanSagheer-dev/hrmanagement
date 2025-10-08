@@ -19,9 +19,9 @@ export const useProfileForm = () => {
   useEffect(() => {
     if (userData) {
       const updatedData = {
-        name: userData.name || "",
-        role: userData.role || "",
-        avatar: userData.avatar || "",
+        name: userData.name ?? "",
+        role: userData.role ?? "",
+        avatar: userData.avatar ?? "",
       };
       setFormData(updatedData);
       setPreviewImage(userData.avatar || IMAGES.Profileimg.src);
@@ -74,9 +74,9 @@ export const useProfileForm = () => {
       if (Object.keys(updates).length > 0) {
         const updatedData = await updateUser(updates);
         setFormData({
-          name: updatedData.name,
-          role: updatedData.role,
-          avatar: updatedData.avatar,
+          name: updatedData.name ?? "",
+          role: updatedData.role ?? "",
+          avatar: updatedData.avatar ?? "",
         });
         setPreviewImage(updatedData.avatar || IMAGES.Profileimg.src);
         toast.success("Profile updated successfully");

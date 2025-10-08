@@ -146,7 +146,7 @@ const employeeFormSlice = createSlice({
       state.formError = action.payload;
     },
 
-    resetForm: (state) => {
+    resetForm: () => {
       return initialState;
     },
   },

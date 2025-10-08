@@ -96,7 +96,7 @@ const DocumentsForm: React.FC<DocumentsTabProps> = ({ onTabChange }) => {
               {uploadedFiles[doc.id] && (
                 <div className="flex items-center mt-2">
                   <p className="text-sm text-gray-400 flex-1 truncate">
-                    {uploadedFiles[doc.id].name}
+                    {uploadedFiles[doc.id]?.name ?? ""}
                   </p>
                   <button
                     onClick={() => handleRemoveFile(doc.id)}
