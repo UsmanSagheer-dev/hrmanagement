@@ -1,17 +1,28 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import { IoChevronBackOutline } from "react-icons/io5";
 import InputField from "../../../../components/inputField/InputField";
 import Button from "../../../../components/button/Button";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import Loader from "@/app/components/loader/Loader";
+import { useSearchParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 function ResetPassword() {
   const searchParams = useSearchParams();
+  const phoneNumber = searchParams.get("phone") || "";
+
   const router = useRouter();
-  const phoneNumber = searchParams?.get("phone") || "";
+
+  if (!phoneNumber) {
+    if (typeof window !== "undefined") {
+      router.push("/auth/forgetpassword");
+    }
+    return null;
+  }
 
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -19,12 +30,6 @@ function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!phoneNumber) {
-      router.push("/auth/forgetpassword");
-    }
-  }, [phoneNumber, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,60 +83,66 @@ function ResetPassword() {
   };
 
   return (
-    <div className="h-screen bg-[#131313] flex items-center justify-center">
-      <div className="w-[455px] max-w-full flex flex-col justify-center">
-        <Link className="w-[67px] cursor-pointer mb-[30px]" href="/auth/forgetpassword">
-          <div className="flex gap-[5px]">
-            <IoChevronBackOutline color="white" size={24} />
-            <h1 className="text-white text-[16px] font-light">Back</h1>
+    <Suspense fallback={<Loader />}>
+      <div className="h-screen bg-[#131313] flex items-center justify-center">
+        <div className="w-[455px] max-w-full flex flex-col justify-center">
+          <Link
+            className="w-[67px] cursor-pointer mb-[30px]"
+            href="/auth/forgetpassword"
+          >
+            <div className="flex gap-[5px]">
+              <IoChevronBackOutline color="white" size={24} />
+              <h1 className="text-white text-[16px] font-light">Back</h1>
+            </div>
+          </Link>
+
+          <div className="flex flex-col ml-[15px] mb-[30px]">
+            <h1 className="text-white text-[30px] font-semibold">
+              Reset Password
+            </h1>
+            <p className="text-white text-[16px] font-light">
+              Enter the 6-digit OTP sent to your phone and set a new password
+              (min 8 characters).
+            </p>
           </div>
-        </Link>
 
-        <div className="flex flex-col ml-[15px] mb-[30px]">
-          <h1 className="text-white text-[30px] font-semibold">
-            Reset Password
-          </h1>
-          <p className="text-white text-[16px] font-light">
-            Enter the 6-digit OTP sent to your phone and set a new password (min 8 characters).
-          </p>
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col space-y-4 p-4 rounded-md"
+          >
+            <InputField
+              label="OTP Code"
+              type="text"
+              value={otp}
+              onChange={setOtp}
+              disabled={loading}
+            />
+            <InputField
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={setNewPassword}
+              disabled={loading}
+            />
+            <InputField
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              disabled={loading}
+            />
+
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            {message && <p className="text-green-500 text-center">{message}</p>}
+
+            <Button
+              title={loading ? <Loader /> : "Reset Password"}
+              disabled={loading}
+            />
+          </form>
         </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col space-y-4 p-4 rounded-md"
-        >
-          <InputField
-            label="OTP Code"
-            type="text"
-            value={otp}
-            onChange={setOtp}
-            disabled={loading}
-       
-          />
-          <InputField
-            label="New Password"
-            type="password"
-            value={newPassword}
-            onChange={setNewPassword}
-            disabled={loading}
-          
-          />
-          <InputField
-            label="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            disabled={loading}
-          
-          />
-
-          {error && <p className="text-red-500 text-center">{error}</p>}
-          {message && <p className="text-green-500 text-center">{message}</p>}
-
-          <Button title={loading ? <Loader/> : "Reset Password"} disabled={loading} />
-        </form>
       </div>
-    </div>
+    </Suspense>
   );
 }
 

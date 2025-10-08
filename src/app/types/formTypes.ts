@@ -6,7 +6,6 @@ export type ProfessionalInformationFormProps = {
   onTabChange: (tabName: string) => void;
 };
 
-
 export interface FormData {
   personal: {
     firstName: string;
@@ -48,8 +47,8 @@ export interface FormData {
   };
 }
 
-export type PersonalForm={
-     employeeId: string;
+export type PersonalForm = {
+  employeeId: string;
   userName: string;
   employeeType: string;
   emailAddress: string;
@@ -58,7 +57,7 @@ export type PersonalForm={
   workingDays: string;
   joiningDate: string;
   officeLocation: string;
-}
+};
 
 export type AccountAccessFormProps = {
   onTabChange: (tabName: string) => void;
@@ -70,9 +69,6 @@ export type FormDataAccount = {
   skypeId: string;
   githubId: string;
 };
-
-
-
 
 export interface UseEmployeeFormReturn {
   userRole: string | null;

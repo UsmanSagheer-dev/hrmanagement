@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 interface EmployeeTableToolbarProps {
   onSearch?: (query: string) => void;
-  onFilter?: () => void;
+  onFilter?: (filter: any) => void; // Updated to accept a function with an argument
 }
 
 const EmployeeTableToolbar: React.FC<EmployeeTableToolbarProps> = ({

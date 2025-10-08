@@ -40,9 +40,10 @@ const InfoSection = ({ label, value }: { label: string; value: any }) => (
 export const ProfileContent: React.FC<ProfileContentProps> = ({
   activeProfileTab,
   setActiveProfileTab,
-  employeeId,
+  userData,
 }) => {
-  const { userData, loading, error } = useUserData(employeeId);
+  const { employeeId } = userData; // Access employeeId from userData
+  const { loading, error } = useUserData(employeeId); // Removed unused fetchedUserData
 
   const getDocumentFiles = () => {
     if (!userData) return [];

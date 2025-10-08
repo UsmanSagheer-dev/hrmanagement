@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -24,7 +24,7 @@ export const useSignUp = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { email, password, name } = formData;
 
@@ -59,9 +59,8 @@ export const useSignUp = () => {
         toast.success("Employee account created successfully!");
         router.push("/auth/login");
       }
-
-    } catch (error) {
-      toast.error(error.message || "Something went wrong");
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }

@@ -15,13 +15,24 @@ const RowActions: React.FC<RowActionsProps> = ({
 }) => (
   <div className="flex space-x-2">
     {onView && (
-      <Button icon={BiShow} className="bg-transparent " onClick={onView} />
+      <Button
+        icon={BiShow}
+        title=""
+        className="bg-transparent "
+        onClick={onView}
+      />
     )}
     {onEdit && (
-      <Button icon={RiEdit2Line} className="bg-transparent" onClick={onEdit} />
+      <Button
+        icon={RiEdit2Line}
+        title=""
+        className="bg-transparent"
+        onClick={onEdit}
+      />
     )}
     {onDelete && (
       <Button
+        title=""
         icon={RiDeleteBin5Line}
         className="bg-transparent"
         onClick={onDelete}

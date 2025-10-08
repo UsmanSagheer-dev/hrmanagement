@@ -5,15 +5,16 @@ import { toast } from "react-toastify";
 export interface AttendanceRecord {
   id: string;
   date: string;
- 
+  attendanceData: string; // Already added
+  checkInTime: string | null; // Already added
   status: "ON_TIME" | "LATE" | "ABSENT";
-  employee?: {
+  employee: {
     firstName: string;
     lastName: string;
     employeeId: string;
     employeeType: string;
     designation: string;
-    profileImage: string | null;
+    profileImage?: string; // Updated to match useAttendance.ts
   };
 }
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const useDocumentsForm = () => {
   const { formData, updateFormData } = useEmployeeFormContext();
-  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>(
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>(
     {}
   );
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});

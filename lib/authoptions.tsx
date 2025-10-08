@@ -2,6 +2,17 @@ import { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import db from "./prismadb";
+import { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      role?: string;
+      avatar?: string | null;
+    } & DefaultSession["user"];
+  }
+}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -16,7 +27,6 @@ export const authOptions: AuthOptions = {
           throw new Error("Email and password are required");
         }
 
-        // Optimized query with minimal fields
         const user = await db.user.findUnique({
           where: { email: credentials.email },
           select: {
@@ -54,15 +64,14 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // Update session every 24 hours
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/auth/login",
   },
   callbacks: {
     async jwt({ token, user }) {
-      // Only update token with user data when user is present (initial sign-in)
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -73,14 +82,13 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Efficient session assignment
       if (token?.id) {
         session.user = {
           id: token.id as string,
           email: token.email as string,
           name: token.name || null,
           role: (token.role as string) || "user",
-          avatar: token.avatar || null,
+          avatar: (token.avatar as string | null) || null, // Explicit cast
         };
       }
       return session;

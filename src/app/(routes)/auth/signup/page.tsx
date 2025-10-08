@@ -51,9 +51,9 @@ const SignUp: React.FC = () => {
 
           <div className="flex items-center justify-center w-full px-4 mt-4">
             <Button
+              type="submit"
               title={isLoading ? "Creating Account..." : "Register"}
               disabled={isLoading}
-              onClick={handleSubmit}
             />
           </div>
 

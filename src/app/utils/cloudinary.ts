@@ -26,9 +26,14 @@ export const uploadToCloudinary = async (fileData: string): Promise<string> => {
       );
     }
 
-    const uploadOptions = {
+    const uploadOptions: {
+      folder: string;
+      resource_type: "image" | "raw"; // Explicitly typed to match Cloudinary's UploadApiOptions
+      public_id: string;
+      quality?: string;
+    } = {
       folder: "user_documents",
-      resource_type: isPDF ? "raw" : "image",
+      resource_type: isPDF ? "raw" : "image", // Explicitly typed
       public_id: `${Date.now()}`,
       ...(isImage && { quality: "auto" }),
     };

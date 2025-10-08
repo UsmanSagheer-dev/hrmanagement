@@ -2,8 +2,26 @@ import NextAuth from "next-auth";
 import Github from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client"; 
+import { DefaultSession } from "next-auth"; // Added DefaultSession import
 
 const prisma = new PrismaClient(); 
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      role?: string;
+      avatar?: string | null; // Added avatar property to match authoptions.tsx
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    userId: string; // Ensure userId is explicitly typed as string
+    role?: string;
+  }
+}
 
 export const { signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -23,8 +41,8 @@ export const { signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
-        session.user.id = token.userId;
+        session.user.role = token.role as string | undefined;
+        session.user.id = token.userId as string; 
       }
       return session;
     }

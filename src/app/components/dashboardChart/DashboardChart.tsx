@@ -27,7 +27,7 @@ export default function AttendanceOverview() {
     daysOfWeek,
   } = useDashboardChart();
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, label }: any) => {
     const [tooltipData, setTooltipData] = useState<{
       high: number;
       medium: number;
@@ -55,7 +55,9 @@ export default function AttendanceOverview() {
           className="p-3 rounded-md"
         >
           <p className="font-bold text-white">{label}</p>
-          <p style={{ color: COLORS.onTime }}>{`On Time: ${tooltipData.high}`}</p>
+          <p
+            style={{ color: COLORS.onTime }}
+          >{`On Time: ${tooltipData.high}`}</p>
           <p style={{ color: COLORS.late }}>{`Late: ${tooltipData.medium}`}</p>
           <p style={{ color: COLORS.absent }}>{`Absent: ${tooltipData.low}`}</p>
         </div>

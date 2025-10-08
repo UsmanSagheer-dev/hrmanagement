@@ -75,7 +75,7 @@ async function markAbsentEmployees() {
           data: {
             employeeId: employee.id,
             date: today,
-            checkInTime: null,
+            checkInTime: "",
             checkOutTime: null,
             status: "ABSENT"
           }
@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
       const attendanceData = {
         employeeId,
         date: dateString,
-        checkInTime: calculatedStatus === "ABSENT" ? null : checkInTime,
+        checkInTime: calculatedStatus === "ABSENT" ? "" : checkInTime,
         checkOutTime: calculatedStatus === "ABSENT" ? null : checkOutTime,
         status: calculatedStatus,
       };
@@ -387,7 +387,7 @@ export async function PUT(req: NextRequest) {
       updateData.status = calculatedStatus;
 
       if (calculatedStatus === "ABSENT") {
-        updateData.checkInTime = null;
+        updateData.checkInTime = "";
         updateData.checkOutTime = null;
       } else {
         if (checkInTime !== undefined) {

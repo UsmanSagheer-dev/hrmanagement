@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense, useState } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Header from "../../../components/header/Header";
 import Table from "../../../components/table/Table";
@@ -8,25 +8,28 @@ import RowActions from "../../../components/rowActions/RowActions";
 import Image from "next/image";
 import EmployeeTableToolbar from "../../../components/employeeTableToolbar/EmployeeTableToolbar";
 import { Employee } from "@/app/types/types";
-import { useEmployees } from "./useEmployees";
 import toast from "react-hot-toast";
+import { fetchEmployees } from "./useEmployees";
 
-function Page() {
-  const {
-    isLoading,
-    error,
-    currentPage,
-    recordsPerPage,
-    filteredEmployees,
-    paginatedData,
-    handleSearch,
-    handleFilter,
-    handleEdit,
-    handleDelete,
-    handleView,
-    setCurrentPage,
-    setRecordsPerPage,
-  } = useEmployees();
+export const dynamic = "force-dynamic";
+
+async function Page() {
+  let employees: Employee[] = [];
+  let error: string | null = null;
+
+  try {
+    employees = await fetchEmployees();
+  } catch (err: any) {
+    error = err.message || "Failed to fetch employees.";
+  }
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
+
+  const paginatedData = employees.slice(
+    (currentPage - 1) * recordsPerPage,
+    currentPage * recordsPerPage
+  );
 
   const columns = [
     {
@@ -54,7 +57,6 @@ function Page() {
         </div>
       ),
     },
-
     { key: "department", header: "Department" },
     { key: "designation", header: "Designation" },
     { key: "employeeType", header: "Type" },
@@ -72,66 +74,61 @@ function Page() {
       header: "Action",
       render: (employee: Employee) => (
         <RowActions
-          onView={() => handleView(employee)}
-          onEdit={() => handleEdit(employee)}
-          onDelete={() => handleDelete(employee)}
+          onView={() => console.log("View", employee)}
+          onEdit={() => console.log("Edit", employee)}
+          onDelete={() => console.log("Delete", employee)}
         />
       ),
     },
   ];
 
   return (
-    <div className="h-screen bg-[#131313] p-[15px]">
-      <div className="w-full h-full flex justify-between gap-3">
-        <div>
-          <Sidebar />
-        </div>
-        <div className="w-full">
-          <Header
-            title="All Employees"
-            description="All Employee Information"
-          />
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="h-screen bg-[#131313] p-[15px]">
+        <div className="w-full h-full flex justify-between gap-3">
+          <div>
+            <Sidebar />
+          </div>
+          <div className="w-full">
+            <Header
+              title="All Employees"
+              description="All Employee Information"
+            />
 
-          <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-3 flex flex-col">
-            <div className="mb-4 flex-shrink-0">
-              <EmployeeTableToolbar
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-              />
-            </div>
+            <div className="max-h-[86vh] w-full bg-transparent border border-[#A2A1A833] rounded-[10px] p-3 flex flex-col">
+              <div className="mb-4 flex-shrink-0">
+                <EmployeeTableToolbar />
+              </div>
 
-            <div className="flex-grow overflow-auto hide-vertical-scrollbar">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-                </div>
-              ) : error ? (
-                <div className="text-center text-red-500 py-10">{error}</div>
-              ) : paginatedData.length === 0 ? (
-                <div className="text-center text-gray-400 py-10">
-                  No employees found
-                </div>
-              ) : (
-                <Table data={paginatedData} columns={columns} />
-              )}
-            </div>
+              <div className="flex-grow overflow-auto hide-vertical-scrollbar">
+                {error ? (
+                  <div className="text-center text-red-500 py-10">{error}</div>
+                ) : paginatedData.length === 0 ? (
+                  <div className="text-center text-gray-400 py-10">
+                    No employees found
+                  </div>
+                ) : (
+                  <Table data={paginatedData} columns={columns} />
+                )}
+              </div>
 
-            <div className="mt-4 flex-shrink-0">
-              <Pagination
-                currentPage={currentPage}
-                recordsPerPage={recordsPerPage}
-                totalRecords={filteredEmployees.length}
-                onPageChange={setCurrentPage}
-                onRecordsPerPageChange={(newRecords) => {
-                  setRecordsPerPage(newRecords);
-                  setCurrentPage(1);
-                }}
-              />
+              <div className="mt-4 flex-shrink-0">
+                <Pagination
+                  currentPage={currentPage}
+                  recordsPerPage={recordsPerPage}
+                  totalRecords={employees.length}
+                  onPageChange={setCurrentPage}
+                  onRecordsPerPageChange={(newRecords) => {
+                    setRecordsPerPage(newRecords);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
 

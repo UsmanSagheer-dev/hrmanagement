@@ -63,6 +63,10 @@ export function useDepartmentEmployees() {
     router.push(`/employee/${employee.id}`);
   };
 
+  const handleEdit = (employee: Employee) => {
+    router.push(`/admin/employees/edit/${employee.id}`);
+  };
+
   const actualTotalRecords = employees.length;
   const startIndex = (currentPage - 1) * recordsPerPage;
   const paginatedData = employees.slice(
@@ -80,6 +84,7 @@ export function useDepartmentEmployees() {
     actualTotalRecords,
     setCurrentPage,
     setRecordsPerPage,
+    handleEdit,
     handleDelete,
     handleView,
   };

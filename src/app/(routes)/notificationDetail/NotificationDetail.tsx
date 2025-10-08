@@ -1,5 +1,5 @@
 import React from "react";
-import { Notification, NotificationDetailProps } from "../../types/types";
+import {  NotificationDetailProps } from "../../types/types";
 import { FaSpinner } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import { useNotificationEmployee } from "./useNotificationEmployee";
