@@ -38,6 +38,7 @@ function determineAttendanceStatus(
   }
 }
 
+// Add detailed error logging to the markAbsentEmployees function
 async function markAbsentEmployees() {
   try {
     const today = new Date().toISOString().split("T")[0];
@@ -47,47 +48,52 @@ async function markAbsentEmployees() {
     });
 
     for (const employee of employees) {
-      // Check if employee has an approved leave request for today
-      const approvedLeave = await db.leaveRequest.findFirst({
-        where: {
-          employeeId: employee.id,
-          startDate: { lte: today },
-          endDate: { gte: today },
-          status: "APPROVED",
-        },
-      });
-
-      // Skip marking absent if employee has approved leave
-      if (approvedLeave) {
-        continue;
-      }
-
-      const attendanceRecord = await db.attendance.findFirst({
-        where: {
-          employeeId: employee.id,
-          date: today,
-        },
-      });
-
-      if (!attendanceRecord) {
-        await db.attendance.create({
-          data: {
+      try {
+        // Check if employee has an approved leave request for today
+        const approvedLeave = await db.leaveRequest.findFirst({
+          where: {
             employeeId: employee.id,
-            date: today,
-            checkInTime: "",
-            checkOutTime: null,
-            status: "ABSENT",
+            startDate: { lte: today },
+            endDate: { gte: today },
+            status: "APPROVED",
           },
         });
+
+        // Skip marking absent if employee has approved leave
+        if (approvedLeave) {
+          continue;
+        }
+
+        const attendanceRecord = await db.attendance.findFirst({
+          where: {
+            employeeId: employee.id,
+            date: today,
+          },
+        });
+
+        if (!attendanceRecord) {
+          await db.attendance.create({
+            data: {
+              employeeId: employee.id,
+              date: today,
+              checkInTime: "",
+              checkOutTime: null,
+              status: "ABSENT",
+            },
+          });
+        }
+      } catch (innerError) {
+        console.error(`Error processing employee ID ${employee.id}:`, innerError);
       }
     }
 
     return { success: true };
-  } catch (error) {
-    return { success: false, error };
+  } catch (error: any) {
+    return { success: false, error: "Unknown error" };
   }
 }
 
+// Add detailed error logging to the POST handler
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -262,8 +268,9 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
+    console.error("Error in POST /api/attendance:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to record attendance" },
+      { error: "An unexpected error occurred." },
       { status: 500 }
     );
   }
