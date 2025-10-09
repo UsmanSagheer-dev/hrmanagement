@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
-import toast from "react-hot-toast";
 
 function determineAttendanceStatus(
   checkInTime: string | null
@@ -42,11 +41,11 @@ function determineAttendanceStatus(
 async function markAbsentEmployees() {
   try {
     const today = new Date().toISOString().split("T")[0];
-    
+
     const employees = await db.employee.findMany({
-      select: { id: true }
+      select: { id: true },
     });
-    
+
     for (const employee of employees) {
       // Check if employee has an approved leave request for today
       const approvedLeave = await db.leaveRequest.findFirst({
@@ -54,8 +53,8 @@ async function markAbsentEmployees() {
           employeeId: employee.id,
           startDate: { lte: today },
           endDate: { gte: today },
-          status: "APPROVED"
-        }
+          status: "APPROVED",
+        },
       });
 
       // Skip marking absent if employee has approved leave
@@ -66,10 +65,10 @@ async function markAbsentEmployees() {
       const attendanceRecord = await db.attendance.findFirst({
         where: {
           employeeId: employee.id,
-          date: today
-        }
+          date: today,
+        },
       });
-      
+
       if (!attendanceRecord) {
         await db.attendance.create({
           data: {
@@ -77,15 +76,14 @@ async function markAbsentEmployees() {
             date: today,
             checkInTime: "",
             checkOutTime: null,
-            status: "ABSENT"
-          }
+            status: "ABSENT",
+          },
         });
       }
     }
-    
+
     return { success: true };
   } catch (error) {
-    console.error("Error marking absent employees:", error);
     return { success: false, error };
   }
 }
@@ -107,16 +105,16 @@ export async function POST(req: NextRequest) {
 
     const isAdmin = user?.role === "Admin";
     const data = await req.json();
-    const { employeeId, date, checkInTime, checkOutTime, status, autoMarkAbsent } = data;
-    
+    const { employeeId, date, checkInTime, status, autoMarkAbsent } = data;
+
     // If the autoMarkAbsent flag is set, run the absent marking function
     if (autoMarkAbsent && isAdmin) {
       const result = await markAbsentEmployees();
       return NextResponse.json({
-        message: result.success 
-          ? "Absent employees marked successfully" 
+        message: result.success
+          ? "Absent employees marked successfully"
           : "Failed to mark absent employees",
-        success: result.success
+        success: result.success,
       });
     }
 
@@ -128,8 +126,8 @@ export async function POST(req: NextRequest) {
         employeeId: isAdmin ? employeeId : session.user.id,
         startDate: { lte: dateString },
         endDate: { gte: dateString },
-        status: "APPROVED"
-      }
+        status: "APPROVED",
+      },
     });
 
     if (approvedLeave) {
@@ -164,7 +162,7 @@ export async function POST(req: NextRequest) {
         employeeId,
         date: dateString,
         checkInTime: calculatedStatus === "ABSENT" ? "" : checkInTime,
-        checkOutTime: calculatedStatus === "ABSENT" ? null : checkOutTime,
+        checkOutTime: calculatedStatus === "ABSENT" ? null : undefined,
         status: calculatedStatus,
       };
 
@@ -264,7 +262,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    toast.error("Error recording attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to record attendance" },
       { status: 500 }
@@ -337,7 +334,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(attendanceRecords);
   } catch (error: any) {
-    toast.error("Error fetching attendance data");
     return NextResponse.json(
       { error: error.message || "Failed to fetch attendance data" },
       { status: 500 }
@@ -365,7 +361,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const data = await req.json();
-    const { id, checkInTime, checkOutTime, status } = data;
+    const { id, checkInTime, status } = data;
 
     if (!id) {
       return NextResponse.json(
@@ -379,36 +375,14 @@ export async function PUT(req: NextRequest) {
       calculatedStatus = determineAttendanceStatus(checkInTime);
     }
 
-    const updateData: any = {
-      updatedAt: new Date(),
-    };
-
-    if (calculatedStatus) {
-      updateData.status = calculatedStatus;
-
-      if (calculatedStatus === "ABSENT") {
-        updateData.checkInTime = "";
-        updateData.checkOutTime = null;
-      } else {
-        if (checkInTime !== undefined) {
-          updateData.checkInTime = checkInTime;
-        }
-        if (checkOutTime !== undefined) {
-          updateData.checkOutTime = checkOutTime;
-        }
-      }
-    } else {
-      if (checkInTime !== undefined) {
-        updateData.checkInTime = checkInTime;
-      }
-      if (checkOutTime !== undefined) {
-        updateData.checkOutTime = checkOutTime;
-      }
-    }
-
     const updatedAttendance = await db.attendance.update({
       where: { id },
-      data: updateData,
+      data: {
+        updatedAt: new Date(),
+        status: calculatedStatus,
+        checkInTime: calculatedStatus === "ABSENT" ? "" : checkInTime,
+        checkOutTime: calculatedStatus === "ABSENT" ? null : undefined,
+      },
     });
 
     return NextResponse.json({
@@ -416,7 +390,6 @@ export async function PUT(req: NextRequest) {
       attendance: updatedAttendance,
     });
   } catch (error: any) {
-    toast.error("Error updating attendance:");
     return NextResponse.json(
       { error: error.message || "Failed to update attendance" },
       { status: 500 }
@@ -461,7 +434,6 @@ export async function DELETE(req: NextRequest) {
       message: "Attendance record deleted successfully",
     });
   } catch (error: any) {
-    toast.error("Error deleting attendance");
     return NextResponse.json(
       { error: error.message || "Failed to delete attendance record" },
       { status: 500 }
