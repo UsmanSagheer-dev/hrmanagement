@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Header from "../../../components/header/Header";
 import Table from "../../../components/table/Table";
@@ -13,18 +13,24 @@ import { fetchEmployees } from "./useEmployees";
 
 export const dynamic = "force-dynamic";
 
-async function Page() {
-  let employees: Employee[] = [];
-  let error: string | null = null;
-
-  try {
-    employees = await fetchEmployees();
-  } catch (err: any) {
-    error = err.message || "Failed to fetch employees.";
-  }
-
+function EmployeeDetailsPage() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
+
+  useEffect(() => {
+    async function loadEmployees() {
+      try {
+        const data = await fetchEmployees();
+        setEmployees(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch employees.");
+      }
+    }
+
+    loadEmployees();
+  }, []);
 
   const paginatedData = employees.slice(
     (currentPage - 1) * recordsPerPage,
@@ -132,4 +138,4 @@ async function Page() {
   );
 }
 
-export default Page;
+export default EmployeeDetailsPage;

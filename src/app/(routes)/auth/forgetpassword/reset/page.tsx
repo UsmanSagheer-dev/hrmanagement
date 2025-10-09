@@ -11,7 +11,7 @@ import { useSearchParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-function ResetPassword() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const phoneNumber = searchParams.get("phone") || "";
 
@@ -83,65 +83,71 @@ function ResetPassword() {
   };
 
   return (
-    <Suspense fallback={<Loader />}>
-      <div className="h-screen bg-[#131313] flex items-center justify-center">
-        <div className="w-[455px] max-w-full flex flex-col justify-center">
-          <Link
-            className="w-[67px] cursor-pointer mb-[30px]"
-            href="/auth/forgetpassword"
-          >
-            <div className="flex gap-[5px]">
-              <IoChevronBackOutline color="white" size={24} />
-              <h1 className="text-white text-[16px] font-light">Back</h1>
-            </div>
-          </Link>
-
-          <div className="flex flex-col ml-[15px] mb-[30px]">
-            <h1 className="text-white text-[30px] font-semibold">
-              Reset Password
-            </h1>
-            <p className="text-white text-[16px] font-light">
-              Enter the 6-digit OTP sent to your phone and set a new password
-              (min 8 characters).
-            </p>
+    <div className="h-screen bg-[#131313] flex items-center justify-center">
+      <div className="w-[455px] max-w-full flex flex-col justify-center">
+        <Link
+          className="w-[67px] cursor-pointer mb-[30px]"
+          href="/auth/forgetpassword"
+        >
+          <div className="flex gap-[5px]">
+            <IoChevronBackOutline color="white" size={24} />
+            <h1 className="text-white text-[16px] font-light">Back</h1>
           </div>
+        </Link>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col space-y-4 p-4 rounded-md"
-          >
-            <InputField
-              label="OTP Code"
-              type="text"
-              value={otp}
-              onChange={setOtp}
-              disabled={loading}
-            />
-            <InputField
-              label="New Password"
-              type="password"
-              value={newPassword}
-              onChange={setNewPassword}
-              disabled={loading}
-            />
-            <InputField
-              label="Confirm Password"
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              disabled={loading}
-            />
-
-            {error && <p className="text-red-500 text-center">{error}</p>}
-            {message && <p className="text-green-500 text-center">{message}</p>}
-
-            <Button
-              title={loading ? <Loader /> : "Reset Password"}
-              disabled={loading}
-            />
-          </form>
+        <div className="flex flex-col ml-[15px] mb-[30px]">
+          <h1 className="text-white text-[30px] font-semibold">
+            Reset Password
+          </h1>
+          <p className="text-white text-[16px] font-light">
+            Enter the 6-digit OTP sent to your phone and set a new password
+            (min 8 characters).
+          </p>
         </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col space-y-4 p-4 rounded-md"
+        >
+          <InputField
+            label="OTP Code"
+            type="text"
+            value={otp}
+            onChange={setOtp}
+            disabled={loading}
+          />
+          <InputField
+            label="New Password"
+            type="password"
+            value={newPassword}
+            onChange={setNewPassword}
+            disabled={loading}
+          />
+          <InputField
+            label="Confirm Password"
+            type="password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            disabled={loading}
+          />
+
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          {message && <p className="text-green-500 text-center">{message}</p>}
+
+          <Button
+            title={loading ? <Loader /> : "Reset Password"}
+            disabled={loading}
+          />
+        </form>
       </div>
+    </div>
+  );
+}
+
+function ResetPassword() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <ResetPasswordContent />
     </Suspense>
   );
 }
