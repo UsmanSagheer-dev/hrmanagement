@@ -68,6 +68,10 @@ const Sidebar: React.FC = () => {
   const [activeItemId, setActiveItemId] = useState<number | null>(null);
   const [activeTheme, setActiveTheme] = useState<"light" | "dark">("dark");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  // Track whether we've completed the initial session load so we don't show
+  // the loader again on subsequent route/tab changes that temporarily set
+  // `status` to "loading".
+  const [sessionLoadedOnce, setSessionLoadedOnce] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
 
   useEffect(() => {
@@ -78,6 +82,15 @@ const Sidebar: React.FC = () => {
       setMenuItems(filteredItems);
     }
   }, [status, userRole]);
+
+  // Mark that initial session check completed when status becomes
+  // authenticated or unauthenticated. This prevents showing the loader on
+  // later transient "loading" states triggered by navigation.
+  useEffect(() => {
+    if (status !== "loading") {
+      setSessionLoadedOnce(true);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (pathname && menuItems.length > 0) {
@@ -114,7 +127,9 @@ const Sidebar: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  if (status === "loading") {
+  // Only show the full-screen loader during the very first session load.
+  // If `sessionLoadedOnce` is true, avoid showing loader on route changes.
+  if (status === "loading" && !sessionLoadedOnce) {
     return (
       <div className="md:w-64 h-[95vh] bg-[#1a1a1a] hidden md:flex items-center justify-center">
         <div className="text-white">

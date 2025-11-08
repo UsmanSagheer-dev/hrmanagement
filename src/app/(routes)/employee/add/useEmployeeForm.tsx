@@ -22,6 +22,8 @@ export const useEmployeeForm = (): UseEmployeeFormReturn => {
           headers: {
             "Content-Type": "application/json",
           },
+          // include credentials so the NextAuth session cookie is sent
+          credentials: 'include',
         });
 
         if (!response.ok) {

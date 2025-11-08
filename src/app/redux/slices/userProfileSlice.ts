@@ -22,6 +22,8 @@ export const fetchUserProfile = createAsyncThunk<UserData, void, { rejectValue: 
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
+        // ensure the browser sends NextAuth cookies with the request
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -44,6 +46,8 @@ export const updateUserProfile = createAsyncThunk<UserData, { name?: string; rol
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
+        // ensure the browser sends NextAuth cookies with the request
+        credentials: 'include',
       });
 
       if (!response.ok) {

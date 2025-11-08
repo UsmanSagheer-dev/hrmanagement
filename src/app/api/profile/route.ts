@@ -53,10 +53,19 @@ export const GET = async () => {
 
     return NextResponse.json(user);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    // If session decryption failed (NEXTAUTH secret mismatch or corrupted cookie),
+    // return 401 so client can prompt user to sign in again / clear cookies.
+    const e: any = error;
+    const isDecryptionError =
+      e && (e.name === "JWEDecryptionFailed" || /decryption/i.test(e.message || ""));
+    if (isDecryptionError) {
+      return NextResponse.json(
+        { error: "Invalid session (decryption failed). Please sign in again." },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 };
 
@@ -139,10 +148,17 @@ export const PUT = async (req: Request) => {
 
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const e: any = error;
+    const isDecryptionError =
+      e && (e.name === "JWEDecryptionFailed" || /decryption/i.test(e.message || ""));
+    if (isDecryptionError) {
+      return NextResponse.json(
+        { error: "Invalid session (decryption failed). Please sign in again." },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 };
 

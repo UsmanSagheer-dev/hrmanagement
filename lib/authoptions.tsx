@@ -96,3 +96,17 @@ export const authOptions: AuthOptions = {
   },
   debug: process.env.NODE_ENV === "development",
 };
+
+if (!process.env.NEXTAUTH_SECRET) {
+  // Helpful runtime warning so developers don't accidentally run without a stable secret.
+  // NEXTAUTH_SECRET is required for JWT session encryption/decryption. If it changes while
+  // there are active sessions, decryption will fail with JWEDecryptionFailed.
+  // Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  // and place it in your .env.local as NEXTAUTH_SECRET.
+  // See: https://next-auth.js.org/configuration/options#secret
+  // This warning is intentionally non-fatal so dev servers still run.
+  // eslint-disable-next-line no-console
+  console.warn(
+    "WARNING: NEXTAUTH_SECRET is not set. Set a stable NEXTAUTH_SECRET in your environment to avoid session decryption errors."
+  );
+}

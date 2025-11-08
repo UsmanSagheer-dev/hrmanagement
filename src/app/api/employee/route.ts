@@ -4,6 +4,11 @@ import { authOptions } from "../../../../lib/authoptions";
 import db from "../../../../lib/prismadb";
 import { uploadToCloudinary } from "@/app/utils/cloudinary";
 
+function isValidObjectId(id: string | null): id is string {
+  if (!id) return false;
+  return /^[a-fA-F0-9]{24}$/.test(id);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -189,13 +194,89 @@ export async function GET(req: NextRequest) {
     const department = searchParams.get("department");
 
     if (id) {
-      const employee = await db.employee.findUnique({ where: { id } });
+      // Normalize the incoming id (decode + trim) — sometimes front-end
+      // values contain extra whitespace or encoding.
+      const rawId = decodeURIComponent(id).trim();
+
+      // Dev-time diagnostics: log the incoming id and the requesting user.
+      // eslint-disable-next-line no-console
+      console.debug("/api/employee GET - incoming id:", { rawId, requester: session.user.id });
+
+      // Support finding by MongoDB ObjectId (the primary `id`) or by the
+      // human-readable `employeeId` (e.g. "EMP001"). If the provided `id`
+      // looks like an ObjectId use it against the `id` field; otherwise look
+      // up `employeeId` (try exact match first, then fallback to a
+      // case-insensitive-like contains search as a last resort).
+      let employee = null;
+
+      if (isValidObjectId(rawId)) {
+        // incoming value looks like an ObjectId; try lookup by primary id
+        employee = await db.employee.findUnique({ where: { id: rawId } });
+        // eslint-disable-next-line no-console
+        console.debug("/api/employee GET - looked up by ObjectId, found:", !!employee);
+      }
 
       if (!employee) {
-        return NextResponse.json(
-          { error: "Employee not found" },
-          { status: 404 }
-        );
+        // Try exact employeeId match (employeeId is unique in schema)
+        try {
+          employee = await db.employee.findUnique({ where: { employeeId: rawId } });
+        } catch (e) {
+          // ignore and continue to fallback
+        }
+
+        // If not found, try common case variations in case the stored value has
+        // different casing (EMP001 vs emp001). These are cheap checks.
+        if (!employee) {
+          try {
+            employee = await db.employee.findUnique({ where: { employeeId: rawId.toUpperCase() } });
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (!employee) {
+          try {
+            employee = await db.employee.findUnique({ where: { employeeId: rawId.toLowerCase() } });
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        // If the incoming id looks like an email, also try matching email/workEmail
+        if (!employee && rawId.includes("@")) {
+          try {
+            employee = await db.employee.findFirst({
+              where: {
+                OR: [{ email: rawId }, { workEmail: rawId }],
+              },
+            });
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        // Debug whether exact/cased/email fallbacks found a result
+        // eslint-disable-next-line no-console
+        console.debug("/api/employee GET - exact/case/email fallback found:", !!employee);
+      }
+
+      if (!employee) {
+        // Fallback: attempt a case-insensitive-ish search using findMany
+        // and regex-like contains. This is more permissive and helps when
+        // formatting differs (e.g., extra spaces or different casing).
+        const candidates = await db.employee.findMany({
+          where: {
+            employeeId: { contains: rawId },
+          },
+          take: 1,
+        });
+        if (candidates && candidates.length > 0) {
+          employee = candidates[0];
+        }
+      }
+
+      if (!employee) {
+        return NextResponse.json({ error: "Employee not found" }, { status: 404 });
       }
 
       return NextResponse.json(employee);
@@ -251,16 +332,38 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const employee = await db.employee.findUnique({
-      where: { id },
-    });
-
-    if (!employee) {
-      return NextResponse.json(
-        { error: "Employee not found" },
-        { status: 404 }
-      );
+    // Support deleting by ObjectId or by human-readable employeeId
+    const rawId = decodeURIComponent(id).trim();
+    let employee = null;
+    if (isValidObjectId(rawId)) {
+      employee = await db.employee.findUnique({ where: { id: rawId } });
     }
+    if (!employee) {
+      try {
+        employee = await db.employee.findUnique({ where: { employeeId: rawId } });
+      } catch (e) {
+        // continue
+      }
+    }
+
+  if (!employee) {
+  console.error("/api/employee GET - Employee not found:", {
+    searchedId: rawId,
+    wasObjectId: isValidObjectId(rawId),
+    requesterId: session.user.id
+  });
+  
+  return NextResponse.json(
+    { 
+      error: "Employee not found",
+      details: {
+        searchedId: rawId,
+        suggestion: "Verify the employee exists in the database. Check the employeeId format."
+      }
+    },
+    { status: 404 }
+  );
+}
 
     await db.notification.deleteMany({
       where: { OR: [{ sourceId: id }, { targetId: id }] },
